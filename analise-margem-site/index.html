@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Análise de Margem — Lumen Posto Club</title>
+<meta name="description" content="Descubra a margem de referência que a revenda de combustíveis pratica na sua região, com dados oficiais da ANP e cotações reais de distribuidoras. Mude sua margem fazendo gestão de pricing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1220;
+    --bg-card: #131c2e;
+    --bg-card-hover: #182240;
+    --border: #1f2c4a;
+    --text: #e6edf7;
+    --text-muted: #8b97b3;
+    --accent: #4f8aff;
+    --green: #2dd4bf;
+    --red: #f87171;
+    --yellow: #fbbf24;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+
+  /* Hero */
+  .hero {
+    padding: 72px 0 56px;
+    background: radial-gradient(1200px 500px at 50% -10%, rgba(79,138,255,0.18), transparent 65%);
+    text-align: center;
+  }
+  .badge-club {
+    display: inline-block; padding: 6px 14px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--bg-card);
+    color: var(--text-muted); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 22px;
+  }
+  h1 {
+    font-size: 42px; font-weight: 800; letter-spacing: -0.03em;
+    margin: 0 0 18px; line-height: 1.15;
+  }
+  h1 .destaque { color: var(--accent); }
+  .hero-sub {
+    color: var(--text-muted); font-size: 17px; max-width: 640px;
+    margin: 0 auto 30px;
+  }
+  .btn {
+    display: inline-block; padding: 14px 28px; border-radius: 10px;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 16px;
+    border: none; cursor: pointer; text-decoration: none; font-family: inherit;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-green { background: var(--green); color: #06281f; }
+
+  section { padding: 48px 0; }
+  h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; }
+  .section-sub { color: var(--text-muted); font-size: 15px; margin: 0 0 26px; }
+
+  /* Analise */
+  .selects { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  label { display: block; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  select, input[type=text], input[type=email], input[type=tel], input[type=number] {
+    width: 100%; padding: 13px 14px; font: inherit; font-size: 16px;
+    background: var(--bg-card); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px;
+    transition: border-color 0.15s;
+  }
+  select:focus, input:focus { outline: none; border-color: var(--accent); }
+
+  .resultado {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 26px; margin-top: 8px;
+  }
+  .margem-hero { text-align: center; padding: 8px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+  .margem-hero-label { color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .margem-hero-valor { font-size: 52px; font-weight: 800; letter-spacing: -0.03em; color: var(--green); line-height: 1.1; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+  .margem-hero-pct { color: var(--text-muted); font-size: 15px; }
+  .margem-detalhe { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .md-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .md-label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .md-valor { font-size: 20px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .md-range { color: var(--text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .fonte { color: var(--text-muted); font-size: 11px; margin-top: 16px; }
+  .ref-nacional-aviso { color: var(--yellow); font-size: 12px; margin-top: 10px; }
+
+  /* Pergunta */
+  .pergunta { text-align: center; margin-top: 40px; }
+  .pergunta h2 { font-size: 32px; }
+  .calc { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 560px; margin: 22px auto 0; text-align: left; }
+  .calc-resultado {
+    max-width: 560px; margin: 18px auto 0; padding: 20px 24px; border-radius: 12px;
+    background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.3);
+    font-size: 17px; display: none;
+  }
+  .calc-resultado.ok { background: rgba(45,212,191,0.08); border-color: rgba(45,212,191,0.3); }
+  .calc-resultado strong { font-size: 24px; }
+  .calc-resultado .num-red { color: var(--red); }
+  .calc-resultado .num-green { color: var(--green); }
+
+  /* CTA / Form */
+  .cta {
+    background: linear-gradient(160deg, #131c2e 0%, #0e1830 100%);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  }
+  .cta-inner { max-width: 620px; margin: 0 auto; text-align: center; }
+  .cta h2 { font-size: 34px; }
+  .cta-lista { list-style: none; padding: 0; margin: 24px 0 30px; text-align: left; display: inline-block; }
+  .cta-lista li { padding: 7px 0 7px 30px; position: relative; color: var(--text); font-size: 15px; }
+  .cta-lista li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+  form { text-align: left; max-width: 460px; margin: 0 auto; }
+  .form-campo { margin-bottom: 14px; }
+  .form-erro { color: var(--red); font-size: 13px; margin-top: 10px; display: none; }
+  .form-sucesso {
+    display: none; padding: 26px; border-radius: 12px; text-align: center;
+    background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.3);
+  }
+  .form-sucesso h3 { margin: 0 0 8px; font-size: 20px; color: var(--green); }
+  .form-sucesso p { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+  footer { padding: 40px 20px 56px; color: var(--text-muted); font-size: 12px; text-align: center; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 30px; }
+    .hero { padding: 52px 0 40px; }
+    .selects, .calc { grid-template-columns: 1fr; }
+    .margem-hero-valor { font-size: 42px; }
+    .cta h2, .pergunta h2 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="container">
+    <div class="badge-club">Lumen Posto Club</div>
+    <h1>Mude a sua margem fazendo <span class="destaque">gestão de pricing</span>.</h1>
+    <p class="hero-sub">A margem do seu posto não é sorte, nem bandeira, nem ponto. É gestão.
+    Veja agora a margem de referência que a revenda está praticando na sua região —
+    com dados oficiais da ANP e cotações reais de distribuidoras.</p>
+    <a class="btn" href="#analise">Ver a margem da minha região</a>
+  </div>
+</div>
+
+<section id="analise">
+  <div class="container">
+    <h2>Qual a margem de referência da sua região?</h2>
+    <p class="section-sub">Preço médio na bomba (ANP) menos o custo médio na distribuidora. Escolha o estado e o combustível.</p>
+
+    <div class="selects">
+      <div>
+        <label for="sel-uf">Estado</label>
+        <select id="sel-uf"></select>
+      </div>
+      <div>
+        <label for="sel-prod">Combustível</label>
+        <select id="sel-prod">
+          <option value="gasolina">Gasolina Comum</option>
+          <option value="etanol">Etanol</option>
+          <option value="s10">Diesel S10</option>
+          <option value="s500">Diesel S500</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="resultado" id="resultado">
+      <div class="margem-hero">
+        <div class="margem-hero-label" id="res-label">Margem de referência</div>
+        <div class="margem-hero-valor" id="res-margem">—</div>
+        <div class="margem-hero-pct" id="res-pct"></div>
+      </div>
+      <div class="margem-detalhe">
+        <div class="md-item">
+          <div class="md-label">Preço médio na bomba (ANP)</div>
+          <div class="md-valor" id="res-bomba">—</div>
+          <div class="md-range" id="res-range"></div>
+        </div>
+        <div class="md-item">
+          <div class="md-label">Custo médio distribuidora</div>
+          <div class="md-valor" id="res-dist">—</div>
+          <div class="md-range" id="res-dist-data"></div>
+        </div>
+        <div class="md-item">
+          <div class="md-label">Postos monitorados no estado</div>
+          <div class="md-valor" id="res-postos">—</div>
+          <div class="md-range">coletas ANP na última semana</div>
+        </div>
+      </div>
+      <div class="ref-nacional-aviso" id="res-aviso" style="display:none"></div>
+      <div class="fonte" id="res-fonte"></div>
+    </div>
+
+    <div class="pergunta">
+      <h2>Você tem essa margem?</h2>
+      <p class="section-sub">Compare com a sua realidade. Preencha e veja quanto está ficando na mesa todo mês.</p>
+      <div class="calc">
+        <div>
+          <label for="in-margem">Minha margem hoje (R$/litro)</label>
+          <input type="number" id="in-margem" step="0.01" min="0" max="5" placeholder="Ex.: 0,80" inputmode="decimal">
+        </div>
+        <div>
+          <label for="in-volume">Litros vendidos por mês</label>
+          <input type="number" id="in-volume" step="1000" min="0" placeholder="Ex.: 150000" inputmode="numeric">
+        </div>
+      </div>
+      <div class="calc-resultado" id="calc-resultado"></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="entrar">
+  <div class="container cta-inner">
+    <h2>Quer mudar esse jogo?</h2>
+    <p class="section-sub">Entre para o <strong>Lumen Posto Club</strong> e faça gestão de pricing de verdade:</p>
+    <ul class="cta-lista">
+      <li>Monitor diário de preços da concorrência e das distribuidoras</li>
+      <li>Margem de referência da sua região acompanhada semana a semana</li>
+      <li>Direção prática de pricing: quando subir, quando segurar, quando brigar</li>
+      <li>Comunidade fechada de revendedores que jogam o mesmo jogo</li>
+    </ul>
+    <form id="form-lead" novalidate>
+      <div class="form-campo">
+        <label for="f-nome">Nome</label>
+        <input type="text" id="f-nome" name="nome" autocomplete="name" required placeholder="Seu nome">
+      </div>
+      <div class="form-campo">
+        <label for="f-email">E-mail</label>
+        <input type="email" id="f-email" name="email" autocomplete="email" required placeholder="voce@seuposto.com.br">
+      </div>
+      <div class="form-campo">
+        <label for="f-wpp">WhatsApp</label>
+        <input type="tel" id="f-wpp" name="whatsapp" autocomplete="tel" required placeholder="(65) 99999-9999">
+      </div>
+      <button class="btn btn-green" type="submit" id="btn-enviar" style="width:100%">Quero entrar para o Lumen Posto Club</button>
+      <div class="form-erro" id="form-erro"></div>
+    </form>
+    <div class="form-sucesso" id="form-sucesso">
+      <h3>Recebemos seus dados ✓</h3>
+      <p>Em breve nosso time te chama no WhatsApp para apresentar o clube.<br>Enquanto isso, continue explorando a margem da sua região aqui em cima.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Fontes: ANP (Levantamento Semanal de Preços) e cotações de distribuidoras coletadas pelo Lumen Posto Club.<br>
+  Valores médios de referência regional — não constituem recomendação de preço. Cada posto define seu preço de forma independente.</p>
+  <p>Membros do clube acompanham tudo isso todos os dias no
+  <a href="https://monitor.lumenclubpainel.com.br" rel="noopener">Monitor Lumen</a>.</p>
+</footer>
+
+<script>
+// ============================================================
+// DADOS — tenta o data.json ao vivo do Monitor; se falhar (CORS/
+// offline), usa o snapshot embutido abaixo (gerado no deploy).
+// ============================================================
+const FALLBACK = {"atualizado_em":"01/08/2026, 12:23:51","semana_referencia":"2026-07-24","distribuicao_ultima_data":"2026-07-31","kpis":{"n_postos":3689,"n_cidades":319,"n_estados":14,"n_coletas":10934},"agregados_estado":{"BA":{"total_postos":244,"gasolina":{"n":238,"media":7.031,"min":6.38,"max":7.84},"etanol":{"n":212,"media":4.785,"min":4.05,"max":6.39},"s10":{"n":178,"media":7.554,"min":6.69,"max":8.99},"s500":{"n":142,"media":7.341,"min":5.99,"max":8.89}},"CE":{"total_postos":134,"gasolina":{"n":131,"media":6.926,"min":6.47,"max":7.51},"etanol":{"n":115,"media":5.209,"min":4.62,"max":6.19},"s10":{"n":123,"media":7.142,"min":6.15,"max":7.99},"s500":{"n":19,"media":7.127,"min":6.15,"max":7.99}},"DF":{"total_postos":50,"gasolina":{"n":50,"media":5.94,"min":5.59,"max":6.59},"etanol":{"n":25,"media":3.833,"min":3.48,"max":4.29},"s10":{"n":13,"media":6.927,"min":6.59,"max":7.19},"s500":{"n":12,"media":6.961,"min":6.54,"max":7.32}},"GO":{"total_postos":174,"gasolina":{"n":172,"media":6.641,"min":5.69,"max":7.09},"etanol":{"n":170,"media":4.146,"min":3.28,"max":4.59},"s10":{"n":140,"media":6.755,"min":6.29,"max":7.99},"s500":{"n":90,"media":6.276,"min":5.74,"max":7.95}},"MG":{"total_postos":504,"gasolina":{"n":499,"media":6.333,"min":5.78,"max":7.19},"etanol":{"n":478,"media":4.101,"min":3.36,"max":5.12},"s10":{"n":347,"media":6.857,"min":6.05,"max":7.99},"s500":{"n":235,"media":6.484,"min":5.72,"max":7.49}},"MS":{"total_postos":50,"gasolina":{"n":50,"media":6.579,"min":6.17,"max":7.29},"etanol":{"n":31,"media":4.037,"min":3.69,"max":4.97},"s10":{"n":23,"media":6.922,"min":6.45,"max":7.69},"s500":{"n":29,"media":6.546,"min":6.04,"max":7.58}},"MT":{"total_postos":86,"gasolina":{"n":85,"media":6.812,"min":6.23,"max":7.29},"etanol":{"n":83,"media":3.754,"min":3.19,"max":3.99},"s10":{"n":58,"media":6.986,"min":6.15,"max":7.98},"s500":{"n":52,"media":6.708,"min":5.77,"max":7.39}},"PA":{"total_postos":117,"gasolina":{"n":114,"media":6.766,"min":5.97,"max":7.7},"etanol":{"n":56,"media":5.004,"min":3.95,"max":5.82},"s10":{"n":86,"media":7.268,"min":6.43,"max":9.15},"s500":{"n":52,"media":7.181,"min":6.14,"max":8.75}},"PR":{"total_postos":276,"gasolina":{"n":266,"media":6.637,"min":5.87,"max":7.39},"etanol":{"n":266,"media":4.188,"min":3.34,"max":4.99},"s10":{"n":184,"media":6.892,"min":6.29,"max":7.99},"s500":{"n":133,"media":6.304,"min":5.49,"max":7.19}},"RJ":{"total_postos":325,"gasolina":{"n":324,"media":6.684,"min":5.99,"max":7.99},"etanol":{"n":284,"media":4.828,"min":4.09,"max":5.89},"s10":{"n":218,"media":7.134,"min":5.89,"max":8.19},"s500":{"n":116,"media":6.998,"min":5.89,"max":7.99}},"RO":{"total_postos":52,"gasolina":{"n":51,"media":7.37,"min":7.02,"max":7.89},"etanol":{"n":29,"media":5.396,"min":4.89,"max":5.99},"s10":{"n":49,"media":7.283,"min":6.49,"max":7.99},"s500":{"n":33,"media":7.181,"min":6.57,"max":7.88}},"RS":{"total_postos":292,"gasolina":{"n":292,"media":6.253,"min":5.39,"max":7.63},"etanol":{"n":142,"media":4.732,"min":3.79,"max":5.69},"s10":{"n":178,"media":6.621,"min":5.99,"max":7.79},"s500":{"n":154,"media":6.382,"min":5.58,"max":7.69}},"SC":{"total_postos":167,"gasolina":{"n":166,"media":6.52,"min":5.89,"max":7.09},"etanol":{"n":109,"media":4.616,"min":4.1,"max":6.36},"s10":{"n":116,"media":6.851,"min":6.18,"max":8.38},"s500":{"n":68,"media":6.586,"min":5.98,"max":7.47}},"SP":{"total_postos":1218,"gasolina":{"n":1209,"media":6.428,"min":5.49,"max":9.79},"etanol":{"n":1199,"media":3.763,"min":2.87,"max":6.19},"s10":{"n":825,"media":6.946,"min":5.97,"max":9.79},"s500":{"n":415,"media":6.561,"min":5.74,"max":8.69}}},"distribuicao_estado":{"BA":{"data_ref":"2026-07-31T00:00:00.000Z","gasolina":5.925,"etanol":4.095,"s10":6.69,"s500":5.945,"margem":{"gasolina":{"revenda":7.031,"distribuicao":5.925,"margem_rs":1.106,"margem_pct":18.67},"etanol":{"revenda":4.785,"distribuicao":4.095,"margem_rs":0.69,"margem_pct":16.85},"s10":{"revenda":7.554,"distribuicao":6.69,"margem_rs":0.864,"margem_pct":12.91},"s500":{"revenda":7.341,"distribuicao":5.945,"margem_rs":1.396,"margem_pct":23.48}}},"GO":{"data_ref":"2026-07-31T00:00:00.000Z","gasolina":5.538,"etanol":3.242,"s10":5.99,"s500":5.426,"margem":{"gasolina":{"revenda":6.641,"distribuicao":5.538,"margem_rs":1.103,"margem_pct":19.92},"etanol":{"revenda":4.146,"distribuicao":3.242,"margem_rs":0.904,"margem_pct":27.88},"s10":{"revenda":6.755,"distribuicao":5.99,"margem_rs":0.765,"margem_pct":12.77},"s500":{"revenda":6.276,"distribuicao":5.426,"margem_rs":0.85,"margem_pct":15.67}}},"MG":{"data_ref":"2026-07-31T00:00:00.000Z","gasolina":5.48,"etanol":3.59,"s10":5.87,"s500":5.397,"margem":{"gasolina":{"revenda":6.333,"distribuicao":5.48,"margem_rs":0.853,"margem_pct":15.57},"etanol":{"revenda":4.101,"distribuicao":3.59,"margem_rs":0.511,"margem_pct":14.23},"s10":{"revenda":6.857,"distribuicao":5.87,"margem_rs":0.987,"margem_pct":16.81},"s500":{"revenda":6.484,"distribuicao":5.397,"margem_rs":1.087,"margem_pct":20.14}}},"MT":{"data_ref":"2026-07-31T00:00:00.000Z","gasolina":5.563,"etanol":2.789,"s10":6.118,"s500":5.57,"margem":{"gasolina":{"revenda":6.812,"distribuicao":5.563,"margem_rs":1.249,"margem_pct":22.45},"etanol":{"revenda":3.754,"distribuicao":2.789,"margem_rs":0.965,"margem_pct":34.6},"s10":{"revenda":6.986,"distribuicao":6.118,"margem_rs":0.868,"margem_pct":14.19},"s500":{"revenda":6.708,"distribuicao":5.57,"margem_rs":1.138,"margem_pct":20.43}}},"PR":{"data_ref":"2026-07-31T00:00:00.000Z","gasolina":5.15,"etanol":4.88,"s10":5.965,"s500":5.225,"margem":{"gasolina":{"revenda":6.637,"distribuicao":5.15,"margem_rs":1.487,"margem_pct":28.87},"etanol":{"revenda":4.188,"distribuicao":4.88,"margem_rs":-0.692,"margem_pct":-14.18},"s10":{"revenda":6.892,"distribuicao":5.965,"margem_rs":0.927,"margem_pct":15.54},"s500":{"revenda":6.304,"distribuicao":5.225,"margem_rs":1.079,"margem_pct":20.65}}},"RO":{"data_ref":"2026-07-28T00:00:00.000Z","gasolina":6.385,"etanol":3.66,"s10":6.215,"s500":5.75,"margem":{"gasolina":{"revenda":7.37,"distribuicao":6.385,"margem_rs":0.985,"margem_pct":15.43},"etanol":{"revenda":5.396,"distribuicao":3.66,"margem_rs":1.736,"margem_pct":47.43},"s10":{"revenda":7.283,"distribuicao":6.215,"margem_rs":1.068,"margem_pct":17.18},"s500":{"revenda":7.181,"distribuicao":5.75,"margem_rs":1.431,"margem_pct":24.89}}},"SC":{"data_ref":"2026-07-31T00:00:00.000Z","gasolina":5.26,"etanol":3.3,"s10":5.99,"s500":5.19,"margem":{"gasolina":{"revenda":6.52,"distribuicao":5.26,"margem_rs":1.26,"margem_pct":23.95},"etanol":{"revenda":4.616,"distribuicao":3.3,"margem_rs":1.316,"margem_pct":39.88},"s10":{"revenda":6.851,"distribuicao":5.99,"margem_rs":0.861,"margem_pct":14.37},"s500":{"revenda":6.586,"distribuicao":5.19,"margem_rs":1.396,"margem_pct":26.9}}},"SP":{"data_ref":"2026-07-31T00:00:00.000Z","gasolina":5.355,"etanol":3.17,"s10":5.9,"s500":5.225,"margem":{"gasolina":{"revenda":6.428,"distribuicao":5.355,"margem_rs":1.073,"margem_pct":20.04},"etanol":{"revenda":3.763,"distribuicao":3.17,"margem_rs":0.593,"margem_pct":18.71},"s10":{"revenda":6.946,"distribuicao":5.9,"margem_rs":1.046,"margem_pct":17.73},"s500":{"revenda":6.561,"distribuicao":5.225,"margem_rs":1.336,"margem_pct":25.57}}}}};
+
+const DATA_URL = 'https://monitor.lumenclubpainel.com.br/data.json';
+const WEBHOOK_LEAD = 'https://n8n.srv1662375.hstgr.cloud/webhook/crm-lead-add';
+
+const UF_NOMES = {
+  AC:'Acre', AL:'Alagoas', AP:'Amapá', AM:'Amazonas', BA:'Bahia', CE:'Ceará',
+  DF:'Distrito Federal', ES:'Espírito Santo', GO:'Goiás', MA:'Maranhão',
+  MT:'Mato Grosso', MS:'Mato Grosso do Sul', MG:'Minas Gerais', PA:'Pará',
+  PB:'Paraíba', PR:'Paraná', PE:'Pernambuco', PI:'Piauí', RJ:'Rio de Janeiro',
+  RN:'Rio Grande do Norte', RS:'Rio Grande do Sul', RO:'Rondônia', RR:'Roraima',
+  SC:'Santa Catarina', SP:'São Paulo', SE:'Sergipe', TO:'Tocantins'
+};
+const PROD_NOMES = { gasolina:'Gasolina Comum', etanol:'Etanol', s10:'Diesel S10', s500:'Diesel S500' };
+
+let DATA = FALLBACK;
+
+const fmtRS = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+const fmtRS3 = v => 'R$ ' + v.toFixed(3).replace('.', ',');
+const fmtMil = v => v.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+
+// Mediana da margem entre os estados com cotação de distribuidora —
+// vira a referência nacional para UFs sem dado local.
+function margemNacional(prod) {
+  const vals = [];
+  for (const uf in (DATA.distribuicao_estado || {})) {
+    const m = DATA.distribuicao_estado[uf]?.margem?.[prod];
+    if (m && m.margem_rs > 0) vals.push(m);
+  }
+  if (!vals.length) return null;
+  vals.sort((a, b) => a.margem_rs - b.margem_rs);
+  return vals[Math.floor(vals.length / 2)];
+}
+
+function margemRegiao(uf, prod) {
+  const local = DATA.distribuicao_estado?.[uf]?.margem?.[prod];
+  if (local && local.margem_rs > 0) return { ...local, nacional: false };
+  const nac = margemNacional(prod);
+  return nac ? { ...nac, nacional: true } : null;
+}
+
+function render() {
+  const uf = document.getElementById('sel-uf').value;
+  const prod = document.getElementById('sel-prod').value;
+  const agg = DATA.agregados_estado?.[uf];
+  const aggProd = agg?.[prod];
+  const dist = DATA.distribuicao_estado?.[uf];
+  const m = margemRegiao(uf, prod);
+
+  document.getElementById('res-label').textContent =
+    'Margem de referência — ' + (UF_NOMES[uf] || uf) + ' · ' + PROD_NOMES[prod];
+
+  const elM = document.getElementById('res-margem');
+  const elPct = document.getElementById('res-pct');
+  const aviso = document.getElementById('res-aviso');
+  if (m) {
+    elM.textContent = fmtRS(m.margem_rs) + '/L';
+    elPct.textContent = m.margem_pct ? ('≈ ' + String(m.margem_pct).replace('.', ',') + '% sobre o preço de bomba') : '';
+    aviso.style.display = m.nacional ? 'block' : 'none';
+    aviso.textContent = m.nacional
+      ? 'Ainda não temos cotação de distribuidora neste estado — mostrando a margem de referência nacional (mediana dos estados monitorados).'
+      : '';
+  } else {
+    elM.textContent = '—';
+    elPct.textContent = 'Sem dados suficientes para este combustível.';
+    aviso.style.display = 'none';
+  }
+
+  document.getElementById('res-bomba').textContent = aggProd ? fmtRS3(aggProd.media) : '—';
+  document.getElementById('res-range').textContent =
+    aggProd ? ('de ' + fmtRS(aggProd.min) + ' a ' + fmtRS(aggProd.max)) : '';
+  const distPreco = (!m || m.nacional) ? null : dist?.[prod];
+  document.getElementById('res-dist').textContent = distPreco ? fmtRS3(distPreco) : '—';
+  document.getElementById('res-dist-data').textContent =
+    distPreco && dist?.data_ref ? ('cotação de ' + new Date(dist.data_ref).toLocaleDateString('pt-BR')) : '';
+  document.getElementById('res-postos').textContent = agg ? fmtMil(agg.total_postos) : '—';
+  document.getElementById('res-fonte').textContent =
+    'Fontes: ANP, semana de ' + (DATA.semana_referencia ? new Date(DATA.semana_referencia + 'T12:00:00').toLocaleDateString('pt-BR') : '—') +
+    ' · cotações de distribuidoras Lumen até ' + (DATA.distribuicao_ultima_data || '—') +
+    ' · atualizado em ' + (DATA.atualizado_em || '—');
+
+  calcular();
+}
+
+function calcular() {
+  const box = document.getElementById('calc-resultado');
+  const uf = document.getElementById('sel-uf').value;
+  const prod = document.getElementById('sel-prod').value;
+  const m = margemRegiao(uf, prod);
+  const minha = parseFloat(document.getElementById('in-margem').value);
+  const litros = parseFloat(document.getElementById('in-volume').value);
+
+  if (!m || isNaN(minha)) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+
+  const gap = m.margem_rs - minha;
+  const vol = (!isNaN(litros) && litros > 0) ? litros : null;
+
+  if (gap > 0.005) {
+    const mes = vol ? gap * vol : null;
+    box.className = 'calc-resultado';
+    box.innerHTML =
+      'Sua margem está <strong class="num-red">' + fmtRS(gap) + '/L abaixo</strong> da referência da região.' +
+      (mes ? '<br>Isso significa <strong class="num-red">R$ ' + fmtMil(Math.round(mes)) + ' por mês</strong> ficando na mesa.' :
+        '<br>Informe seus litros/mês para ver quanto isso representa em reais.');
+  } else {
+    box.className = 'calc-resultado ok';
+    box.innerHTML =
+      'Sua margem está <strong class="num-green">na referência da região ou acima</strong>. ' +
+      'Agora o jogo é sustentar isso com gestão de pricing — sem perder volume.';
+  }
+}
+
+function montarUFs() {
+  const sel = document.getElementById('sel-uf');
+  const ufs = Object.keys(DATA.agregados_estado || {}).sort();
+  sel.innerHTML = ufs.map(uf =>
+    '<option value="' + uf + '">' + (UF_NOMES[uf] || uf) + ' (' + uf + ')</option>').join('');
+  if (ufs.includes('MT')) sel.value = 'MT';
+}
+
+// ---------- Lead form → CRM (n8n → Notion → crm.lumenclubpainel.com.br) ----------
+document.getElementById('form-lead').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('f-nome').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const wpp = document.getElementById('f-wpp').value.replace(/\D/g, '');
+  const erro = document.getElementById('form-erro');
+  erro.style.display = 'none';
+
+  if (!nome) { erro.textContent = 'Informe seu nome.'; erro.style.display = 'block'; return; }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { erro.textContent = 'Informe um e-mail válido.'; erro.style.display = 'block'; return; }
+  if (wpp.length < 10) { erro.textContent = 'Informe um WhatsApp válido com DDD.'; erro.style.display = 'block'; return; }
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+
+  // POST simples (urlencoded, sem preflight). Resposta é opaca (no-cors),
+  // mas o webhook processa e o lead cai na lista do CRM.
+  const body = new URLSearchParams({
+    nome, email, whatsapp: wpp,
+    cargo: 'Site Análise de Margem',
+    origem: 'direct'
+  });
+  try {
+    await fetch(WEBHOOK_LEAD, { method: 'POST', mode: 'no-cors', body });
+    document.getElementById('form-lead').style.display = 'none';
+    document.getElementById('form-sucesso').style.display = 'block';
+    try { localStorage.setItem('lumen_lead_enviado', new Date().toISOString()); } catch (_) {}
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Quero entrar para o Lumen Posto Club';
+    erro.textContent = 'Não foi possível enviar agora. Tente de novo em instantes.';
+    erro.style.display = 'block';
+  }
+});
+
+// ---------- boot ----------
+montarUFs();
+render();
+document.getElementById('sel-uf').addEventListener('change', render);
+document.getElementById('sel-prod').addEventListener('change', render);
+document.getElementById('in-margem').addEventListener('input', calcular);
+document.getElementById('in-volume').addEventListener('input', calcular);
+
+// Dados ao vivo do Monitor (precisa do header CORS em /data.json — ver README)
+fetch(DATA_URL, { cache: 'no-store' })
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(json => {
+    if (json && json.agregados_estado) {
+      const ufAtual = document.getElementById('sel-uf').value;
+      DATA = json;
+      montarUFs();
+      const sel = document.getElementById('sel-uf');
+      if ([...sel.options].some(o => o.value === ufAtual)) sel.value = ufAtual;
+      render();
+    }
+  })
+  .catch(() => { /* mantém o snapshot embutido */ });
+</script>
+</body>
+</html>
