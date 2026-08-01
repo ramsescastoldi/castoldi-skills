@@ -27,17 +27,27 @@ Campos enviados ao webhook: `nome`, `email`, `whatsapp` (só dígitos, o workflo
 prefixa 55), `cargo = "Site Análise de Margem"` (serve de tag de origem no CRM)
 e `origem = "direct"`.
 
+## Status do deploy
+
+✅ **NO AR** em https://analise-margem-lumen.netlify.app (Netlify, projeto
+`analise-margem-lumen`, time Lumen — o mesmo de calculadora.lumenpostoclub.com.br).
+
+**Pra atualizar o site:** edite o `index.html` aqui, mergeie na `main`, e
+publique o arquivo novo no projeto Netlify (drag-and-drop do `index.html` na aba
+Deploys, ou peça no Cowork "republica o site de análise de margem").
+
+Obs.: existe um projeto vazio `analise-margem-lumen-apagar` no Netlify (sobra da
+criação) — pode deletar na UI.
+
 ## O que precisa ser configurado (uma vez)
 
-1. **Publicar o site** — criar projeto no Cloudflare Pages (mesmo padrão do CRM)
-   e apontar o DNS de `analise.lumenclubpainel.com.br` pra ele:
-
-   ```bash
-   CLOUDFLARE_API_TOKEN=<token-cf-pages> CLOUDFLARE_ACCOUNT_ID=79e04a87e429f8c73f3d2384fa96f2aa \
-     npx wrangler@4 pages deploy analise-margem-site --project-name=analise-margem --branch=main
-   ```
-
-   (Netlify drag-and-drop também funciona — a pasta é 100% estática.)
+1. **Domínio próprio** — duas opções:
+   - `analise.lumenpostoclub.com.br` (recomendado — esse domínio já roda no
+     Netlify, ex.: calculadora): Netlify → projeto `analise-margem-lumen` →
+     Domain settings → Add domain alias.
+   - `analise.lumenclubpainel.com.br`: além do Add domain no Netlify, criar no
+     Cloudflare o CNAME `analise` → `analise-margem-lumen.netlify.app`
+     (modo "DNS only").
 
 2. **CORS do Monitor** — pro site puxar os dados AO VIVO, o
    `monitor.lumenclubpainel.com.br/data.json` precisa responder com
