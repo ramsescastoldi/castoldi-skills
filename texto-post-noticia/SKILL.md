@@ -69,6 +69,25 @@ Byline dividido (estilo g1 — só o nome sai colorido):
 
 Assinatura discreta do perfil no rodapé do card: `--assinatura`
 
+### Direto do link (caminho preferido — exige rede livre)
+
+`render_do_link.py` lê a página, extrai `og:image`, manchete, linha-fina,
+autor e data, baixa a foto e renderiza. É o que o fluxo automático deve chamar.
+
+```bash
+python3 scripts/render_do_link.py \
+  --link "https://veiculo.com.br/materia" \
+  --estilo metropoles --saida ~/renders/post.png --telegram
+```
+
+- Autor sai do JSON-LD (`author.name`) ou das metatags; sem assinatura
+  confirmada, cai em `Redação`. Nunca inventa nome.
+- `--telegram` envia no `@ramsesninjabot`, lendo o token de `~/lumen-ninja/.env`.
+- Página sem `og:image` aborta com aviso — nesse caso passe a foto na mão pelo
+  `gerar_noticia.py`.
+- `--manchete` existe só para consertar extração torta, **nunca** para
+  editorializar (ver REGRA ZERO).
+
 **QC obrigatório:** abrir o PNG (Read) antes de entregar — nada cortado,
 quebrado ou encostando.
 
