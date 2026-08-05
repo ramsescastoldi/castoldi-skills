@@ -69,7 +69,31 @@ Byline dividido (estilo g1 — só o nome sai colorido):
 
 Assinatura discreta do perfil no rodapé do card: `--assinatura`
 
-### Direto do link (caminho preferido — exige rede livre)
+### No Mac, em um comando (caminho de uso diário)
+
+`rodar.sh` lê a fila do dia do fluxo ninja (`~/lumen-ninja/fila/AAAA-MM-DD.json`),
+renderiza cada notícia com a foto da própria matéria e salva em
+`~/lumen-ninja/renders/AAAA-MM-DD/`. Frases (`"tipo":"frase"`) são ignoradas —
+elas têm modelo próprio.
+
+```bash
+cd ~/castoldi-skills/texto-post-noticia
+
+bash rodar.sh                          # todas as notícias da fila de hoje
+bash rodar.sh 1 3 5                    # só as que ele aprovou
+bash rodar.sh https://... https://...  # links avulsos, sem fila
+
+TELEGRAM=1 bash rodar.sh 1 3           # e manda no @ramsesninjabot
+ESTILO=g1 ASSINATURA=1 bash rodar.sh   # troca estilo e assina o card
+DIA=2026-08-04 bash rodar.sh           # fila de outro dia
+```
+
+Confere o Pillow antes de começar, segue em frente quando um veículo falha e
+abre a pasta no final. Veículo que renderiza por JavaScript ou não expõe
+`og:image` falha com aviso — nesse caso, baixe a foto e use o
+`gerar_noticia.py` direto.
+
+### Direto do link (uma notícia só — exige rede livre)
 
 `render_do_link.py` lê a página, extrai `og:image`, manchete, linha-fina,
 autor e data, baixa a foto e renderiza. É o que o fluxo automático deve chamar.
