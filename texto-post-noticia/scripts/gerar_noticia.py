@@ -34,6 +34,21 @@ CINZA_TEXTO = (92, 92, 92)
 CINZA_DATA = (110, 110, 110)
 BRANCO = (255, 255, 255)
 
+# Geometria comum. Cada estilo sobrescreve o que difere.
+# As margens saem da medição das referências: o card ocupa 58% a 75% da
+# largura e deixa a foto respirar — não chega perto das bordas.
+PADRAO = {
+    "margem_lat": 146,   # ~73% de largura de card
+    "margem_base": 78,
+    "raio": 22,
+    "pad": 34,
+    "corpo_kicker": 22,
+    "corpo_linha": 24,
+    "corpo_autor": 22,
+    "corpo_data": 21,
+    "corpo_veiculo": 26,
+}
+
 # Cada estilo replica a diagramação de um veículo das referências.
 ESTILOS = {
     "metropoles": {
@@ -47,8 +62,8 @@ ESTILOS = {
         "kicker_caps": False,
         "kicker_track": 0,
         "barra": False,
-        "manchete_max": 46,
-        "manchete_min": 32,
+        "manchete_max": 40,
+        "manchete_min": 28,
         "leading": 1.18,
     },
     "g1": {
@@ -62,8 +77,9 @@ ESTILOS = {
         "kicker_caps": False,
         "kicker_track": 0,
         "barra": False,
-        "manchete_max": 52,
-        "manchete_min": 34,
+        "manchete_max": 42,
+        "manchete_min": 30,
+        "margem_lat": 152,
         "leading": 1.20,
     },
     "veja": {
@@ -77,8 +93,9 @@ ESTILOS = {
         "kicker_caps": True,
         "kicker_track": 4,
         "barra": False,
-        "manchete_max": 48,
-        "manchete_min": 32,
+        "manchete_max": 40,
+        "manchete_min": 28,
+        "margem_lat": 136,
         "leading": 1.18,
     },
     "expresso": {
@@ -93,8 +110,10 @@ ESTILOS = {
         "kicker_caps": True,
         "kicker_track": 2,
         "barra": True,
-        "manchete_max": 48,
-        "manchete_min": 32,
+        "manchete_max": 40,
+        "manchete_min": 28,
+        "margem_lat": 150,
+        "raio": 20,
         "leading": 1.16,
     },
 }
@@ -164,9 +183,8 @@ def ajustar_manchete(draw, texto, cfg, max_w, max_linhas):
 
 
 def gerar(foto_path, manchete, linha_fina, kicker, autor, data, veiculo,
-          estilo, assinatura, saida, prefixo="", sufixo="",
-          margem_lat=58, margem_base=66, raio=26):
-    cfg = ESTILOS[estilo]
+          estilo, assinatura, saida, prefixo="", sufixo="", margem_lat=None):
+    cfg = dict(PADRAO, **ESTILOS[estilo])
     acento = cfg["acento"]
     centro = cfg["alinhamento"] == "center"
 
@@ -175,9 +193,11 @@ def gerar(foto_path, manchete, linha_fina, kicker, autor, data, veiculo,
     d = ImageDraw.Draw(base)
 
     # ---- Geometria do card ----
-    card_x0 = margem_lat * S
-    card_x1 = W - margem_lat * S
-    pad = 40 * S
+    lat = margem_lat if margem_lat is not None else cfg["margem_lat"]
+    margem_base, raio = cfg["margem_base"], cfg["raio"]
+    card_x0 = lat * S
+    card_x1 = W - lat * S
+    pad = cfg["pad"] * S
     barra_w = 7 * S
     barra_gap = 20 * S
     recuo = (barra_w + barra_gap) if cfg["barra"] else 0
@@ -185,11 +205,11 @@ def gerar(foto_path, manchete, linha_fina, kicker, autor, data, veiculo,
     texto_w = (card_x1 - pad) - texto_x
 
     # ---- Fontes ----
-    f_kicker = fonte(*cfg["fonte_kicker"], 25 * S)
-    f_linha = fonte(*cfg["fonte_linha"], 27 * S)
-    f_autor = fonte(*cfg["fonte_autor"], 25 * S)
-    f_data = fonte(*cfg["fonte_data"], 24 * S)
-    f_veic = fonte("Inter.ttf", "Black", 30 * S)
+    f_kicker = fonte(*cfg["fonte_kicker"], cfg["corpo_kicker"] * S)
+    f_linha = fonte(*cfg["fonte_linha"], cfg["corpo_linha"] * S)
+    f_autor = fonte(*cfg["fonte_autor"], cfg["corpo_autor"] * S)
+    f_data = fonte(*cfg["fonte_data"], cfg["corpo_data"] * S)
+    f_veic = fonte("Inter.ttf", "Black", cfg["corpo_veiculo"] * S)
 
     max_linhas = 3 if linha_fina else 4
     f_head, linhas_head = ajustar_manchete(d, manchete, cfg, texto_w, max_linhas)
@@ -200,12 +220,12 @@ def gerar(foto_path, manchete, linha_fina, kicker, autor, data, veiculo,
     # ---- Altura do card, a partir do conteúdo ----
     alt = pad
     if kicker:
-        alt += int(f_kicker.size * 1.05) + 16 * S
+        alt += int(f_kicker.size * 1.05) + 13 * S
     alt += len(linhas_head) * lh_head
     if linhas_linha:
-        alt += 26 * S + len(linhas_linha) * lh_linha
+        alt += 20 * S + len(linhas_linha) * lh_linha
     if autor or data or veiculo:
-        alt += 26 * S
+        alt += 22 * S
         if autor:
             alt += int(f_autor.size * 1.30)
         if data:
@@ -251,7 +271,7 @@ def gerar(foto_path, manchete, linha_fina, kicker, autor, data, veiculo,
         else:
             kx = texto_x
         desenhar_track(d, (kx, y), k, f_kicker, acento, tr)
-        y += int(f_kicker.size * 1.05) + 16 * S
+        y += int(f_kicker.size * 1.05) + 13 * S
 
     # Barra vertical de acento (estilo Expresso), ao lado da manchete
     if cfg["barra"]:
@@ -265,12 +285,12 @@ def gerar(foto_path, manchete, linha_fina, kicker, autor, data, veiculo,
 
     # Linha-fina
     if linhas_linha:
-        y += 26 * S
+        y += 20 * S
         escrever(linhas_linha, f_linha, CINZA_TEXTO, lh_linha)
 
     # Assinatura, data e veículo
     if autor or data or veiculo:
-        y += 26 * S
+        y += 22 * S
         topo_rodape = y
         if autor:
             # Só o nome vai no acento; "Por" e o veículo ficam em cinza.
@@ -319,6 +339,8 @@ def main():
     p.add_argument("--data", default="", help="Data/hora como saiu no veículo.")
     p.add_argument("--veiculo", default="", help="Nome do veículo (canto direito do rodapé).")
     p.add_argument("--estilo", default="metropoles", choices=sorted(ESTILOS))
+    p.add_argument("--margem", type=int, default=None,
+                   help="Margem lateral do card em px. Menor = card mais largo.")
     p.add_argument("--assinatura", action="store_true",
                    help="Acrescenta '@eusouramses' discreto no rodapé do card.")
     p.add_argument("--saida", required=True)
@@ -328,7 +350,7 @@ def main():
     os.makedirs(destino, exist_ok=True)
     gerar(a.foto, a.manchete, a.linha_fina, a.kicker, a.autor, a.data,
           a.veiculo, a.estilo, a.assinatura, a.saida,
-          prefixo=a.autor_prefixo, sufixo=a.autor_sufixo)
+          prefixo=a.autor_prefixo, sufixo=a.autor_sufixo, margem_lat=a.margem)
     print("gerado:", a.saida)
 
 
