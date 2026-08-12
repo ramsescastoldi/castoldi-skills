@@ -1,0 +1,55 @@
+name: Deploy suamotonoboleto para Netlify
+
+on:
+  workflow_dispatch:
+    inputs:
+      proxy_path:
+        description: "URL efêmera de deploy do Netlify MCP (proxy-path)"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: locagora-suamotonoboleto
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Mascarar URL de deploy nos logs
+        run: echo "::add-mask::${{ inputs.proxy_path }}"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Deploy para o Netlify
+        env:
+          PROXY_PATH: ${{ inputs.proxy_path }}
+        run: |
+          npx -y @netlify/mcp@latest \
+            --site-id 59469ddf-51bf-4d3c-a493-b515a114484b \
+            --proxy-path "$PROXY_PATH"
+
+      - name: Smoke test em produção
+        run: |
+          B=https://suamotonoboleto.netlify.app
+          fails=0
+          chk() { if [ "$1" = "$2" ]; then echo "OK: $3"; else echo "FALHOU: $3 (esperado $2, obtido $1)"; fails=$((fails+1)); fi; }
+
+          chk "$(curl -s -o /dev/null -w '%{http_code}' $B/)" 200 "landing responde 200"
+          curl -s $B/ | grep -q "SUA MOTO" && echo "OK: headline presente" || { echo "FALHOU: headline"; fails=$((fails+1)); }
+          chk "$(curl -s $B/api/vagas | grep -c '"ok":true')" 1 "api/vagas responde"
+          chk "$(curl -s -o /dev/null -w '%{http_code}' -X POST $B/api/lead -H 'content-type: application/json' -d '{"nome":"X","fone":"123"}')" 400 "lead inválido rejeitado"
+          chk "$(curl -s -o /dev/null -w '%{http_code}' "$B/api/admin?k=chave-errada")" 401 "admin protegido"
+          chk "$(curl -s -o /dev/null -w '%{http_code}' -X POST $B/api/validar -H 'content-type: application/json' -d '{"code":"MOTO-XXXX","pin":"0000"}')" 401 "validação exige PIN"
+          chk "$(curl -s -o /dev/null -w '%{http_code}' $B/qr.html)" 200 "página do QR"
+          chk "$(curl -s -o /dev/null -w '%{http_code}' $B/validar.html)" 200 "página da equipe"
+          chk "$(curl -s -o /dev/null -w '%{http_code}' $B/vale.html)" 200 "página do posto"
+          chk "$(curl -s -o /dev/null -w '%{http_code}' $B/admin.html)" 200 "painel admin"
+
+          [ $fails -eq 0 ] && echo "TODOS OS SMOKE TESTS PASSARAM" || { echo "$fails smoke tests falharam"; exit 1; }
