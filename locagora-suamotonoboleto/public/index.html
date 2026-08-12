@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SUA MOTO NO BOLETO — Locagora Cuiabá</title>
+<meta name="description" content="Motoboy: sua moto nova no boleto, até negativado. Os 40 primeiros entregadores na inauguração da LOCAGORA Cuiabá (22/06) ganham café da manhã grátis + vale-combustível de R$50.">
+<meta property="og:title" content="🏍️ SUA MOTO NO BOLETO — até NEGATIVADO">
+<meta property="og:description" content="LOCAGORA Cuiabá inaugura 22/06. Os 40 primeiros motoboys ganham CAFÉ DA MANHÃ GRÁTIS + VALE R$50 DE COMBUSTÍVEL. Garanta seu QR Code!">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --preto:#0a0a0d; --carbono:#141419; --laranja:#ff5a00; --amarelo:#ffcc00;
+    --branco:#f5f5f5; --cinza:#9a9aa5; --verde:#22c55e; --vermelho:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--preto);color:var(--branco);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:480px;margin:0 auto;padding:0 18px}
+  h1,h2,.display{font-family:'Anton',Impact,sans-serif;text-transform:uppercase;letter-spacing:.5px;line-height:1.05}
+  .laranja{color:var(--laranja)} .amarelo{color:var(--amarelo)}
+
+  .topbar{background:var(--laranja);color:#000;text-align:center;font-weight:800;font-size:13px;padding:8px 10px;letter-spacing:1px;text-transform:uppercase}
+
+  .hero{padding:34px 0 26px;background:
+    radial-gradient(ellipse 120% 60% at 50% -10%, rgba(255,90,0,.28), transparent 60%),
+    var(--preto)}
+  .badge{display:inline-block;background:var(--carbono);border:1px solid var(--laranja);color:var(--amarelo);
+    font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+  .hero h1{font-size:44px;margin-bottom:14px}
+  .hero p.sub{font-size:17px;font-weight:600;color:var(--branco);line-height:1.45}
+  .hero p.sub b{color:var(--amarelo)}
+
+  .vagas{display:flex;align-items:center;gap:10px;background:var(--carbono);border:1px dashed var(--laranja);
+    border-radius:12px;padding:12px 14px;margin:18px 0 6px;font-weight:800;font-size:15px}
+  .vagas .num{font-family:'Anton';font-size:30px;color:var(--vermelho);min-width:54px;text-align:center}
+  .pulse{animation:pulse 1.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+  .form-card{background:var(--carbono);border:2px solid var(--laranja);border-radius:18px;padding:22px 18px;margin-top:18px;
+    box-shadow:0 0 40px rgba(255,90,0,.25)}
+  .form-card h2{font-size:22px;text-align:center;margin-bottom:4px}
+  .form-card p.mini{text-align:center;font-size:13px;color:var(--cinza);margin-bottom:16px}
+  label{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin:12px 0 6px}
+  input{width:100%;background:#0e0e13;border:1.5px solid #2c2c35;border-radius:12px;color:var(--branco);
+    font-size:18px;font-weight:600;padding:15px 14px;outline:none}
+  input:focus{border-color:var(--laranja)}
+  .btn{display:block;width:100%;background:linear-gradient(180deg,var(--laranja),#e04b00);color:#000;border:none;border-radius:14px;
+    font-family:'Anton';font-size:22px;text-transform:uppercase;letter-spacing:1px;padding:18px 10px;margin-top:18px;cursor:pointer;
+    box-shadow:0 6px 0 #903000, 0 8px 24px rgba(255,90,0,.45)}
+  .btn:active{transform:translateY(2px)}
+  .erro{display:none;background:rgba(239,68,68,.12);border:1px solid var(--vermelho);color:#fca5a5;
+    border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;margin-top:12px}
+  .seguro{text-align:center;font-size:12px;color:var(--cinza);margin-top:12px}
+
+  section{padding:34px 0}
+  .dark2{background:var(--carbono)}
+  .punch{font-size:20px;font-weight:800;line-height:1.5;margin-bottom:14px}
+  .punch .x{color:var(--vermelho);text-decoration:line-through}
+  .beneficios{list-style:none;margin-top:8px}
+  .beneficios li{display:flex;gap:10px;align-items:flex-start;font-size:16px;font-weight:600;padding:10px 0;border-bottom:1px solid #22222b}
+  .beneficios li:last-child{border:none}
+  .beneficios .ic{font-size:20px;line-height:1.3}
+
+  .passos{counter-reset:p;list-style:none}
+  .passos li{position:relative;padding:14px 0 14px 58px;font-size:16px;font-weight:600;line-height:1.4}
+  .passos li::before{counter-increment:p;content:counter(p);position:absolute;left:0;top:10px;width:42px;height:42px;
+    background:var(--laranja);color:#000;font-family:'Anton';font-size:22px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+  .passos b{color:var(--amarelo)}
+
+  .oferta-box{background:linear-gradient(160deg,#1a1206,#141419);border:2px solid var(--amarelo);border-radius:18px;padding:22px;text-align:center}
+  .oferta-box .display{font-size:30px;color:var(--amarelo)}
+  .oferta-box p{font-size:15px;font-weight:600;margin-top:10px;color:var(--branco)}
+  .risco{font-family:'Anton';color:var(--vermelho);font-size:20px;margin-top:14px;text-transform:uppercase}
+
+  .mapa iframe{width:100%;height:260px;border:0;border-radius:14px;filter:grayscale(.2) contrast(1.05)}
+  .end{font-size:15px;font-weight:600;margin:14px 0;line-height:1.5}
+  .btn-rota{display:block;text-align:center;background:transparent;border:2px solid var(--laranja);color:var(--laranja);
+    border-radius:12px;font-family:'Anton';font-size:18px;text-transform:uppercase;padding:14px;text-decoration:none;letter-spacing:1px}
+
+  .cd{display:flex;gap:8px;justify-content:center;margin:16px 0}
+  .cd div{background:#0e0e13;border:1px solid #2c2c35;border-radius:10px;padding:10px 0;width:70px;text-align:center}
+  .cd .n{font-family:'Anton';font-size:26px;color:var(--amarelo);display:block}
+  .cd .l{font-size:10px;text-transform:uppercase;color:var(--cinza);letter-spacing:1px}
+
+  footer{padding:28px 18px 90px;text-align:center;font-size:11px;color:#5b5b66;line-height:1.6}
+  .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(10,10,13,.92);backdrop-filter:blur(6px);
+    border-top:1px solid #2c2c35;z-index:50}
+  .sticky-cta a{display:block;text-align:center;background:var(--laranja);color:#000;font-family:'Anton';font-size:18px;
+    text-transform:uppercase;letter-spacing:1px;border-radius:12px;padding:14px;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">🏍️ Inauguração LOCAGORA Cuiabá • 22/06 • Só os 40 primeiros</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="badge">⚡ Atenção motoboy / entregador de Cuiabá</span>
+    <h1>SUA MOTO <span class="laranja">NO BOLETO</span>.<br>ATÉ <span class="amarelo">NEGATIVADO</span>.<br>SEM ENROLAÇÃO.</h1>
+    <p class="sub">Dia <b>22/06</b> a <b>LOCAGORA</b> abre as portas em Cuiabá — motos novas e seminovas pro seu corre. E os <b>40 PRIMEIROS entregadores</b> que chegarem levam:</p>
+
+    <div class="oferta-box" style="margin-top:16px">
+      <div class="display">☕ CAFÉ DA MANHÃ GRÁTIS<br>+ ⛽ VALE R$50 DE COMBUSTÍVEL</div>
+      <p>É só se cadastrar, receber seu <b>QR Code</b> e validar na porta da loja no dia da inauguração.</p>
+    </div>
+
+    <div class="vagas"><span class="num pulse" id="vagas-num">40</span> <span>vagas restantes de 40.<br>Cadastrou, garantiu a fila.</span></div>
+
+    <div class="form-card" id="form">
+      <h2>Garanta seu <span class="laranja">QR Code</span> agora</h2>
+      <p class="mini">Leva 15 segundos. Grátis.</p>
+      <form id="lead-form" novalidate>
+        <label for="nome">Seu nome</label>
+        <input id="nome" name="nome" type="text" placeholder="Nome completo" autocomplete="name" required>
+        <label for="fone">Seu WhatsApp</label>
+        <input id="fone" name="fone" type="tel" placeholder="(65) 99999-9999" autocomplete="tel" inputmode="numeric" required>
+        <div class="erro" id="erro"></div>
+        <button class="btn" type="submit" id="btn-enviar">🔥 Quero minha vaga entre os 40</button>
+      </form>
+      <p class="seguro">🔒 Seus dados estão seguros. Sem spam, sem pegadinha.</p>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="punch">Tá pagando <span class="x">diária de moto alugada</span> e no fim do mês não sobra nada?</p>
+    <p class="punch">Nome sujo te travou no banco? <span class="laranja">Aqui a conversa é outra.</span></p>
+    <ul class="beneficios">
+      <li><span class="ic">✅</span> <span><b>Negativado compra.</b> Análise na hora, de boa, sem julgamento.</span></li>
+      <li><span class="ic">✅</span> <span><b>Boleto que cabe no corre.</b> Parcela pensada pra quem vive de entrega.</span></li>
+      <li><span class="ic">✅</span> <span><b>Motos novas e seminovas</b> prontas pra rodar de iFood, 99 e Lalamove no mesmo dia.</span></li>
+      <li><span class="ic">✅</span> <span><b>Sai da diária.</b> Cada boleto pago é um pedaço da moto que é SUA.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="dark2">
+  <div class="wrap">
+    <h2 style="font-size:28px;margin-bottom:18px">Como funciona <span class="laranja">(simples assim)</span></h2>
+    <ol class="passos">
+      <li><b>Cadastra</b> teu nome e WhatsApp aqui na página.</li>
+      <li>Recebe teu <b>QR Code exclusivo</b> na tela, na hora.</li>
+      <li>Dia <b>22/06</b>, chega cedo na LOCAGORA (Av. Ten. Cel. Duarte, 1410 — Centro Sul).</li>
+      <li>Validou o QR entre os <b>40 primeiros</b>: <b>café da manhã grátis + vale R$50 de combustível</b> pra usar no posto parceiro.</li>
+    </ol>
+    <p class="risco">⚠️ Chegou depois dos 40? Perdeu. Sem choro.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="text-align:center">
+    <h2 style="font-size:28px">Faltam</h2>
+    <div class="cd" id="cd">
+      <div><span class="n" id="cd-d">--</span><span class="l">dias</span></div>
+      <div><span class="n" id="cd-h">--</span><span class="l">horas</span></div>
+      <div><span class="n" id="cd-m">--</span><span class="l">min</span></div>
+      <div><span class="n" id="cd-s">--</span><span class="l">seg</span></div>
+    </div>
+    <p style="font-weight:800;font-size:16px">para a inauguração — <span class="amarelo">22/06, a partir das 7h</span></p>
+  </div>
+</section>
+
+<section class="dark2 mapa">
+  <div class="wrap">
+    <h2 style="font-size:28px;margin-bottom:14px">Onde? <span class="laranja">Cola aqui</span> 📍</h2>
+    <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+      src="https://maps.google.com/maps?q=Av.%20Tenente%20Coronel%20Duarte%2C%201410%20-%20Centro%20Sul%2C%20Cuiab%C3%A1%20-%20MT&z=17&output=embed"></iframe>
+    <p class="end">🏁 <b>LOCAGORA Cuiabá</b><br>Av. Tenente Coronel Duarte, 1410 — Centro Sul, Cuiabá-MT</p>
+    <a class="btn-rota" target="_blank" rel="noopener"
+      href="https://www.google.com/maps/dir/?api=1&destination=Av.+Tenente+Coronel+Duarte,+1410+-+Centro+Sul,+Cuiab%C3%A1+-+MT">🧭 Traçar rota no Maps</a>
+  </div>
+</section>
+
+<footer>
+  LOCAGORA Cuiabá — revenda de motos novas e seminovas.<br>
+  Promoção "Café dos 40" válida somente em 22/06/2026, na inauguração da unidade, para os 40 primeiros cadastrados que validarem o QR Code na loja. Vale-combustível de R$50 pessoal e intransferível, validado uma única vez no posto parceiro. Venda de motocicletas sujeita a análise de crédito.
+</footer>
+
+<div class="sticky-cta" id="sticky"><a href="#form">🔥 Garantir minha vaga agora</a></div>
+
+<script>
+  // máscara de telefone
+  const fone = document.getElementById('fone');
+  fone.addEventListener('input', () => {
+    let d = fone.value.replace(/\D/g, '').slice(0, 11);
+    let out = '';
+    if (d.length > 0) out = '(' + d.slice(0, 2);
+    if (d.length >= 3) out += ') ' + d.slice(2, 7);
+    if (d.length >= 8) out += '-' + d.slice(7);
+    fone.value = out;
+  });
+
+  // envio do formulário
+  const form = document.getElementById('lead-form');
+  const erro = document.getElementById('erro');
+  const btn = document.getElementById('btn-enviar');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    erro.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'GARANTINDO SUA VAGA...';
+    try {
+      const r = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ nome: document.getElementById('nome').value, fone: fone.value })
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.erro || 'Erro. Tente de novo.');
+      localStorage.setItem('smb_code', j.code);
+      location.href = '/qr.html?c=' + encodeURIComponent(j.code) + (j.jaCadastrado ? '&ja=1' : '');
+    } catch (err) {
+      erro.textContent = err.message;
+      erro.style.display = 'block';
+      btn.disabled = false; btn.textContent = '🔥 Quero minha vaga entre os 40';
+    }
+  });
+
+  // se já tem cadastro salvo, leva direto pro QR
+  const salvo = localStorage.getItem('smb_code');
+  if (salvo) {
+    const s = document.getElementById('sticky');
+    s.innerHTML = '<a href="/qr.html?c=' + encodeURIComponent(salvo) + '">📲 Ver meu QR Code (já tô dentro)</a>';
+  }
+
+  // vagas restantes
+  fetch('/api/vagas').then(r => r.json()).then(j => {
+    if (j.ok) document.getElementById('vagas-num').textContent = j.restantes;
+  }).catch(() => {});
+
+  // countdown 22/06/2026 07:00 Cuiabá (UTC-4)
+  const alvo = new Date('2026-06-22T07:00:00-04:00').getTime();
+  setInterval(() => {
+    let ms = Math.max(0, alvo - Date.now());
+    const d = Math.floor(ms / 864e5); ms -= d * 864e5;
+    const h = Math.floor(ms / 36e5); ms -= h * 36e5;
+    const m = Math.floor(ms / 6e4); ms -= m * 6e4;
+    const sg = Math.floor(ms / 1e3);
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = String(h).padStart(2, '0');
+    document.getElementById('cd-m').textContent = String(m).padStart(2, '0');
+    document.getElementById('cd-s').textContent = String(sg).padStart(2, '0');
+  }, 1000);
+</script>
+</body>
+</html>

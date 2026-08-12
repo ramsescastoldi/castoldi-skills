@@ -1,0 +1,283 @@
+import type { Context, Config } from "@netlify/functions";
+import { getStore } from "@netlify/blobs";
+
+const LIMITE_VAGAS = 40;
+const VALOR_VOUCHER = 50;
+
+const STAFF_PIN = Netlify.env.get("STAFF_PIN") || "2206";
+const POSTO_PIN = Netlify.env.get("POSTO_PIN") || "5050";
+const ADMIN_KEY = Netlify.env.get("ADMIN_KEY") || "locagora-admin";
+
+const store = () => getStore({ name: "locagora", consistency: "strong" });
+
+const json = (data: unknown, status = 200) =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: { "content-type": "application/json; charset=utf-8" },
+  });
+
+const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function gerarCodigo(prefixo: string, len: number): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(len));
+  let s = "";
+  for (const b of bytes) s += CODE_CHARS[b % CODE_CHARS.length];
+  return `${prefixo}-${s}`;
+}
+
+function normalizarFone(raw: string): string | null {
+  let d = (raw || "").replace(/\D/g, "");
+  if (d.startsWith("55") && d.length > 11) d = d.slice(2);
+  if (d.length === 10) d = d.slice(0, 2) + "9" + d.slice(2); // fixo antigo -> celular
+  if (d.length !== 11) return null;
+  if (d[2] !== "9") return null;
+  const ddd = parseInt(d.slice(0, 2), 10);
+  if (ddd < 11 || ddd > 99) return null;
+  return "55" + d;
+}
+
+function foneBonito(f: string): string {
+  // 55 65 9XXXX XXXX
+  const d = f.startsWith("55") ? f.slice(2) : f;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+function agoraCuiaba(iso?: string): string {
+  const dt = iso ? new Date(iso) : new Date();
+  return dt.toLocaleString("pt-BR", { timeZone: "America/Cuiaba" });
+}
+
+async function contador(s: ReturnType<typeof getStore>) {
+  const c = (await s.get("contador", { type: "json" })) as { validados: number } | null;
+  return c || { validados: 0 };
+}
+
+async function todosLeads(s: ReturnType<typeof getStore>) {
+  const { blobs } = await s.list({ prefix: "lead/" });
+  const leads = await Promise.all(blobs.map((b) => s.get(b.key, { type: "json" })));
+  leads.sort((a: any, b: any) => (a.criadoEm < b.criadoEm ? -1 : 1));
+  return leads as any[];
+}
+
+export default async (req: Request, context: Context) => {
+  const url = new URL(req.url);
+  const action = url.pathname.replace(/^\/api\//, "").replace(/\/$/, "");
+  const s = store();
+
+  try {
+    // ---------- CADASTRO DE LEAD ----------
+    if (action === "lead" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      const nome = String(body.nome || "").trim().replace(/\s+/g, " ").slice(0, 80);
+      const fone = normalizarFone(String(body.fone || ""));
+      if (nome.length < 3) return json({ ok: false, erro: "Digite seu nome completo." }, 400);
+      if (!fone) return json({ ok: false, erro: "WhatsApp inválido. Use DDD + número. Ex: (65) 99999-9999" }, 400);
+
+      const existente = (await s.get(`fone/${fone}`, { type: "json" })) as { code: string } | null;
+      if (existente) {
+        return json({ ok: true, code: existente.code, jaCadastrado: true });
+      }
+
+      let code = gerarCodigo("MOTO", 4);
+      while (await s.get(`lead/${code}`, { type: "json" })) code = gerarCodigo("MOTO", 4);
+
+      const lead = {
+        code,
+        nome,
+        fone,
+        criadoEm: new Date().toISOString(),
+        validado: null as null | { pos: number | null; em: string },
+        voucher: null as null | { code: string; valor: number; criadoEm: string; usadoEm: string | null },
+      };
+      await s.setJSON(`lead/${code}`, lead);
+      await s.setJSON(`fone/${fone}`, { code });
+      return json({ ok: true, code, jaCadastrado: false });
+    }
+
+    // ---------- VAGAS RESTANTES ----------
+    if (action === "vagas" && req.method === "GET") {
+      const c = await contador(s);
+      return json({
+        ok: true,
+        total: LIMITE_VAGAS,
+        validados: c.validados,
+        restantes: Math.max(0, LIMITE_VAGAS - c.validados),
+      });
+    }
+
+    // ---------- STATUS DO LEAD ----------
+    if (action === "status" && req.method === "GET") {
+      const code = (url.searchParams.get("c") || "").toUpperCase().trim();
+      const lead = (await s.get(`lead/${code}`, { type: "json" })) as any;
+      if (!lead) return json({ ok: false, erro: "Código não encontrado." }, 404);
+      const c = await contador(s);
+      return json({
+        ok: true,
+        code: lead.code,
+        nome: lead.nome,
+        validado: lead.validado,
+        voucher: lead.voucher
+          ? { code: lead.voucher.code, valor: lead.voucher.valor, usadoEm: lead.voucher.usadoEm }
+          : null,
+        restantes: Math.max(0, LIMITE_VAGAS - c.validados),
+      });
+    }
+
+    // ---------- VALIDAÇÃO NA LOJA (café + libera voucher) ----------
+    if (action === "validar" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      const pin = String(body.pin || "").trim();
+      const code = String(body.code || "").toUpperCase().trim();
+      if (pin !== STAFF_PIN) return json({ ok: false, erro: "PIN da equipe incorreto." }, 401);
+
+      const lead = (await s.get(`lead/${code}`, { type: "json" })) as any;
+      if (!lead) return json({ ok: false, erro: "QR Code / código não encontrado." }, 404);
+
+      if (lead.validado) {
+        return json({
+          ok: true,
+          jaValidado: true,
+          nome: lead.nome,
+          fone: foneBonito(lead.fone),
+          pos: lead.validado.pos,
+          em: agoraCuiaba(lead.validado.em),
+          dentroDoLimite: lead.validado.pos !== null,
+          voucher: lead.voucher ? { code: lead.voucher.code, valor: lead.voucher.valor } : null,
+        });
+      }
+
+      const c = await contador(s);
+      const dentro = c.validados < LIMITE_VAGAS;
+      const pos = dentro ? c.validados + 1 : null;
+      const em = new Date().toISOString();
+
+      let voucher = null as any;
+      if (dentro) {
+        let vcode = gerarCodigo("VALE50", 5);
+        while (await s.get(`voucher/${vcode}`, { type: "json" })) vcode = gerarCodigo("VALE50", 5);
+        voucher = { code: vcode, valor: VALOR_VOUCHER, criadoEm: em, usadoEm: null };
+        await s.setJSON(`voucher/${vcode}`, { leadCode: code });
+        await s.setJSON("contador", { validados: c.validados + 1 });
+      }
+
+      lead.validado = { pos, em };
+      lead.voucher = voucher;
+      await s.setJSON(`lead/${code}`, lead);
+
+      return json({
+        ok: true,
+        jaValidado: false,
+        nome: lead.nome,
+        fone: foneBonito(lead.fone),
+        pos,
+        em: agoraCuiaba(em),
+        dentroDoLimite: dentro,
+        voucher: voucher ? { code: voucher.code, valor: voucher.valor } : null,
+      });
+    }
+
+    // ---------- VALIDAÇÃO DO VOUCHER NO POSTO ----------
+    if (action === "vale" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      const pin = String(body.pin || "").trim();
+      const vcode = String(body.code || "").toUpperCase().trim();
+      if (pin !== POSTO_PIN) return json({ ok: false, erro: "PIN do posto incorreto." }, 401);
+
+      const ref = (await s.get(`voucher/${vcode}`, { type: "json" })) as { leadCode: string } | null;
+      if (!ref) return json({ ok: false, erro: "Voucher não encontrado." }, 404);
+
+      const lead = (await s.get(`lead/${ref.leadCode}`, { type: "json" })) as any;
+      if (!lead || !lead.voucher || lead.voucher.code !== vcode)
+        return json({ ok: false, erro: "Voucher inválido." }, 404);
+
+      if (lead.voucher.usadoEm) {
+        return json({
+          ok: false,
+          jaUsado: true,
+          erro: `VOUCHER JÁ UTILIZADO em ${agoraCuiaba(lead.voucher.usadoEm)}`,
+          nome: lead.nome,
+          valor: lead.voucher.valor,
+        }, 409);
+      }
+
+      lead.voucher.usadoEm = new Date().toISOString();
+      await s.setJSON(`lead/${ref.leadCode}`, lead);
+
+      return json({
+        ok: true,
+        nome: lead.nome,
+        fone: foneBonito(lead.fone),
+        valor: lead.voucher.valor,
+        em: agoraCuiaba(lead.voucher.usadoEm),
+      });
+    }
+
+    // ---------- ADMIN (JSON) ----------
+    if (action === "admin" && req.method === "GET") {
+      if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
+      const leads = await todosLeads(s);
+      const c = await contador(s);
+      return json({
+        ok: true,
+        total: leads.length,
+        validados: c.validados,
+        restantes: Math.max(0, LIMITE_VAGAS - c.validados),
+        vouchersUsados: leads.filter((l) => l.voucher?.usadoEm).length,
+        leads: leads.map((l) => ({
+          code: l.code,
+          nome: l.nome,
+          fone: foneBonito(l.fone),
+          foneLink: l.fone,
+          cadastro: agoraCuiaba(l.criadoEm),
+          pos: l.validado ? l.validado.pos : null,
+          validadoEm: l.validado ? agoraCuiaba(l.validado.em) : null,
+          voucher: l.voucher?.code || null,
+          voucherUsadoEm: l.voucher?.usadoEm ? agoraCuiaba(l.voucher.usadoEm) : null,
+        })),
+      });
+    }
+
+    // ---------- EXPORT CSV (Excel / Google Sheets) ----------
+    if (action === "export" && req.method === "GET") {
+      if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
+      const leads = await todosLeads(s);
+      const sep = url.searchParams.get("fmt") === "sheets" ? "," : ";";
+      const esc = (v: unknown) => {
+        const t = v === null || v === undefined ? "" : String(v);
+        return /[";,\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+      };
+      const linhas = [
+        ["codigo", "nome", "whatsapp", "cadastrado_em", "posicao", "validado_em", "voucher", "voucher_valor", "voucher_usado_em"].join(sep),
+        ...leads.map((l) =>
+          [
+            l.code,
+            l.nome,
+            "+" + l.fone,
+            agoraCuiaba(l.criadoEm),
+            l.validado?.pos ?? "",
+            l.validado ? agoraCuiaba(l.validado.em) : "",
+            l.voucher?.code || "",
+            l.voucher ? l.voucher.valor : "",
+            l.voucher?.usadoEm ? agoraCuiaba(l.voucher.usadoEm) : "",
+          ].map(esc).join(sep)
+        ),
+      ];
+      return new Response("\uFEFF" + linhas.join("\r\n"), {
+        headers: {
+          "content-type": "text/csv; charset=utf-8",
+          "content-disposition": url.searchParams.get("fmt") === "sheets"
+            ? "inline"
+            : 'attachment; filename="leads-locagora-suamotonoboleto.csv"',
+        },
+      });
+    }
+
+    return json({ ok: false, erro: "Rota não encontrada." }, 404);
+  } catch (e: any) {
+    console.error("Erro na API:", e);
+    return json({ ok: false, erro: "Erro interno. Tente novamente." }, 500);
+  }
+};
+
+export const config: Config = {
+  path: "/api/*",
+};
