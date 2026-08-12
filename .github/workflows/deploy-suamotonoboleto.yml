@@ -1,12 +1,17 @@
 name: Deploy suamotonoboleto para Netlify
 
+# Requer o secret NETLIFY_AUTH_TOKEN (Settings > Secrets and variables > Actions).
+# Gere o token em: https://app.netlify.com/user/applications#personal-access-tokens
+# Alternativa sem workflow: conectar o repositório direto no painel do Netlify
+# (Site configuration > Build & deploy > Link repository).
+
 on:
   workflow_dispatch:
-    inputs:
-      proxy_path:
-        description: "URL efêmera de deploy do Netlify MCP (proxy-path)"
-        required: true
-        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - "locagora-suamotonoboleto/**"
 
 jobs:
   deploy:
@@ -21,23 +26,24 @@ jobs:
         with:
           node-version: 22
 
-      - name: Mascarar URL de deploy nos logs
-        run: echo "::add-mask::${{ inputs.proxy_path }}"
-
       - name: Instalar dependências
         run: npm ci
 
       - name: Deploy para o Netlify
         env:
-          PROXY_PATH: ${{ inputs.proxy_path }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: 59469ddf-51bf-4d3c-a493-b515a114484b
         run: |
-          npx -y @netlify/mcp@latest \
-            --site-id 59469ddf-51bf-4d3c-a493-b515a114484b \
-            --proxy-path "$PROXY_PATH"
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "::error::Secret NETLIFY_AUTH_TOKEN não configurado no repositório."
+            exit 1
+          fi
+          npx -y netlify-cli@latest deploy --prod --dir public --functions netlify/functions
 
       - name: Smoke test em produção
         run: |
           B=https://suamotonoboleto.netlify.app
+          sleep 15
           fails=0
           chk() { if [ "$1" = "$2" ]; then echo "OK: $3"; else echo "FALHOU: $3 (esperado $2, obtido $1)"; fails=$((fails+1)); fi; }
 
