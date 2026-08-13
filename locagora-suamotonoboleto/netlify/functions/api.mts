@@ -139,9 +139,11 @@ export default async (req: Request, context: Context) => {
     // ---------- VAGAS RESTANTES ----------
     if (action === "vagas" && req.method === "GET") {
       const c = await contador(s);
+      const { blobs } = await s.list({ prefix: "lead/" });
       return json({
         ok: true,
         total: LIMITE_VAGAS,
+        inscritos: blobs.length,
         validados: c.validados,
         restantes: Math.max(0, LIMITE_VAGAS - c.validados),
       });
@@ -153,8 +155,10 @@ export default async (req: Request, context: Context) => {
       const lead = (await s.get(`lead/${code}`, { type: "json" })) as any;
       if (!lead) return json({ ok: false, erro: "Código não encontrado." }, 404);
       const c = await contador(s);
+      const { blobs } = await s.list({ prefix: "lead/" });
       return json({
         ok: true,
+        inscritos: blobs.length,
         code: lead.code,
         nome: lead.nome,
         validado: lead.validado,

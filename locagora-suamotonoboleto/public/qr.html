@@ -64,10 +64,11 @@
         📅 <b>Dia 22/06, a partir das 7h</b><br>
         📍 Av. Ten. Cel. Duarte, 1410 — Centro Sul, Cuiabá<br>
         1️⃣ Mostra esse QR pra equipe na entrada<br>
-        2️⃣ Entrou nos <b>40 primeiros</b>? ☕ Café da manhã grátis<br>
-        3️⃣ Teu <b>VALE R$50 de combustível</b> aparece AQUI nessa tela na hora ⛽
+        2️⃣ Chegou entre os <b>40 primeiros</b>? ☕ Café da manhã grátis<br>
+        3️⃣ Teu <b>VALE R$50 de combustível</b> aparece AQUI nessa tela na hora ⛽<br>
+        4️⃣ Chegou depois? Concorre aos <b>brindes</b> do dia 🎁
       </div>
-      <p class="mini" style="margin-top:12px">Restam <b id="restantes" class="amarelo">--</b> vagas de 40. Chega CEDO.</p>
+      <p class="mini" style="margin-top:12px"><b id="restantes" class="amarelo">--</b> motoboys inscritos disputando os 40 vales. <b>É por ordem de chegada — chega CEDO.</b></p>
     </div>
     <a class="btn btn-zap" id="btn-share" target="_blank" rel="noopener">📲 Chamar os parças (compartilhar)</a>
     <a class="btn btn-rota" target="_blank" rel="noopener"
@@ -97,10 +98,11 @@
 
   <!-- TELA 3: VALIDADO FORA DOS 40 -->
   <div id="tela-fora" class="hide">
-    <div class="cabecalho"><h1>😤 As 40 vagas <span class="laranja">já eram</span></h1></div>
+    <div class="cabecalho"><h1>🎁 VOCÊ TÁ NA <span class="laranja">DISPUTA DOS BRINDES</span></h1></div>
     <div class="card">
-      <p style="font-weight:700;font-size:15px;line-height:1.6">Você validou, mas os 40 primeiros já garantiram o café e o vale.<br><br>
-      Relaxa: <b class="amarelo">entra na loja mesmo assim</b> — tem moto nova e seminova no boleto te esperando, até pra negativado. 🏍️</p>
+      <p style="font-weight:700;font-size:15px;line-height:1.6">Os 40 primeiros a chegar já levaram o café e o vale de combustível.<br><br>
+      Mas você <b class="amarelo">tá dentro da disputa dos brindes</b> que rolam durante o dia — fica na loja e presta atenção nas chamadas! 🎉<br><br>
+      E o principal: tem <b class="amarelo">moto nova e seminova no boleto</b> te esperando, até pra negativado. 🏍️</p>
     </div>
   </div>
 </div>
@@ -162,7 +164,7 @@
         $('tela-qr').classList.remove('hide');
         $('nome-lead').textContent = (j.nome || 'PARÇA').split(' ')[0].toUpperCase();
         $('codigo-lead').textContent = j.code;
-        if (typeof j.restantes === 'number') $('restantes').textContent = j.restantes;
+        if (typeof j.inscritos === 'number') $('restantes').textContent = j.inscritos;
         if (!$('qr').innerHTML) {
           desenharQR($('qr'), location.origin + '/validar.html?c=' + encodeURIComponent(j.code));
           $('btn-share').href = 'https://wa.me/?text=' + msgShare();
