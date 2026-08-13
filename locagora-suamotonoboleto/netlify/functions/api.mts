@@ -53,10 +53,15 @@ async function tgChats(s: ReturnType<typeof getStore>): Promise<number[]> {
 }
 
 const TG_TECLADO = {
-  keyboard: [[{ text: "📋 Status dos cadastros" }, { text: "⛽ Vouchers usados no posto" }]],
+  keyboard: [
+    [{ text: "📋 Status dos cadastros" }, { text: "⛽ Vouchers usados no posto" }],
+    [{ text: "🛠️ Criar site" }, { text: "✅ Gerar página" }],
+  ],
   resize_keyboard: true,
   is_persistent: true,
 };
+
+const draftKey = (chatId: number) => `tg/draft/${chatId}`;
 
 async function tgSend(chatId: number, texto: string, comTeclado = false) {
   const body: Record<string, unknown> = { chat_id: chatId, text: texto, parse_mode: "HTML" };
@@ -323,6 +328,40 @@ export default async (req: Request, context: Context) => {
         await s.setJSON("telegram/chats", chats);
       }
 
+      // foto recebida = moto para o rascunho do site de vendas
+      if (msg.photo?.length) {
+        const draft = (await s.get(draftKey(chatId), { type: "json" })) as any;
+        if (!draft) {
+          await tgSend(chatId, "Pra montar um site de vendas, aperte 🛠️ Criar site primeiro.", true);
+          return json({ ok: true });
+        }
+        const cap = String(msg.caption || "").trim();
+        if (!cap) {
+          await tgSend(chatId, "⚠️ Manda a foto DE NOVO com a legenda no formato:\n<code>CG 160 Titan | R$ 18.900 | Entrada R$ 1.000 | 36x de R$ 640</code>", true);
+          return json({ ok: true });
+        }
+        const [modelo, valor, entrada, parcelas] = cap.split("|").map((t) => t.trim());
+        const fileId = msg.photo[msg.photo.length - 1].file_id;
+        const fr = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getFile?file_id=${encodeURIComponent(fileId)}`);
+        const fd = (await fr.json()) as any;
+        let fotoId = "";
+        if (fd.ok) {
+          const bin = await fetch(`https://api.telegram.org/file/bot${TG_TOKEN}/${fd.result.file_path}`);
+          fotoId = String(Date.now());
+          await s.set(`promo/foto/${fotoId}`, await bin.arrayBuffer(), { metadata: { ct: "image/jpeg" } });
+        }
+        draft.motos.push({
+          foto: fotoId,
+          modelo: modelo || `Moto ${draft.motos.length + 1}`,
+          valor: valor || "",
+          entrada: entrada || "",
+          parcelas: parcelas || "",
+        });
+        await s.setJSON(draftKey(chatId), draft);
+        await tgSend(chatId, `🏍️ <b>${modelo || "Moto"}</b> adicionada (${draft.motos.length} no site).\nManda a próxima foto ou aperte ✅ Gerar página.`, true);
+        return json({ ok: true });
+      }
+
       if (texto.startsWith("/start")) {
         await tgSend(chatId, `🔔 <b>Notificações Locagora ativadas!</b>\nVocê receberá aviso de cada cadastro, validação de QR e uso de voucher.\nUse os botões aqui embaixo 👇`, true);
       } else if (texto.includes("status")) {
@@ -334,6 +373,27 @@ export default async (req: Request, context: Context) => {
           `📋 <b>STATUS DOS CADASTROS</b>\n📝 Cadastrados: <b>${leads.length}</b>\n✅ Validados na loja: <b>${c.validados}/${LIMITE_VAGAS}</b>\n🎟️ Vagas restantes: <b>${Math.max(0, LIMITE_VAGAS - c.validados)}</b>\n⛽ Vouchers usados no posto: <b>${usados}</b>\n🕐 ${agoraCuiaba()}`,
           true
         );
+      } else if (texto.includes("criar site")) {
+        await s.setJSON(draftKey(chatId), { motos: [] });
+        await tgSend(
+          chatId,
+          "🛠️ <b>Vamos montar seu site de vendas!</b>\nMe manda cada moto como uma FOTO com a legenda neste formato:\n<code>CG 160 Titan | R$ 18.900 | Entrada R$ 1.000 | 36x de R$ 640</code>\n(pode mandar quantas quiser)\nQuando terminar, aperte ✅ Gerar página.",
+          true
+        );
+      } else if (texto.includes("gerar")) {
+        const draft = (await s.get(draftKey(chatId), { type: "json" })) as any;
+        if (!draft?.motos?.length) {
+          await tgSend(chatId, "Nenhuma moto no rascunho. Aperte 🛠️ Criar site e mande as fotos com legenda.", true);
+        } else {
+          const slug = gerarCodigo("", 6).slice(1).toLowerCase();
+          await s.setJSON(`promo/site/${slug}`, { motos: draft.motos, criadoEm: new Date().toISOString() });
+          await s.delete(draftKey(chatId));
+          await tgSend(
+            chatId,
+            `✅ <b>Página no ar!</b>\n${url.origin}/promo.html?p=${slug}\n🏍️ ${draft.motos.length} moto(s) publicada(s).\nCompartilha esse link — cada interessado que clicar em "QUERO ESSA NO BOLETO" cai aqui no bot com nome e WhatsApp.`,
+            true
+          );
+        }
       } else if (texto.includes("voucher")) {
         const leads = await todosLeads(s);
         const usados = leads.filter((l) => l.voucher?.usadoEm);
@@ -374,7 +434,8 @@ export default async (req: Request, context: Context) => {
 
     if (action === "foto" && req.method === "GET") {
       const id = (url.searchParams.get("id") || "").replace(/[^0-9]/g, "");
-      const res = await s.getWithMetadata(`foto/${id}`, { type: "arrayBuffer" });
+      const prefixo = url.searchParams.get("t") === "promo" ? "promo/foto/" : "foto/";
+      const res = await s.getWithMetadata(`${prefixo}${id}`, { type: "arrayBuffer" });
       if (!res) return json({ ok: false, erro: "Foto não encontrada." }, 404);
       return new Response(res.data, {
         headers: {
@@ -400,6 +461,30 @@ export default async (req: Request, context: Context) => {
       const id = String(body.id || "").replace(/[^0-9]/g, "");
       if (!id) return json({ ok: false, erro: "id obrigatório." }, 400);
       await s.delete(`foto/${id}`);
+      return json({ ok: true });
+    }
+
+    // ---------- SITE DE VENDAS GERADO PELO BOT ----------
+    if (action === "promo" && req.method === "GET") {
+      const p = (url.searchParams.get("p") || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const site = (await s.get(`promo/site/${p}`, { type: "json" })) as any;
+      if (!site) return json({ ok: false, erro: "Página não encontrada." }, 404);
+      return json({ ok: true, motos: site.motos });
+    }
+
+    // ---------- INTERESSE EM MOTO (da página de vendas → Telegram) ----------
+    if (action === "interesse" && req.method === "POST") {
+      const body = await req.json().catch(() => ({}));
+      const nome = String(body.nome || "").trim().replace(/\s+/g, " ").slice(0, 80);
+      const fone = normalizarFone(String(body.fone || ""));
+      if (nome.length < 3) return json({ ok: false, erro: "Digite seu nome completo." }, 400);
+      if (!fone) return json({ ok: false, erro: "WhatsApp inválido. Use DDD + número. Ex: (65) 99999-9999" }, 400);
+      const moto = String(body.moto || "").slice(0, 80);
+      await s.setJSON(`interesse/${Date.now()}`, { nome, fone, moto, em: new Date().toISOString() });
+      await tgNotify(
+        s,
+        `🎯 <b>INTERESSE EM MOTO</b>\n🏍️ ${moto}\n👤 ${nome}\n📱 ${foneBonito(fone)}\n🕐 ${agoraCuiaba()}\n👉 Chama agora: https://wa.me/${fone}`
+      );
       return json({ ok: true });
     }
 
