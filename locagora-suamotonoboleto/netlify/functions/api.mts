@@ -56,6 +56,7 @@ const TG_TECLADO = {
   keyboard: [
     [{ text: "📋 Status dos cadastros" }, { text: "⛽ Vouchers usados no posto" }],
     [{ text: "🛠️ Criar site" }, { text: "✅ Gerar página" }],
+    [{ text: "📸 Fotos da landing" }],
   ],
   resize_keyboard: true,
   is_persistent: true,
@@ -328,11 +329,25 @@ export default async (req: Request, context: Context) => {
         await s.setJSON("telegram/chats", chats);
       }
 
-      // foto recebida = moto para o rascunho do site de vendas
+      // foto recebida = moto para o site de vendas OU carrossel da landing oficial
       if (msg.photo?.length) {
         const draft = (await s.get(draftKey(chatId), { type: "json" })) as any;
         if (!draft) {
-          await tgSend(chatId, "Pra montar um site de vendas, aperte 🛠️ Criar site primeiro.", true);
+          await tgSend(chatId, "Antes de mandar fotos, aperte 🛠️ Criar site (página de vendas) ou 📸 Fotos da landing (página oficial).", true);
+          return json({ ok: true });
+        }
+        if (draft.modo === "landing") {
+          const fileId = msg.photo[msg.photo.length - 1].file_id;
+          const fr = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getFile?file_id=${encodeURIComponent(fileId)}`);
+          const fd = (await fr.json()) as any;
+          if (fd.ok) {
+            const bin = await fetch(`https://api.telegram.org/file/bot${TG_TOKEN}/${fd.result.file_path}`);
+            await s.set(`foto/${Date.now()}`, await bin.arrayBuffer(), { metadata: { ct: "image/jpeg" } });
+            const { blobs } = await s.list({ prefix: "foto/" });
+            await tgSend(chatId, `📸 Foto adicionada à landing oficial (${blobs.length} no carrossel). Manda mais ou aperte outro botão para sair.`, true);
+          } else {
+            await tgSend(chatId, "⚠️ Não consegui baixar essa foto. Tenta de novo.", true);
+          }
           return json({ ok: true });
         }
         const cap = String(msg.caption || "").trim();
@@ -373,8 +388,15 @@ export default async (req: Request, context: Context) => {
           `📋 <b>STATUS DOS CADASTROS</b>\n📝 Cadastrados: <b>${leads.length}</b>\n✅ Validados na loja: <b>${c.validados}/${LIMITE_VAGAS}</b>\n🎟️ Vagas restantes: <b>${Math.max(0, LIMITE_VAGAS - c.validados)}</b>\n⛽ Vouchers usados no posto: <b>${usados}</b>\n🕐 ${agoraCuiaba()}`,
           true
         );
+      } else if (texto.includes("fotos da landing")) {
+        await s.setJSON(draftKey(chatId), { modo: "landing" });
+        await tgSend(
+          chatId,
+          "📸 <b>Modo fotos da landing oficial.</b>\nManda as fotos das motos (sem legenda) — elas entram no carrossel \"As motos que te esperam\" da página principal na hora.\nPara apagar alguma, use o painel admin.",
+          true
+        );
       } else if (texto.includes("criar site")) {
-        await s.setJSON(draftKey(chatId), { motos: [] });
+        await s.setJSON(draftKey(chatId), { modo: "promo", motos: [] });
         await tgSend(
           chatId,
           "🛠️ <b>Vamos montar seu site de vendas!</b>\nMe manda cada moto como uma FOTO com a legenda neste formato:\n<code>CG 160 Titan | R$ 18.900 | Entrada R$ 1.000 | 36x de R$ 640</code>\n(pode mandar quantas quiser)\nQuando terminar, aperte ✅ Gerar página.",
