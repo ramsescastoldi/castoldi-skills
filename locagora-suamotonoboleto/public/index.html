@@ -43,6 +43,16 @@
   .barra{background:#eceef3;border-radius:999px;height:14px;margin-top:12px;overflow:hidden}
   .barra-fill{background:linear-gradient(90deg,var(--vermelho),#ff6b3d);height:100%;width:100%;border-radius:999px;transition:width .8s ease}
   .vagas-alerta{margin-top:10px;font-size:13px;font-weight:800;color:var(--preto);text-align:center;background:var(--amarelo);border-radius:8px;padding:7px 8px}
+  .prova{display:flex;align-items:center;gap:8px;margin-top:14px;background:var(--cinza-claro);border:1.5px solid var(--borda);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700}
+  .prova-dot{width:9px;height:9px;border-radius:50%;background:var(--verde);animation:pulse 1.2s infinite;flex-shrink:0}
+  .micro-oferta{background:var(--amarelo);color:var(--preto);font-weight:900;font-size:13px;text-align:center;border-radius:10px;padding:9px 10px;margin-bottom:14px;letter-spacing:.3px}
+  .faq{list-style:none}
+  .faq li{padding:11px 0;border-bottom:1px solid var(--borda);font-size:16px;font-weight:600}
+  .faq li:last-child{border:none}
+  .faq b{color:var(--azul)}
+  .motos-foto{position:relative;border-radius:16px;overflow:hidden;background:var(--cinza-claro);aspect-ratio:4/3}
+  .motos-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease}
+  .motos-foto img.on{opacity:1}
   .pulse{animation:pulse 1.2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
@@ -126,16 +136,19 @@
       <div class="vagas-alerta" id="vagas-alerta">🔥 Cadastro grátis de 15 segundos — garanta antes que feche</div>
     </div>
 
+    <div class="prova" id="prova" style="display:none"><span class="prova-dot"></span><span id="prova-txt"></span></div>
+
     <div class="form-card" id="form">
+      <div class="micro-oferta">☕ CAFÉ + ⛽ R$50 DE GASOLINA PELOS 15 SEGUNDOS DE CADASTRO</div>
       <h2>Garanta seu <span class="azul">QR Code</span> agora</h2>
-      <p class="mini">Leva 15 segundos. Grátis.</p>
+      <p class="mini">Grátis. Sem pegadinha.</p>
       <form id="lead-form" novalidate>
         <label for="nome">Seu nome</label>
         <input id="nome" name="nome" type="text" placeholder="Nome completo" autocomplete="name" required>
         <label for="fone">Seu WhatsApp</label>
         <input id="fone" name="fone" type="tel" placeholder="(65) 99999-9999" autocomplete="tel" inputmode="numeric" required>
         <div class="erro" id="erro"></div>
-        <button class="btn" type="submit" id="btn-enviar">🔥 Quero minha vaga entre os 40</button>
+        <button class="btn" type="submit" id="btn-enviar">🔥 GARANTIR MEU VALE DE R$50</button>
       </form>
       <p class="seguro">🔒 Seus dados estão seguros. Sem spam, sem pegadinha.</p>
     </div>
@@ -181,6 +194,26 @@
   </div>
 </section>
 
+<section id="motos" style="display:none">
+  <div class="wrap">
+    <h2 style="font-size:26px;margin-bottom:14px">🏍️ As motos que <span class="azul">te esperam</span></h2>
+    <div class="motos-foto" id="motos-foto"></div>
+    <p style="font-weight:800;font-size:15px;margin-top:12px;text-align:center">Todas no boleto. Todas prontas pro corre. <span class="azul">Vem ver de perto dia 22/06.</span></p>
+  </div>
+</section>
+
+<section class="cinza-bg">
+  <div class="wrap">
+    <h2 style="font-size:26px;margin-bottom:10px">Papo reto <span class="azul">(sem letra miúda)</span></h2>
+    <ul class="faq">
+      <li>💸 <b>Custa algo?</b> Nada. Cadastro, café e vale são 100% grátis.</li>
+      <li>🏍️ <b>Sou obrigado a comprar moto?</b> Não. Vale e café são seus de qualquer jeito.</li>
+      <li>📉 <b>Tô negativado, posso ir?</b> Pode — e é exatamente pra você que a loja existe.</li>
+      <li>⛽ <b>Como recebo os R$50?</b> Validou entre os 40 primeiros, o vale aparece no seu celular na hora. É só usar no posto parceiro.</li>
+    </ul>
+  </div>
+</section>
+
 <section class="mapa">
   <div class="wrap">
     <h2 style="font-size:26px;margin-bottom:14px">Onde? <span class="azul">Cola aqui</span> 📍</h2>
@@ -197,7 +230,7 @@
   Promoção "Café dos 40" válida somente em 22/06/2026, na inauguração da unidade, para os 40 primeiros cadastrados que validarem o QR Code na loja. Vale-combustível de R$50 pessoal e intransferível, validado uma única vez no posto parceiro. Venda de motocicletas sujeita a análise de crédito.
 </footer>
 
-<div class="sticky-cta" id="sticky"><a href="#form">🔥 Garantir minha vaga agora</a></div>
+<div class="sticky-cta" id="sticky"><a href="#form">🔥 Garantir meu vale de R$50</a></div>
 
 <script>
   // máscara de telefone
@@ -228,11 +261,12 @@
       const j = await r.json();
       if (!j.ok) throw new Error(j.erro || 'Erro. Tente de novo.');
       localStorage.setItem('smb_code', j.code);
+      if (typeof fbq === 'function' && !j.jaCadastrado) fbq('track', 'Lead');
       location.href = '/qr.html?c=' + encodeURIComponent(j.code) + (j.jaCadastrado ? '&ja=1' : '');
     } catch (err) {
       erro.textContent = err.message;
       erro.style.display = 'block';
-      btn.disabled = false; btn.textContent = '🔥 Quero minha vaga entre os 40';
+      btn.disabled = false; btn.textContent = '🔥 GARANTIR MEU VALE DE R$50';
     }
   });
 
@@ -243,9 +277,50 @@
     s.innerHTML = '<a href="/qr.html?c=' + encodeURIComponent(salvo) + '">📲 Ver meu QR Code (já tô dentro)</a>';
   }
 
+  // prova social: últimos cadastros rodando
+  fetch('/api/recentes').then(r => r.json()).then(j => {
+    if (!j.ok || !j.recentes.length) return;
+    const box = document.getElementById('prova'), txt = document.getElementById('prova-txt');
+    let i = 0;
+    const mostra = () => {
+      const p = j.recentes[i % j.recentes.length];
+      txt.textContent = p.nome + ' garantiu a vaga ' + (p.min < 1 ? 'agora mesmo' : 'há ' + p.min + ' min');
+      i++;
+    };
+    mostra(); box.style.display = 'flex';
+    setInterval(mostra, 4000);
+  }).catch(() => {});
+
+  // fotos das motos (só aparece se o admin subiu fotos)
+  fetch('/api/fotos').then(r => r.json()).then(j => {
+    if (!j.ok || !j.ids.length) return;
+    const box = document.getElementById('motos-foto');
+    box.innerHTML = j.ids.map((id, i) =>
+      '<img src="/api/foto?id=' + id + '" alt="Moto Locagora" loading="lazy"' + (i === 0 ? ' class="on"' : '') + '>').join('');
+    document.getElementById('motos').style.display = 'block';
+    if (j.ids.length > 1) {
+      const imgs = box.querySelectorAll('img');
+      let i = 0;
+      setInterval(() => { imgs[i % imgs.length].classList.remove('on'); i++; imgs[i % imgs.length].classList.add('on'); }, 3500);
+    }
+  }).catch(() => {});
+
+  // Meta Pixel: liga sozinho quando META_PIXEL_ID estiver configurado no Netlify
+  fetch('/api/config').then(r => r.json()).then(j => {
+    if (!j.ok || !j.pixel) return;
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
+    s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', j.pixel); fbq('track', 'PageView');
+  }).catch(() => {});
+
   // vagas restantes + barra de progresso (FOMO)
   fetch('/api/vagas').then(r => r.json()).then(j => {
     if (!j.ok) return;
+    if (!localStorage.getItem('smb_code')) {
+      const st = document.querySelector('#sticky a');
+      if (st) st.textContent = '🔥 Restam ' + j.restantes + ' — garantir meu R$50';
+    }
     document.getElementById('vagas-num').textContent = j.restantes;
     document.getElementById('barra-fill').style.width = Math.max(4, (j.restantes / j.total) * 100) + '%';
     const alerta = document.getElementById('vagas-alerta');

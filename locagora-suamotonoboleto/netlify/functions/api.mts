@@ -349,6 +349,60 @@ export default async (req: Request, context: Context) => {
       return json({ ok: true });
     }
 
+    // ---------- ÚLTIMOS CADASTROS (prova social — só primeiro nome + inicial) ----------
+    if (action === "recentes" && req.method === "GET") {
+      const leads = await todosLeads(s);
+      const agora = Date.now();
+      const recentes = leads.slice(-5).reverse().map((l) => {
+        const partes = l.nome.split(" ");
+        const nome = partes[0] + (partes[1] ? " " + partes[1][0] + "." : "");
+        return { nome, min: Math.max(0, Math.round((agora - new Date(l.criadoEm).getTime()) / 60000)) };
+      });
+      return json({ ok: true, recentes });
+    }
+
+    // ---------- CONFIG PÚBLICA (pixel etc.) ----------
+    if (action === "config" && req.method === "GET") {
+      return json({ ok: true, pixel: Netlify.env.get("META_PIXEL_ID") || null });
+    }
+
+    // ---------- FOTOS DAS MOTOS ----------
+    if (action === "fotos" && req.method === "GET") {
+      const { blobs } = await s.list({ prefix: "foto/" });
+      return json({ ok: true, ids: blobs.map((b) => b.key.slice(5)).sort().reverse() });
+    }
+
+    if (action === "foto" && req.method === "GET") {
+      const id = (url.searchParams.get("id") || "").replace(/[^0-9]/g, "");
+      const res = await s.getWithMetadata(`foto/${id}`, { type: "arrayBuffer" });
+      if (!res) return json({ ok: false, erro: "Foto não encontrada." }, 404);
+      return new Response(res.data, {
+        headers: {
+          "content-type": String(res.metadata?.ct || "image/jpeg"),
+          "cache-control": "public, max-age=86400",
+        },
+      });
+    }
+
+    if (action === "foto" && req.method === "POST") {
+      if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
+      const buf = await req.arrayBuffer();
+      if (buf.byteLength < 1024) return json({ ok: false, erro: "Arquivo vazio ou inválido." }, 400);
+      if (buf.byteLength > 4_500_000) return json({ ok: false, erro: "Foto muito grande (máx 4MB)." }, 400);
+      const id = String(Date.now());
+      await s.set(`foto/${id}`, buf, { metadata: { ct: req.headers.get("content-type") || "image/jpeg" } });
+      return json({ ok: true, id });
+    }
+
+    if (action === "foto-del" && req.method === "POST") {
+      if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
+      const body = await req.json().catch(() => ({}));
+      const id = String(body.id || "").replace(/[^0-9]/g, "");
+      if (!id) return json({ ok: false, erro: "id obrigatório." }, 400);
+      await s.delete(`foto/${id}`);
+      return json({ ok: true });
+    }
+
     // ---------- RESET TOTAL (admin — apaga todos os cadastros e zera o placar) ----------
     if (action === "reset" && req.method === "GET") {
       if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
