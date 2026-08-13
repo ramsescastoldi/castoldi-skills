@@ -12,96 +12,104 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --preto:#0a0a0d; --carbono:#141419; --laranja:#ff5a00; --amarelo:#ffcc00;
-    --branco:#f5f5f5; --cinza:#9a9aa5; --verde:#22c55e; --vermelho:#ef4444;
+    --azul:#0b46e6; --azul-escuro:#082f9e; --amarelo:#ffc400; --amarelo-claro:#fff3c4;
+    --preto:#111318; --branco:#ffffff; --cinza:#5b6270; --cinza-claro:#f2f4f9;
+    --borda:#dde1ea; --verde:#16a34a; --vermelho:#e11d2e; --vermelho-claro:#fdecee;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--preto);color:var(--branco);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body{background:var(--branco);color:var(--preto);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5}
   .wrap{max-width:480px;margin:0 auto;padding:0 18px}
-  h1,h2,.display{font-family:'Anton',Impact,sans-serif;text-transform:uppercase;letter-spacing:.5px;line-height:1.05}
-  .laranja{color:var(--laranja)} .amarelo{color:var(--amarelo)}
+  h1,h2,.display{font-family:'Montserrat',system-ui,sans-serif;font-weight:900;text-transform:uppercase;line-height:1.12;letter-spacing:-.3px}
+  .azul{color:var(--azul)}
+  .marca{background:var(--amarelo);padding:0 6px;border-radius:4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 
-  .topbar{background:var(--laranja);color:#000;text-align:center;font-weight:800;font-size:13px;padding:8px 10px;letter-spacing:1px;text-transform:uppercase}
+  .topbar{background:var(--vermelho);color:#fff;text-align:center;font-weight:800;font-size:13px;padding:9px 10px;letter-spacing:.6px;text-transform:uppercase}
 
-  .hero{padding:34px 0 26px;background:
-    radial-gradient(ellipse 120% 60% at 50% -10%, rgba(255,90,0,.28), transparent 60%),
-    var(--preto)}
-  .badge{display:inline-block;background:var(--carbono);border:1px solid var(--laranja);color:var(--amarelo);
-    font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
-  .hero h1{font-size:44px;margin-bottom:14px}
-  .hero p.sub{font-size:17px;font-weight:600;color:var(--branco);line-height:1.45}
-  .hero p.sub b{color:var(--amarelo)}
+  .hero{padding:30px 0 26px;background:linear-gradient(180deg,var(--amarelo-claro),var(--branco) 55%)}
+  .badge{display:inline-block;background:var(--azul);color:#fff;
+    font-size:12px;font-weight:800;padding:7px 14px;border-radius:999px;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+  .hero h1{font-size:38px;margin-bottom:14px}
+  .hero p.sub{font-size:17px;font-weight:600;color:var(--preto);line-height:1.5}
+  .hero p.sub b{color:var(--azul)}
 
-  .vagas{display:flex;align-items:center;gap:10px;background:var(--carbono);border:1px dashed var(--laranja);
-    border-radius:12px;padding:12px 14px;margin:18px 0 6px;font-weight:800;font-size:15px}
-  .vagas .num{font-family:'Anton';font-size:30px;color:var(--vermelho);min-width:54px;text-align:center}
+  .vagas{background:var(--branco);border:3px solid var(--vermelho);border-radius:16px;padding:16px;margin:20px 0 6px;
+    box-shadow:0 8px 24px rgba(225,29,46,.15)}
+  .vagas-top{display:flex;align-items:center;gap:12px;font-weight:700;font-size:15px}
+  .vagas .num{font-family:'Montserrat';font-weight:900;font-size:40px;color:var(--vermelho);min-width:64px;text-align:center;line-height:1}
+  .vagas-txt b{color:var(--vermelho);text-transform:uppercase}
+  .barra{background:#eceef3;border-radius:999px;height:14px;margin-top:12px;overflow:hidden}
+  .barra-fill{background:linear-gradient(90deg,var(--vermelho),#ff6b3d);height:100%;width:100%;border-radius:999px;transition:width .8s ease}
+  .vagas-alerta{margin-top:10px;font-size:13px;font-weight:800;color:var(--preto);text-align:center;background:var(--amarelo);border-radius:8px;padding:7px 8px}
   .pulse{animation:pulse 1.2s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  .form-card{background:var(--carbono);border:2px solid var(--laranja);border-radius:18px;padding:22px 18px;margin-top:18px;
-    box-shadow:0 0 40px rgba(255,90,0,.25)}
+  .form-card{background:var(--branco);border:3px solid var(--azul);border-radius:18px;padding:22px 18px;margin-top:18px;
+    box-shadow:0 10px 34px rgba(11,70,230,.16)}
   .form-card h2{font-size:22px;text-align:center;margin-bottom:4px}
-  .form-card p.mini{text-align:center;font-size:13px;color:var(--cinza);margin-bottom:16px}
+  .form-card p.mini{text-align:center;font-size:13px;color:var(--cinza);margin-bottom:16px;font-weight:600}
   label{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin:12px 0 6px}
-  input{width:100%;background:#0e0e13;border:1.5px solid #2c2c35;border-radius:12px;color:var(--branco);
+  input{width:100%;background:var(--branco);border:2px solid var(--borda);border-radius:12px;color:var(--preto);
     font-size:18px;font-weight:600;padding:15px 14px;outline:none}
-  input:focus{border-color:var(--laranja)}
-  .btn{display:block;width:100%;background:linear-gradient(180deg,var(--laranja),#e04b00);color:#000;border:none;border-radius:14px;
-    font-family:'Anton';font-size:22px;text-transform:uppercase;letter-spacing:1px;padding:18px 10px;margin-top:18px;cursor:pointer;
-    box-shadow:0 6px 0 #903000, 0 8px 24px rgba(255,90,0,.45)}
-  .btn:active{transform:translateY(2px)}
-  .erro{display:none;background:rgba(239,68,68,.12);border:1px solid var(--vermelho);color:#fca5a5;
+  input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(11,70,230,.15)}
+  .btn{display:block;width:100%;background:var(--azul);color:#fff;border:none;border-radius:14px;
+    font-family:'Montserrat';font-weight:900;font-size:19px;text-transform:uppercase;letter-spacing:.5px;padding:18px 10px;margin-top:18px;cursor:pointer;
+    box-shadow:0 6px 0 var(--azul-escuro), 0 10px 26px rgba(11,70,230,.35)}
+  .btn:active{transform:translateY(2px);box-shadow:0 3px 0 var(--azul-escuro)}
+  .erro{display:none;background:var(--vermelho-claro);border:1.5px solid var(--vermelho);color:var(--vermelho);
     border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;margin-top:12px}
-  .seguro{text-align:center;font-size:12px;color:var(--cinza);margin-top:12px}
+  .seguro{text-align:center;font-size:12px;color:var(--cinza);margin-top:12px;font-weight:600}
 
   section{padding:34px 0}
-  .dark2{background:var(--carbono)}
-  .punch{font-size:20px;font-weight:800;line-height:1.5;margin-bottom:14px}
+  .cinza-bg{background:var(--cinza-claro)}
+  .punch{font-size:19px;font-weight:800;line-height:1.5;margin-bottom:14px}
   .punch .x{color:var(--vermelho);text-decoration:line-through}
   .beneficios{list-style:none;margin-top:8px}
-  .beneficios li{display:flex;gap:10px;align-items:flex-start;font-size:16px;font-weight:600;padding:10px 0;border-bottom:1px solid #22222b}
+  .beneficios li{display:flex;gap:10px;align-items:flex-start;font-size:16px;font-weight:600;padding:11px 0;border-bottom:1px solid var(--borda)}
   .beneficios li:last-child{border:none}
   .beneficios .ic{font-size:20px;line-height:1.3}
+  .beneficios b{color:var(--azul)}
 
   .passos{counter-reset:p;list-style:none}
-  .passos li{position:relative;padding:14px 0 14px 58px;font-size:16px;font-weight:600;line-height:1.4}
+  .passos li{position:relative;padding:14px 0 14px 58px;font-size:16px;font-weight:600;line-height:1.45}
   .passos li::before{counter-increment:p;content:counter(p);position:absolute;left:0;top:10px;width:42px;height:42px;
-    background:var(--laranja);color:#000;font-family:'Anton';font-size:22px;border-radius:10px;display:flex;align-items:center;justify-content:center}
-  .passos b{color:var(--amarelo)}
+    background:var(--azul);color:#fff;font-family:'Montserrat';font-weight:900;font-size:20px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+  .passos b{background:var(--amarelo);padding:0 4px;border-radius:4px}
 
-  .oferta-box{background:linear-gradient(160deg,#1a1206,#141419);border:2px solid var(--amarelo);border-radius:18px;padding:22px;text-align:center}
-  .oferta-box .display{font-size:30px;color:var(--amarelo)}
-  .oferta-box p{font-size:15px;font-weight:600;margin-top:10px;color:var(--branco)}
-  .risco{font-family:'Anton';color:var(--vermelho);font-size:20px;margin-top:14px;text-transform:uppercase}
+  .oferta-box{background:var(--amarelo);border:none;border-radius:18px;padding:24px 20px;text-align:center;
+    box-shadow:0 10px 30px rgba(255,196,0,.4)}
+  .oferta-box .display{font-size:26px;color:var(--preto)}
+  .oferta-box p{font-size:15px;font-weight:600;margin-top:10px;color:var(--preto)}
+  .oferta-box p b{color:var(--azul)}
+  .risco{font-family:'Montserrat';font-weight:900;color:var(--vermelho);font-size:19px;margin-top:16px;text-transform:uppercase}
 
-  .mapa iframe{width:100%;height:260px;border:0;border-radius:14px;filter:grayscale(.2) contrast(1.05)}
+  .mapa iframe{width:100%;height:260px;border:0;border-radius:14px}
   .end{font-size:15px;font-weight:600;margin:14px 0;line-height:1.5}
-  .btn-rota{display:block;text-align:center;background:transparent;border:2px solid var(--laranja);color:var(--laranja);
-    border-radius:12px;font-family:'Anton';font-size:18px;text-transform:uppercase;padding:14px;text-decoration:none;letter-spacing:1px}
+  .btn-rota{display:block;text-align:center;background:var(--branco);border:2.5px solid var(--azul);color:var(--azul);
+    border-radius:12px;font-family:'Montserrat';font-weight:900;font-size:17px;text-transform:uppercase;padding:14px;text-decoration:none;letter-spacing:.5px}
 
   .cd{display:flex;gap:8px;justify-content:center;margin:16px 0}
-  .cd div{background:#0e0e13;border:1px solid #2c2c35;border-radius:10px;padding:10px 0;width:70px;text-align:center}
-  .cd .n{font-family:'Anton';font-size:26px;color:var(--amarelo);display:block}
-  .cd .l{font-size:10px;text-transform:uppercase;color:var(--cinza);letter-spacing:1px}
+  .cd div{background:var(--branco);border:2px solid var(--borda);border-radius:12px;padding:10px 0;width:70px;text-align:center;box-shadow:0 4px 12px rgba(17,19,24,.06)}
+  .cd .n{font-family:'Montserrat';font-weight:900;font-size:26px;color:var(--azul);display:block}
+  .cd .l{font-size:10px;text-transform:uppercase;color:var(--cinza);letter-spacing:1px;font-weight:700}
 
-  footer{padding:28px 18px 90px;text-align:center;font-size:11px;color:#5b5b66;line-height:1.6}
-  .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(10,10,13,.92);backdrop-filter:blur(6px);
-    border-top:1px solid #2c2c35;z-index:50}
-  .sticky-cta a{display:block;text-align:center;background:var(--laranja);color:#000;font-family:'Anton';font-size:18px;
-    text-transform:uppercase;letter-spacing:1px;border-radius:12px;padding:14px;text-decoration:none}
+  footer{padding:28px 18px 92px;text-align:center;font-size:11px;color:var(--cinza);line-height:1.6;background:var(--cinza-claro)}
+  .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);
+    border-top:1px solid var(--borda);z-index:50;box-shadow:0 -6px 20px rgba(17,19,24,.08)}
+  .sticky-cta a{display:block;text-align:center;background:var(--azul);color:#fff;font-family:'Montserrat';font-weight:900;font-size:17px;
+    text-transform:uppercase;letter-spacing:.5px;border-radius:12px;padding:15px;text-decoration:none}
 </style>
 </head>
 <body>
 
-<div class="topbar">🏍️ Inauguração LOCAGORA Cuiabá • 22/06 • Só os 40 primeiros</div>
+<div class="topbar">⚠️ Só os 40 primeiros ganham — Inauguração LOCAGORA Cuiabá • 22/06</div>
 
 <header class="hero">
   <div class="wrap">
     <span class="badge">⚡ Atenção motoboy / entregador de Cuiabá</span>
-    <h1>SUA MOTO <span class="laranja">NO BOLETO</span>.<br>ATÉ <span class="amarelo">NEGATIVADO</span>.<br>SEM ENROLAÇÃO.</h1>
+    <h1>SUA MOTO <span class="azul">NO BOLETO</span>.<br>ATÉ <span class="marca">NEGATIVADO</span>.<br>SEM ENROLAÇÃO.</h1>
     <p class="sub">Dia <b>22/06</b> a <b>LOCAGORA</b> abre as portas em Cuiabá — motos novas e seminovas pro seu corre. E os <b>40 PRIMEIROS entregadores</b> que chegarem levam:</p>
 
     <div class="oferta-box" style="margin-top:16px">
@@ -109,10 +117,17 @@
       <p>É só se cadastrar, receber seu <b>QR Code</b> e validar na porta da loja no dia da inauguração.</p>
     </div>
 
-    <div class="vagas"><span class="num pulse" id="vagas-num">40</span> <span>vagas restantes de 40.<br>Cadastrou, garantiu a fila.</span></div>
+    <div class="vagas" id="vagas-box">
+      <div class="vagas-top">
+        <span class="num pulse" id="vagas-num">40</span>
+        <span class="vagas-txt"><b>vagas restantes</b> de 40.<br>Zerou, acabou — sem lista de espera.</span>
+      </div>
+      <div class="barra"><div class="barra-fill" id="barra-fill" style="width:100%"></div></div>
+      <div class="vagas-alerta" id="vagas-alerta">🔥 Cadastro grátis de 15 segundos — garanta antes que feche</div>
+    </div>
 
     <div class="form-card" id="form">
-      <h2>Garanta seu <span class="laranja">QR Code</span> agora</h2>
+      <h2>Garanta seu <span class="azul">QR Code</span> agora</h2>
       <p class="mini">Leva 15 segundos. Grátis.</p>
       <form id="lead-form" novalidate>
         <label for="nome">Seu nome</label>
@@ -127,10 +142,10 @@
   </div>
 </header>
 
-<section>
+<section class="cinza-bg">
   <div class="wrap">
     <p class="punch">Tá pagando <span class="x">diária de moto alugada</span> e no fim do mês não sobra nada?</p>
-    <p class="punch">Nome sujo te travou no banco? <span class="laranja">Aqui a conversa é outra.</span></p>
+    <p class="punch">Nome sujo te travou no banco? <span class="azul">Aqui a conversa é outra.</span></p>
     <ul class="beneficios">
       <li><span class="ic">✅</span> <span><b>Negativado compra.</b> Análise na hora, de boa, sem julgamento.</span></li>
       <li><span class="ic">✅</span> <span><b>Boleto que cabe no corre.</b> Parcela pensada pra quem vive de entrega.</span></li>
@@ -140,9 +155,9 @@
   </div>
 </section>
 
-<section class="dark2">
+<section>
   <div class="wrap">
-    <h2 style="font-size:28px;margin-bottom:18px">Como funciona <span class="laranja">(simples assim)</span></h2>
+    <h2 style="font-size:26px;margin-bottom:18px">Como funciona <span class="azul">(simples assim)</span></h2>
     <ol class="passos">
       <li><b>Cadastra</b> teu nome e WhatsApp aqui na página.</li>
       <li>Recebe teu <b>QR Code exclusivo</b> na tela, na hora.</li>
@@ -153,22 +168,22 @@
   </div>
 </section>
 
-<section>
+<section class="cinza-bg">
   <div class="wrap" style="text-align:center">
-    <h2 style="font-size:28px">Faltam</h2>
+    <h2 style="font-size:26px">Faltam</h2>
     <div class="cd" id="cd">
       <div><span class="n" id="cd-d">--</span><span class="l">dias</span></div>
       <div><span class="n" id="cd-h">--</span><span class="l">horas</span></div>
       <div><span class="n" id="cd-m">--</span><span class="l">min</span></div>
       <div><span class="n" id="cd-s">--</span><span class="l">seg</span></div>
     </div>
-    <p style="font-weight:800;font-size:16px">para a inauguração — <span class="amarelo">22/06, a partir das 7h</span></p>
+    <p style="font-weight:800;font-size:16px">para a inauguração — <span class="azul">22/06, a partir das 7h</span></p>
   </div>
 </section>
 
-<section class="dark2 mapa">
+<section class="mapa">
   <div class="wrap">
-    <h2 style="font-size:28px;margin-bottom:14px">Onde? <span class="laranja">Cola aqui</span> 📍</h2>
+    <h2 style="font-size:26px;margin-bottom:14px">Onde? <span class="azul">Cola aqui</span> 📍</h2>
     <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade"
       src="https://maps.google.com/maps?q=Av.%20Tenente%20Coronel%20Duarte%2C%201410%20-%20Centro%20Sul%2C%20Cuiab%C3%A1%20-%20MT&z=17&output=embed"></iframe>
     <p class="end">🏁 <b>LOCAGORA Cuiabá</b><br>Av. Tenente Coronel Duarte, 1410 — Centro Sul, Cuiabá-MT</p>
@@ -228,9 +243,19 @@
     s.innerHTML = '<a href="/qr.html?c=' + encodeURIComponent(salvo) + '">📲 Ver meu QR Code (já tô dentro)</a>';
   }
 
-  // vagas restantes
+  // vagas restantes + barra de progresso (FOMO)
   fetch('/api/vagas').then(r => r.json()).then(j => {
-    if (j.ok) document.getElementById('vagas-num').textContent = j.restantes;
+    if (!j.ok) return;
+    document.getElementById('vagas-num').textContent = j.restantes;
+    document.getElementById('barra-fill').style.width = Math.max(4, (j.restantes / j.total) * 100) + '%';
+    const alerta = document.getElementById('vagas-alerta');
+    if (j.restantes <= 0) {
+      alerta.textContent = '❌ As 40 vagas acabaram — cadastre-se mesmo assim e fique de olho na fila';
+    } else if (j.restantes <= 10) {
+      alerta.textContent = '🚨 ÚLTIMAS ' + j.restantes + ' VAGAS — corre que tá acabando AGORA';
+    } else if (j.validados > 0) {
+      alerta.textContent = '🔥 ' + j.validados + ' motoboys já garantiram — restam só ' + j.restantes;
+    }
   }).catch(() => {});
 
   // countdown 22/06/2026 07:00 Cuiabá (UTC-4)
