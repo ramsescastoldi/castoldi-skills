@@ -52,11 +52,19 @@ async function tgChats(s: ReturnType<typeof getStore>): Promise<number[]> {
   return c || [];
 }
 
-async function tgSend(chatId: number, texto: string) {
+const TG_TECLADO = {
+  keyboard: [[{ text: "📋 Status dos cadastros" }, { text: "⛽ Vouchers usados no posto" }]],
+  resize_keyboard: true,
+  is_persistent: true,
+};
+
+async function tgSend(chatId: number, texto: string, comTeclado = false) {
+  const body: Record<string, unknown> = { chat_id: chatId, text: texto, parse_mode: "HTML" };
+  if (comTeclado) body.reply_markup = TG_TECLADO;
   await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text: texto, parse_mode: "HTML" }),
+    body: JSON.stringify(body),
   });
 }
 
@@ -252,34 +260,93 @@ export default async (req: Request, context: Context) => {
       });
     }
 
-    // ---------- TELEGRAM: registrar chats e testar ----------
+    // ---------- TELEGRAM: setup (registra chats pendentes + ativa webhook dos botões) ----------
     // 1. Cada pessoa abre o bot no Telegram e envia /start
-    // 2. Abrir /api/telegram?k=ADMIN_KEY registra os chats e manda mensagem de teste
+    // 2. Abrir /api/telegram?k=ADMIN_KEY uma vez ativa tudo e manda mensagem de teste
     if (action === "telegram" && req.method === "GET") {
       if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
       if (!TG_TOKEN) return json({ ok: false, erro: "TELEGRAM_BOT_TOKEN não configurado no Netlify." }, 500);
 
-      const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getUpdates`);
-      const data = (await r.json()) as any;
-      if (!data.ok) return json({ ok: false, erro: `Telegram: ${data.description || "token inválido"}` }, 500);
-
       const set = new Set(await tgChats(s));
       const novos: { id: number; nome: string }[] = [];
-      for (const u of data.result || []) {
-        const chat = u.message?.chat || u.my_chat_member?.chat;
-        if (chat?.id && !set.has(chat.id)) {
-          set.add(chat.id);
-          novos.push({ id: chat.id, nome: chat.first_name || chat.title || String(chat.id) });
+      // getUpdates só funciona enquanto o webhook não existe — captura /start dados antes do setup
+      try {
+        const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getUpdates`);
+        const data = (await r.json()) as any;
+        if (data.ok) {
+          for (const u of data.result || []) {
+            const chat = u.message?.chat || u.my_chat_member?.chat;
+            if (chat?.id && !set.has(chat.id)) {
+              set.add(chat.id);
+              novos.push({ id: chat.id, nome: chat.first_name || chat.title || String(chat.id) });
+            }
+          }
         }
-      }
+      } catch {}
       const chats = [...set];
       await s.setJSON("telegram/chats", chats);
+
+      // webhook: faz o bot responder /start e os botões em tempo real
+      const wh = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/setWebhook`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          url: `${url.origin}/api/tghook`,
+          secret_token: ADMIN_KEY.replace(/[^A-Za-z0-9_-]/g, ""),
+          allowed_updates: ["message"],
+        }),
+      });
+      const whData = (await wh.json()) as any;
+
       await Promise.all(
         chats.map((id) =>
-          tgSend(id, `🔔 <b>Notificações Locagora ativadas!</b>\nVocê receberá aviso de cada cadastro, validação de QR e uso de voucher.\n🕐 ${agoraCuiaba()}`).catch(() => {})
+          tgSend(id, `🔔 <b>Notificações Locagora ativadas!</b>\nVocê receberá aviso de cada cadastro, validação de QR e uso de voucher.\nUse os botões aqui embaixo 👇\n🕐 ${agoraCuiaba()}`, true).catch(() => {})
         )
       );
-      return json({ ok: true, registrados: chats.length, novosAgora: novos });
+      return json({ ok: true, registrados: chats.length, novosAgora: novos, webhook: whData.ok === true });
+    }
+
+    // ---------- TELEGRAM: webhook (responde /start e os botões) ----------
+    if (action === "tghook" && req.method === "POST") {
+      if (req.headers.get("x-telegram-bot-api-secret-token") !== ADMIN_KEY.replace(/[^A-Za-z0-9_-]/g, ""))
+        return json({ ok: false }, 401);
+      const up = (await req.json().catch(() => ({}))) as any;
+      const msg = up.message;
+      if (!msg?.chat?.id) return json({ ok: true });
+      const chatId = msg.chat.id as number;
+      const texto = String(msg.text || "").trim().toLowerCase();
+
+      // qualquer interação registra o chat automaticamente
+      const chats = await tgChats(s);
+      if (!chats.includes(chatId)) {
+        chats.push(chatId);
+        await s.setJSON("telegram/chats", chats);
+      }
+
+      if (texto.startsWith("/start")) {
+        await tgSend(chatId, `🔔 <b>Notificações Locagora ativadas!</b>\nVocê receberá aviso de cada cadastro, validação de QR e uso de voucher.\nUse os botões aqui embaixo 👇`, true);
+      } else if (texto.includes("status")) {
+        const leads = await todosLeads(s);
+        const c = await contador(s);
+        const usados = leads.filter((l) => l.voucher?.usadoEm).length;
+        await tgSend(
+          chatId,
+          `📋 <b>STATUS DOS CADASTROS</b>\n📝 Cadastrados: <b>${leads.length}</b>\n✅ Validados na loja: <b>${c.validados}/${LIMITE_VAGAS}</b>\n🎟️ Vagas restantes: <b>${Math.max(0, LIMITE_VAGAS - c.validados)}</b>\n⛽ Vouchers usados no posto: <b>${usados}</b>\n🕐 ${agoraCuiaba()}`,
+          true
+        );
+      } else if (texto.includes("voucher")) {
+        const leads = await todosLeads(s);
+        const usados = leads.filter((l) => l.voucher?.usadoEm);
+        const linhas = usados.length
+          ? usados
+              .map((l) => `#${l.validado?.pos ?? "-"} ${l.nome} — <code>${l.voucher.code}</code>\n   usado em ${agoraCuiaba(l.voucher.usadoEm)}`)
+              .join("\n")
+          : "Nenhum voucher usado no posto ainda.";
+        await tgSend(chatId, `⛽ <b>VOUCHERS USADOS NO POSTO (${usados.length})</b>\n${linhas}`, true);
+      } else {
+        await tgSend(chatId, "Use os botões aqui embaixo 👇", true);
+      }
+      return json({ ok: true });
     }
 
     // ---------- ADMIN (JSON) ----------
