@@ -7,6 +7,7 @@ const VALOR_VOUCHER = 50;
 const STAFF_PIN = Netlify.env.get("STAFF_PIN") || "2206";
 const POSTO_PIN = Netlify.env.get("POSTO_PIN") || "5050";
 const ADMIN_KEY = Netlify.env.get("ADMIN_KEY") || "locagora-admin";
+const TG_TOKEN = Netlify.env.get("TELEGRAM_BOT_TOKEN") || "";
 
 const store = () => getStore({ name: "locagora", consistency: "strong" });
 
@@ -44,6 +45,30 @@ function foneBonito(f: string): string {
 function agoraCuiaba(iso?: string): string {
   const dt = iso ? new Date(iso) : new Date();
   return dt.toLocaleString("pt-BR", { timeZone: "America/Cuiaba" });
+}
+
+async function tgChats(s: ReturnType<typeof getStore>): Promise<number[]> {
+  const c = (await s.get("telegram/chats", { type: "json" })) as number[] | null;
+  return c || [];
+}
+
+async function tgSend(chatId: number, texto: string) {
+  await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text: texto, parse_mode: "HTML" }),
+  });
+}
+
+// Notifica todos os Telegrams registrados. Nunca derruba a requisição principal.
+async function tgNotify(s: ReturnType<typeof getStore>, texto: string) {
+  if (!TG_TOKEN) return;
+  try {
+    const chats = await tgChats(s);
+    await Promise.all(chats.map((id) => tgSend(id, texto).catch(() => {})));
+  } catch {
+    // notificação é melhor-esforço
+  }
 }
 
 async function contador(s: ReturnType<typeof getStore>) {
@@ -90,6 +115,10 @@ export default async (req: Request, context: Context) => {
       };
       await s.setJSON(`lead/${code}`, lead);
       await s.setJSON(`fone/${fone}`, { code });
+      await tgNotify(
+        s,
+        `🏍️ <b>NOVO CADASTRO</b>\n👤 ${nome}\n📱 ${foneBonito(fone)}\n🎟️ Código: <code>${code}</code>\n🕐 ${agoraCuiaba()}`
+      );
       return json({ ok: true, code, jaCadastrado: false });
     }
 
@@ -163,6 +192,13 @@ export default async (req: Request, context: Context) => {
       lead.voucher = voucher;
       await s.setJSON(`lead/${code}`, lead);
 
+      await tgNotify(
+        s,
+        dentro
+          ? `✅ <b>QR VALIDADO NA LOJA</b>\n👤 ${lead.nome}\n📱 ${foneBonito(lead.fone)}\n🏅 Posição: ${pos}/${LIMITE_VAGAS}\n💰 Voucher: <code>${voucher.code}</code> (R$ ${voucher.valor})\n🕐 ${agoraCuiaba(em)}`
+          : `⚠️ <b>QR VALIDADO FORA DO LIMITE</b>\n👤 ${lead.nome}\n📱 ${foneBonito(lead.fone)}\nAs ${LIMITE_VAGAS} vagas já foram preenchidas — sem voucher.\n🕐 ${agoraCuiaba(em)}`
+      );
+
       return json({
         ok: true,
         jaValidado: false,
@@ -202,6 +238,11 @@ export default async (req: Request, context: Context) => {
       lead.voucher.usadoEm = new Date().toISOString();
       await s.setJSON(`lead/${ref.leadCode}`, lead);
 
+      await tgNotify(
+        s,
+        `⛽ <b>VOUCHER USADO NO POSTO</b>\n👤 ${lead.nome}\n📱 ${foneBonito(lead.fone)}\n💰 <code>${lead.voucher.code}</code> (R$ ${lead.voucher.valor})\n🕐 ${agoraCuiaba(lead.voucher.usadoEm)}`
+      );
+
       return json({
         ok: true,
         nome: lead.nome,
@@ -209,6 +250,36 @@ export default async (req: Request, context: Context) => {
         valor: lead.voucher.valor,
         em: agoraCuiaba(lead.voucher.usadoEm),
       });
+    }
+
+    // ---------- TELEGRAM: registrar chats e testar ----------
+    // 1. Cada pessoa abre o bot no Telegram e envia /start
+    // 2. Abrir /api/telegram?k=ADMIN_KEY registra os chats e manda mensagem de teste
+    if (action === "telegram" && req.method === "GET") {
+      if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
+      if (!TG_TOKEN) return json({ ok: false, erro: "TELEGRAM_BOT_TOKEN não configurado no Netlify." }, 500);
+
+      const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getUpdates`);
+      const data = (await r.json()) as any;
+      if (!data.ok) return json({ ok: false, erro: `Telegram: ${data.description || "token inválido"}` }, 500);
+
+      const set = new Set(await tgChats(s));
+      const novos: { id: number; nome: string }[] = [];
+      for (const u of data.result || []) {
+        const chat = u.message?.chat || u.my_chat_member?.chat;
+        if (chat?.id && !set.has(chat.id)) {
+          set.add(chat.id);
+          novos.push({ id: chat.id, nome: chat.first_name || chat.title || String(chat.id) });
+        }
+      }
+      const chats = [...set];
+      await s.setJSON("telegram/chats", chats);
+      await Promise.all(
+        chats.map((id) =>
+          tgSend(id, `🔔 <b>Notificações Locagora ativadas!</b>\nVocê receberá aviso de cada cadastro, validação de QR e uso de voucher.\n🕐 ${agoraCuiaba()}`).catch(() => {})
+        )
+      );
+      return json({ ok: true, registrados: chats.length, novosAgora: novos });
     }
 
     // ---------- ADMIN (JSON) ----------
