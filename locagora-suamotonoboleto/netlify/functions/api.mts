@@ -349,6 +349,26 @@ export default async (req: Request, context: Context) => {
       return json({ ok: true });
     }
 
+    // ---------- RESET TOTAL (admin — apaga todos os cadastros e zera o placar) ----------
+    if (action === "reset" && req.method === "GET") {
+      if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
+      if (url.searchParams.get("confirmar") !== "SIM")
+        return json({
+          ok: false,
+          erro: "Isso apaga TODOS os cadastros, validações e vouchers. Para confirmar, adicione &confirmar=SIM no fim da URL.",
+        }, 400);
+
+      let apagados = 0;
+      for (const prefix of ["lead/", "fone/", "voucher/"]) {
+        const { blobs } = await s.list({ prefix });
+        await Promise.all(blobs.map((b) => s.delete(b.key)));
+        apagados += blobs.length;
+      }
+      await s.delete("contador");
+      await tgNotify(s, `🧹 <b>SISTEMA ZERADO</b>\nTodos os cadastros, validações e vouchers foram apagados.\nPlacar de volta a ${LIMITE_VAGAS}/${LIMITE_VAGAS}.\n🕐 ${agoraCuiaba()}`);
+      return json({ ok: true, registrosApagados: apagados, mensagem: `Sistema zerado. Placar de volta a ${LIMITE_VAGAS}/${LIMITE_VAGAS}. Os Telegrams registrados foram mantidos.` });
+    }
+
     // ---------- ADMIN (JSON) ----------
     if (action === "admin" && req.method === "GET") {
       if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
