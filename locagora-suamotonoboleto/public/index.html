@@ -182,14 +182,14 @@
 
 <section class="cinza-bg">
   <div class="wrap" style="text-align:center">
-    <h2 style="font-size:26px">Faltam</h2>
+    <h2 style="font-size:26px" id="cd-titulo">Faltam</h2>
     <div class="cd" id="cd">
       <div><span class="n" id="cd-d">--</span><span class="l">dias</span></div>
       <div><span class="n" id="cd-h">--</span><span class="l">horas</span></div>
       <div><span class="n" id="cd-m">--</span><span class="l">min</span></div>
       <div><span class="n" id="cd-s">--</span><span class="l">seg</span></div>
     </div>
-    <p style="font-weight:800;font-size:16px">para a inauguração — <span class="azul">22/08, a partir das 7h</span></p>
+    <p style="font-weight:800;font-size:16px" id="cd-sub">para a inauguração — <span class="azul">22/08, a partir das 9h</span></p>
   </div>
 </section>
 
@@ -326,10 +326,14 @@
     }
   }).catch(() => {});
 
-  // countdown 22/08/2026 07:00 Cuiabá (UTC-4)
-  const alvo = new Date('2026-08-22T07:00:00-04:00').getTime();
-  setInterval(() => {
+  // countdown 22/08/2026 09:00 Cuiabá (UTC-4)
+  const alvo = new Date('2026-08-22T09:00:00-04:00').getTime();
+  function tick() {
     let ms = Math.max(0, alvo - Date.now());
+    if (ms === 0) {
+      document.getElementById('cd-titulo').textContent = '🔥 É AGORA!';
+      document.getElementById('cd-sub').innerHTML = 'A LOCAGORA <span class="azul">TÁ ABERTA</span> — corre pra Av. Ten. Cel. Duarte, 1410!';
+    }
     const d = Math.floor(ms / 864e5); ms -= d * 864e5;
     const h = Math.floor(ms / 36e5); ms -= h * 36e5;
     const m = Math.floor(ms / 6e4); ms -= m * 6e4;
@@ -338,7 +342,9 @@
     document.getElementById('cd-h').textContent = String(h).padStart(2, '0');
     document.getElementById('cd-m').textContent = String(m).padStart(2, '0');
     document.getElementById('cd-s').textContent = String(sg).padStart(2, '0');
-  }, 1000);
+  }
+  tick();
+  setInterval(tick, 1000);
 </script>
 </body>
 </html>
