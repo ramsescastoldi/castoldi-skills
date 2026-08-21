@@ -2,7 +2,7 @@
   "name": "locagora-suamotonoboleto",
   "version": "1.0.0",
   "private": true,
-  "description": "Landing page de captação de leads + validação de QR e voucher — inauguração Locagora Cuiabá 22/06/2026",
+  "description": "Landing page de captação de leads + validação de QR e voucher — inauguração Locagora Cuiabá 22/08/2026",
   "dependencies": {
     "@netlify/blobs": "^8.1.0",
     "@netlify/functions": "^2.8.2"
