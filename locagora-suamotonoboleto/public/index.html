@@ -42,7 +42,15 @@
   .estoque-top{display:flex;align-items:center;gap:12px;font-weight:700;font-size:15px}
   .estoque .num{font-family:'Montserrat';font-weight:900;font-size:40px;color:var(--vermelho);min-width:64px;text-align:center;line-height:1}
   .estoque-txt b{color:var(--vermelho);text-transform:uppercase}
-  .estoque-alerta{margin-top:10px;font-size:13px;font-weight:800;text-align:center;background:var(--amarelo);border-radius:8px;padding:7px 8px}
+  .estoque-sub{font-size:13px;font-weight:700;color:var(--cinza)}
+  .estoque-sub b{color:var(--preto)}
+  .barra{background:#eceef3;border-radius:999px;height:14px;margin-top:12px;overflow:hidden}
+  .barra-fill{background:linear-gradient(90deg,var(--vermelho),#ff6b3d);height:100%;width:100%;border-radius:999px;transition:width 1s ease}
+  .estoque-alerta{margin-top:10px;font-size:13px;font-weight:800;text-align:center;background:var(--amarelo);border-radius:8px;padding:8px}
+  .estoque-alerta.quente{background:var(--vermelho);color:#fff;animation:bate 1.6s infinite}
+  @keyframes bate{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  .proximo{display:inline-block;font-family:'Montserrat';font-weight:900;font-size:13px;color:var(--cinza);
+    border:2px dashed var(--borda);border-radius:8px;padding:3px 8px;margin-top:8px}
   .pulse{animation:pulse 1.2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
@@ -115,8 +123,10 @@
     <div class="estoque" id="estoque-box">
       <div class="estoque-top">
         <span class="num pulse" id="estoque-num">--</span>
-        <span class="estoque-txt"><b>motos disponíveis</b><br>Estoque real, atualizado a cada venda.</span>
+        <span class="estoque-txt"><b>motos disponíveis</b><br><span class="estoque-sub" id="estoque-sub">carregando estoque...</span></span>
       </div>
+      <div class="barra"><div class="barra-fill" id="barra-fill" style="width:100%"></div></div>
+      <div class="proximo" id="proximo" style="display:none"></div>
       <div class="estoque-alerta" id="estoque-alerta">🔥 Saiu uma, sai do contador. Quem chega primeiro escolhe.</div>
     </div>
 
@@ -219,17 +229,28 @@
     if (typeof fbq === 'function') fbq('track', 'Contact');
   }));
 
-  // contador de estoque
+  // contador de estoque + FOMO
   fetch('/api/estoque').then(r => r.json()).then(j => {
     if (!j.ok) return;
-    document.getElementById('estoque-num').textContent = j.disponiveis;
+    const disp = j.disponiveis, neg = j.negociando || 0;
+    document.getElementById('estoque-num').textContent = disp;
+    document.getElementById('estoque-sub').innerHTML = 'de <b>' + j.total + '</b> — <b>' + j.vendidas + ' já saíram</b>';
+    document.getElementById('barra-fill').style.width = Math.max(3, (disp / j.total) * 100) + '%';
+
+    const prox = document.getElementById('proximo');
+    if (disp > 0) { prox.textContent = '⏭️ próximo número: ' + (disp - 1); prox.style.display = 'inline-block'; }
+
     const alerta = document.getElementById('estoque-alerta');
-    if (j.disponiveis <= 0) {
+    if (disp <= 0) {
       alerta.textContent = '❌ Estoque esgotado — chama no WhatsApp pra entrar na fila da próxima leva';
-    } else if (j.disponiveis <= 10) {
-      alerta.textContent = '🚨 ÚLTIMAS ' + j.disponiveis + ' MOTOS — depois só na próxima leva';
+    } else if (neg > 0) {
+      alerta.className = 'estoque-alerta quente';
+      alerta.textContent = '🔥 ' + neg + (neg === 1 ? ' MOTO EM NEGOCIAÇÃO AGORA' : ' MOTOS EM NEGOCIAÇÃO AGORA') + ' — esse contador pode virar ' + (disp - 1) + ' a qualquer momento';
+    } else if (disp <= 10) {
+      alerta.className = 'estoque-alerta quente';
+      alerta.textContent = '🚨 ÚLTIMAS ' + disp + ' MOTOS — depois só na próxima leva';
     } else if (j.vendidas > 0) {
-      alerta.textContent = '🔥 ' + j.vendidas + ' já saíram — restam ' + j.disponiveis + ' de ' + j.total;
+      alerta.textContent = '🔥 ' + j.vendidas + ' já saíram — quem demora fica sem escolher a cor';
     }
   }).catch(() => {});
 

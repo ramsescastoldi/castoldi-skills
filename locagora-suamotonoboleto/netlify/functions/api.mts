@@ -3,7 +3,8 @@ import { getStore } from "@netlify/blobs";
 
 const LIMITE_VAGAS = 40;
 const VALOR_VOUCHER = 50;
-const ESTOQUE_PADRAO = 58;
+const ESTOQUE_TOTAL = 65;
+const ESTOQUE_VENDIDAS = 7; // 65 - 7 = 58 disponíveis hoje
 
 const POSTO_PIN = Netlify.env.get("POSTO_PIN") || "5050";
 const ADMIN_KEY = Netlify.env.get("ADMIN_KEY") || "locagora-admin";
@@ -106,8 +107,8 @@ async function registrarVisita(s: ReturnType<typeof getStore>) {
 }
 
 async function estoque(s: ReturnType<typeof getStore>) {
-  const e = (await s.get("estoque", { type: "json" })) as { total: number; vendidas: number } | null;
-  return e || { total: ESTOQUE_PADRAO, vendidas: 0 };
+  const e = (await s.get("estoque", { type: "json" })) as { total: number; vendidas: number; negociando?: number } | null;
+  return e || { total: ESTOQUE_TOTAL, vendidas: ESTOQUE_VENDIDAS, negociando: 0 };
 }
 
 async function contador(s: ReturnType<typeof getStore>) {
@@ -318,7 +319,7 @@ export default async (req: Request, context: Context) => {
 
           const e = await estoque(s);
           const vendidas = Math.min(e.total, e.vendidas + 1);
-          await s.setJSON("estoque", { total: e.total, vendidas });
+          await s.setJSON("estoque", { total: e.total, vendidas, negociando: Math.max(0, (e.negociando || 0) - 1) });
           const restam = Math.max(0, e.total - vendidas);
           await s.delete(draftKey(chatId));
           await tgNotify(
@@ -388,18 +389,28 @@ export default async (req: Request, context: Context) => {
           `🏍️ <b>Registrar venda</b> (restam ${Math.max(0, e.total - e.vendidas)} de ${e.total})\nManda a FOTO da entrega com a legenda:\n<code>Carlos | CG 160 Titan</code>\n(primeiro nome do comprador | modelo)\n\nO site desconta 1 do estoque e publica a foto no mural na hora.`,
           true
         );
+      } else if (texto.includes("negocia")) {
+        const n = texto.match(/(\d{1,3})/);
+        const e = await estoque(s);
+        if (n) {
+          const negociando = parseInt(n[1], 10);
+          await s.setJSON("estoque", { total: e.total, vendidas: e.vendidas, negociando });
+          await tgSend(chatId, `🔥 Site agora mostra <b>${negociando}</b> em negociação.\nO alerta vermelho avisa que o contador pode virar ${Math.max(0, e.total - e.vendidas - 1)} a qualquer momento.`, true);
+        } else {
+          await tgSend(chatId, `🤝 Em negociação agora: <b>${e.negociando || 0}</b>\n\n<i>Para mudar, mande: negociando 3</i>`, true);
+        }
       } else if (texto.includes("estoque")) {
         const n = texto.match(/estoque\s+(\d{1,4})/);
         const e = await estoque(s);
         if (n) {
           const disp = parseInt(n[1], 10);
           const total = Math.max(e.total, e.vendidas + disp);
-          await s.setJSON("estoque", { total, vendidas: total - disp });
-          await tgSend(chatId, `✅ Agora o site mostra <b>${disp}</b> motos disponíveis.\n(total ${total} • vendidas registradas ${total - disp})`, true);
+          await s.setJSON("estoque", { total, vendidas: total - disp, negociando: e.negociando || 0 });
+          await tgSend(chatId, `✅ Agora o site mostra <b>${disp}</b> motos disponíveis.\n(de ${total} — ${total - disp} já saíram)`, true);
         } else {
           await tgSend(
             chatId,
-            `📊 <b>ESTOQUE</b>\n🔵 Disponíveis no site: <b>${Math.max(0, e.total - e.vendidas)}</b>\n✅ Vendidas: <b>${e.vendidas}</b>\n🏍️ Total: <b>${e.total}</b>\n🕐 ${agoraCuiaba()}\n\n<i>Para mudar, mande: estoque 45</i>`,
+            `📊 <b>ESTOQUE</b>\n🔵 Disponíveis no site: <b>${Math.max(0, e.total - e.vendidas)}</b>\n✅ Já saíram: <b>${e.vendidas}</b> de ${e.total}\n🤝 Em negociação: <b>${e.negociando || 0}</b>\n🕐 ${agoraCuiaba()}\n\n<i>Mudar disponíveis: estoque 45</i>\n<i>Mudar negociação: negociando 3</i>`,
             true
           );
         }
@@ -410,7 +421,7 @@ export default async (req: Request, context: Context) => {
         const hoje = v.dia === hojeCuiaba() ? v.hoje || 0 : 0;
         await tgSend(
           chatId,
-          `📈 <b>ACESSOS AO SITE</b>\n👀 Hoje: <b>${hoje}</b>\n📊 Total: <b>${v.total || 0}</b>\n\n🔵 Motos disponíveis: <b>${Math.max(0, e.total - e.vendidas)}</b>\n🎉 Vendas no mural: <b>${vendas.length}</b>\n🕐 ${agoraCuiaba()}`,
+          `📈 <b>ACESSOS AO SITE</b>\n👀 Hoje: <b>${hoje}</b>\n📊 Total: <b>${v.total || 0}</b>\n\n🔵 Disponíveis: <b>${Math.max(0, e.total - e.vendidas)}</b> de ${e.total}\n🤝 Em negociação: <b>${e.negociando || 0}</b>\n🎉 Vendas no mural: <b>${vendas.length}</b>\n🕐 ${agoraCuiaba()}`,
           true
         );
       } else if (texto.includes("fotos da landing")) {
@@ -474,6 +485,7 @@ export default async (req: Request, context: Context) => {
         total: e.total,
         vendidas: e.vendidas,
         disponiveis: Math.max(0, e.total - e.vendidas),
+        negociando: e.negociando || 0,
       });
     }
 
