@@ -8,6 +8,7 @@ const ESTOQUE_PADRAO = 58;
 const POSTO_PIN = Netlify.env.get("POSTO_PIN") || "5050";
 const ADMIN_KEY = Netlify.env.get("ADMIN_KEY") || "locagora-admin";
 const TG_TOKEN = Netlify.env.get("TELEGRAM_BOT_TOKEN") || "";
+const TG_SECRET = (TG_TOKEN.split(":")[1] || "locagora").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 64);
 
 const store = () => getStore({ name: "locagora", consistency: "strong" });
 
@@ -55,8 +56,8 @@ async function tgChats(s: ReturnType<typeof getStore>): Promise<number[]> {
 const TG_TECLADO = {
   keyboard: [
     [{ text: "🏍️ Vendeu uma moto" }, { text: "📊 Estoque" }],
-    [{ text: "📸 Fotos da landing" }, { text: "🛠️ Criar site" }],
-    [{ text: "✅ Gerar página" }, { text: "⛽ Vouchers usados no posto" }],
+    [{ text: "📸 Fotos da landing" }, { text: "📈 Acessos" }],
+    [{ text: "🛠️ Criar site" }, { text: "✅ Gerar página" }],
   ],
   resize_keyboard: true,
   is_persistent: true,
@@ -82,6 +83,25 @@ async function tgNotify(s: ReturnType<typeof getStore>, texto: string) {
     await Promise.all(chats.map((id) => tgSend(id, texto).catch(() => {})));
   } catch {
     // notificação é melhor-esforço
+  }
+}
+
+function hojeCuiaba(): string {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "America/Cuiaba" });
+}
+
+// ponytail: contagem simples por escrita direta; se o tráfego crescer muito, trocar por agregação assíncrona
+async function registrarVisita(s: ReturnType<typeof getStore>) {
+  try {
+    const v = ((await s.get("visitas", { type: "json" })) as any) || { total: 0, dia: "", hoje: 0 };
+    const dia = hojeCuiaba();
+    await s.setJSON("visitas", {
+      total: (v.total || 0) + 1,
+      dia,
+      hoje: v.dia === dia ? (v.hoje || 0) + 1 : 1,
+    });
+  } catch {
+    // contagem é melhor-esforço, nunca derruba a página
   }
 }
 
@@ -234,7 +254,7 @@ export default async (req: Request, context: Context) => {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           url: `${url.origin}/api/tghook`,
-          secret_token: ADMIN_KEY.replace(/[^A-Za-z0-9_-]/g, ""),
+          secret_token: TG_SECRET,
           allowed_updates: ["message"],
         }),
       });
@@ -250,7 +270,7 @@ export default async (req: Request, context: Context) => {
 
     // ---------- TELEGRAM: webhook (responde /start e os botões) ----------
     if (action === "tghook" && req.method === "POST") {
-      if (req.headers.get("x-telegram-bot-api-secret-token") !== ADMIN_KEY.replace(/[^A-Za-z0-9_-]/g, ""))
+      if (req.headers.get("x-telegram-bot-api-secret-token") !== TG_SECRET)
         return json({ ok: false }, 401);
       const up = (await req.json().catch(() => ({}))) as any;
       const msg = up.message;
@@ -350,7 +370,7 @@ export default async (req: Request, context: Context) => {
       }
 
       if (texto.startsWith("/start")) {
-        await tgSend(chatId, `🔔 <b>Notificações Locagora ativadas!</b>\nVocê receberá aviso de cada cadastro, validação de QR e uso de voucher.\nUse os botões aqui embaixo 👇`, true);
+        await tgSend(chatId, `🔔 <b>Bot da Locagora ativo!</b>\n🏍️ Registrar venda (baixa do estoque + mural)\n📊 Ver e mudar motos disponíveis\n📸 Subir fotos das motos pro site\n📈 Acessos ao site\nUse os botões aqui embaixo 👇`, true);
       } else if (texto.includes("status")) {
         const leads = await todosLeads(s);
         const c = await contador(s);
@@ -372,16 +392,27 @@ export default async (req: Request, context: Context) => {
         const n = texto.match(/estoque\s+(\d{1,4})/);
         const e = await estoque(s);
         if (n) {
-          const total = parseInt(n[1], 10);
-          await s.setJSON("estoque", { total, vendidas: Math.min(e.vendidas, total) });
-          await tgSend(chatId, `✅ Estoque total ajustado para <b>${total}</b> motos.\nVendidas: ${Math.min(e.vendidas, total)} • Disponíveis: ${Math.max(0, total - Math.min(e.vendidas, total))}`, true);
+          const disp = parseInt(n[1], 10);
+          const total = Math.max(e.total, e.vendidas + disp);
+          await s.setJSON("estoque", { total, vendidas: total - disp });
+          await tgSend(chatId, `✅ Agora o site mostra <b>${disp}</b> motos disponíveis.\n(total ${total} • vendidas registradas ${total - disp})`, true);
         } else {
           await tgSend(
             chatId,
-            `📊 <b>ESTOQUE</b>\n🏍️ Total: <b>${e.total}</b>\n✅ Vendidas: <b>${e.vendidas}</b>\n🔵 Disponíveis: <b>${Math.max(0, e.total - e.vendidas)}</b>\n🕐 ${agoraCuiaba()}\n\n<i>Para corrigir o total, mande: estoque 58</i>`,
+            `📊 <b>ESTOQUE</b>\n🔵 Disponíveis no site: <b>${Math.max(0, e.total - e.vendidas)}</b>\n✅ Vendidas: <b>${e.vendidas}</b>\n🏍️ Total: <b>${e.total}</b>\n🕐 ${agoraCuiaba()}\n\n<i>Para mudar, mande: estoque 45</i>`,
             true
           );
         }
+      } else if (texto.includes("acessos")) {
+        const v = ((await s.get("visitas", { type: "json" })) as any) || { total: 0, dia: "", hoje: 0 };
+        const e = await estoque(s);
+        const { blobs: vendas } = await s.list({ prefix: "venda/reg/" });
+        const hoje = v.dia === hojeCuiaba() ? v.hoje || 0 : 0;
+        await tgSend(
+          chatId,
+          `📈 <b>ACESSOS AO SITE</b>\n👀 Hoje: <b>${hoje}</b>\n📊 Total: <b>${v.total || 0}</b>\n\n🔵 Motos disponíveis: <b>${Math.max(0, e.total - e.vendidas)}</b>\n🎉 Vendas no mural: <b>${vendas.length}</b>\n🕐 ${agoraCuiaba()}`,
+          true
+        );
       } else if (texto.includes("fotos da landing")) {
         await s.setJSON(draftKey(chatId), { modo: "landing" });
         await tgSend(
@@ -420,7 +451,7 @@ export default async (req: Request, context: Context) => {
           : "Nenhum voucher usado no posto ainda.";
         await tgSend(chatId, `⛽ <b>VOUCHERS USADOS NO POSTO (${usados.length})</b>\n${linhas}`, true);
       } else {
-        await tgSend(chatId, "Use os botões aqui embaixo 👇", true);
+        await tgSend(chatId, "Use os botões aqui embaixo 👇\n<i>Dica: para mudar o estoque, mande \"estoque 45\".</i>", true);
       }
       return json({ ok: true });
     }
@@ -436,6 +467,7 @@ export default async (req: Request, context: Context) => {
 
     // ---------- ESTOQUE DE MOTOS ----------
     if (action === "estoque" && req.method === "GET") {
+      await registrarVisita(s);
       const e = await estoque(s);
       return json({
         ok: true,
