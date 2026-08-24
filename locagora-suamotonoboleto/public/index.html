@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SUA MOTO NO BOLETO — Locagora Cuiabá</title>
-<meta name="description" content="Motoboy: sua moto nova no boleto, até negativado. Os 40 primeiros entregadores na inauguração da LOCAGORA Cuiabá (22/08) ganham café da manhã grátis + vale-combustível de R$50.">
-<meta property="og:title" content="🏍️ SUA MOTO NO BOLETO — até NEGATIVADO">
-<meta property="og:description" content="LOCAGORA Cuiabá inaugura 22/08. Os 40 primeiros motoboys ganham CAFÉ DA MANHÃ GRÁTIS + VALE R$50 DE COMBUSTÍVEL. Garanta seu QR Code!">
+<title>SUA MOTO NO BOLETO EM 18X — Locagora Cuiabá</title>
+<meta name="description" content="Moto nova e seminova no boleto em 18x, até negativado. Análise na hora. Locagora Cuiabá — Av. Ten. Cel. Duarte, 1410, Centro Sul.">
+<meta property="og:title" content="🏍️ SUA MOTO NO BOLETO EM 18X — até NEGATIVADO">
+<meta property="og:description" content="Motos novas e seminovas no boleto em 18x. Análise na hora, sem julgamento. Locagora Cuiabá.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/assets/og.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
@@ -17,7 +17,7 @@
   :root{
     --azul:#0b46e6; --azul-escuro:#082f9e; --amarelo:#ffc400; --amarelo-claro:#fff3c4;
     --preto:#111318; --branco:#ffffff; --cinza:#5b6270; --cinza-claro:#f2f4f9;
-    --borda:#dde1ea; --verde:#16a34a; --vermelho:#e11d2e; --vermelho-claro:#fdecee;
+    --borda:#dde1ea; --verde:#16a34a; --verde-escuro:#0d7a37; --vermelho:#e11d2e;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--branco);color:var(--preto);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5}
@@ -29,45 +29,29 @@
   .topbar{background:var(--vermelho);color:#fff;text-align:center;font-weight:800;font-size:13px;padding:9px 10px;letter-spacing:.6px;text-transform:uppercase}
 
   .hero{padding:30px 0 26px;background:linear-gradient(180deg,var(--amarelo-claro),var(--branco) 55%)}
-  .badge{display:inline-block;background:var(--azul);color:#fff;
-    font-size:12px;font-weight:800;padding:7px 14px;border-radius:999px;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+  .badge{display:inline-block;background:var(--azul);color:#fff;font-size:12px;font-weight:800;padding:7px 14px;border-radius:999px;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
   .hero h1{font-size:38px;margin-bottom:14px}
-  .hero p.sub{font-size:17px;font-weight:600;color:var(--preto);line-height:1.5}
+  .hero p.sub{font-size:17px;font-weight:600;line-height:1.5}
   .hero p.sub b{color:var(--azul)}
 
-  .vagas{background:var(--branco);border:3px solid var(--vermelho);border-radius:16px;padding:16px;margin:20px 0 6px;
-    box-shadow:0 8px 24px rgba(225,29,46,.15)}
-  .vagas-top{display:flex;align-items:center;gap:12px;font-weight:700;font-size:15px}
-  .vagas .num{font-family:'Montserrat';font-weight:900;font-size:40px;color:var(--vermelho);min-width:64px;text-align:center;line-height:1}
-  .vagas-txt b{color:var(--vermelho);text-transform:uppercase}
-  .vagas-alerta{margin-top:10px;font-size:13px;font-weight:800;color:var(--preto);text-align:center;background:var(--amarelo);border-radius:8px;padding:7px 8px}
-  .prova{display:flex;align-items:center;gap:8px;margin-top:14px;background:var(--cinza-claro);border:1.5px solid var(--borda);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700}
-  .prova-dot{width:9px;height:9px;border-radius:50%;background:var(--verde);animation:pulse 1.2s infinite;flex-shrink:0}
-  .micro-oferta{background:var(--amarelo);color:var(--preto);font-weight:900;font-size:13px;text-align:center;border-radius:10px;padding:9px 10px;margin-bottom:14px;letter-spacing:.3px}
-  .faq{list-style:none}
-  .faq li{padding:11px 0;border-bottom:1px solid var(--borda);font-size:16px;font-weight:600}
-  .faq li:last-child{border:none}
-  .faq b{color:var(--azul)}
-  .motos-foto{position:relative;border-radius:16px;overflow:hidden;background:var(--cinza-claro);aspect-ratio:4/3}
-  .motos-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease}
-  .motos-foto img.on{opacity:1}
+  .parcela-box{background:var(--amarelo);border-radius:18px;padding:22px 20px;text-align:center;margin-top:18px;box-shadow:0 10px 30px rgba(255,196,0,.4)}
+  .parcela-box .display{font-size:34px}
+  .parcela-box p{font-size:15px;font-weight:700;margin-top:8px}
+
+  .estoque{background:var(--branco);border:3px solid var(--vermelho);border-radius:16px;padding:16px;margin:18px 0 6px;box-shadow:0 8px 24px rgba(225,29,46,.15)}
+  .estoque-top{display:flex;align-items:center;gap:12px;font-weight:700;font-size:15px}
+  .estoque .num{font-family:'Montserrat';font-weight:900;font-size:40px;color:var(--vermelho);min-width:64px;text-align:center;line-height:1}
+  .estoque-txt b{color:var(--vermelho);text-transform:uppercase}
+  .estoque-alerta{margin-top:10px;font-size:13px;font-weight:800;text-align:center;background:var(--amarelo);border-radius:8px;padding:7px 8px}
   .pulse{animation:pulse 1.2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  .form-card{background:var(--branco);border:3px solid var(--azul);border-radius:18px;padding:22px 18px;margin-top:18px;
-    box-shadow:0 10px 34px rgba(11,70,230,.16)}
-  .form-card h2{font-size:22px;text-align:center;margin-bottom:4px}
-  .form-card p.mini{text-align:center;font-size:13px;color:var(--cinza);margin-bottom:16px;font-weight:600}
-  label{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin:12px 0 6px}
-  input{width:100%;background:var(--branco);border:2px solid var(--borda);border-radius:12px;color:var(--preto);
-    font-size:18px;font-weight:600;padding:15px 14px;outline:none}
-  input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(11,70,230,.15)}
-  .btn{display:block;width:100%;background:var(--azul);color:#fff;border:none;border-radius:14px;
-    font-family:'Montserrat';font-weight:900;font-size:19px;text-transform:uppercase;letter-spacing:.5px;padding:18px 10px;margin-top:18px;cursor:pointer;
-    box-shadow:0 6px 0 var(--azul-escuro), 0 10px 26px rgba(11,70,230,.35)}
-  .btn:active{transform:translateY(2px);box-shadow:0 3px 0 var(--azul-escuro)}
-  .erro{display:none;background:var(--vermelho-claro);border:1.5px solid var(--vermelho);color:var(--vermelho);
-    border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;margin-top:12px}
+  .btn{display:block;width:100%;background:var(--verde);color:#fff;border:none;border-radius:14px;font-family:'Montserrat';font-weight:900;
+    font-size:19px;text-transform:uppercase;letter-spacing:.5px;padding:18px 10px;margin-top:18px;cursor:pointer;text-decoration:none;text-align:center;
+    box-shadow:0 6px 0 var(--verde-escuro), 0 10px 26px rgba(22,163,74,.3)}
+  .btn:active{transform:translateY(2px);box-shadow:0 3px 0 var(--verde-escuro)}
+  .btn-azul{background:var(--azul);box-shadow:0 6px 0 var(--azul-escuro), 0 10px 26px rgba(11,70,230,.3)}
+  .btn-azul:active{box-shadow:0 3px 0 var(--azul-escuro)}
   .seguro{text-align:center;font-size:12px;color:var(--cinza);margin-top:12px;font-weight:600}
 
   section{padding:34px 0}
@@ -86,70 +70,58 @@
     background:var(--azul);color:#fff;font-family:'Montserrat';font-weight:900;font-size:20px;border-radius:12px;display:flex;align-items:center;justify-content:center}
   .passos b{background:var(--amarelo);padding:0 4px;border-radius:4px}
 
-  .oferta-box{background:var(--amarelo);border:none;border-radius:18px;padding:24px 20px;text-align:center;
-    box-shadow:0 10px 30px rgba(255,196,0,.4)}
-  .oferta-box .display{font-size:26px;color:var(--preto)}
-  .oferta-box p{font-size:15px;font-weight:600;margin-top:10px;color:var(--preto)}
-  .oferta-box p b{color:var(--azul)}
-  .risco{font-family:'Montserrat';font-weight:900;color:var(--vermelho);font-size:19px;margin-top:16px;text-transform:uppercase}
+  .faq{list-style:none}
+  .faq li{padding:11px 0;border-bottom:1px solid var(--borda);font-size:16px;font-weight:600}
+  .faq li:last-child{border:none}
+  .faq b{color:var(--azul)}
+
+  .motos-foto{position:relative;border-radius:16px;overflow:hidden;background:var(--cinza-claro);aspect-ratio:4/3}
+  .motos-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease}
+  .motos-foto img.on{opacity:1}
+
+  .mural{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .venda{background:var(--branco);border:2px solid var(--borda);border-radius:14px;overflow:hidden;box-shadow:0 6px 18px rgba(17,19,24,.07)}
+  .venda img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--cinza-claro)}
+  .venda .leg{padding:10px 12px;font-size:14px;font-weight:800;line-height:1.35}
+  .venda .leg span{display:block;font-size:12px;font-weight:600;color:var(--cinza);margin-top:2px}
 
   .mapa iframe{width:100%;height:260px;border:0;border-radius:14px}
   .end{font-size:15px;font-weight:600;margin:14px 0;line-height:1.5}
   .btn-rota{display:block;text-align:center;background:var(--branco);border:2.5px solid var(--azul);color:var(--azul);
     border-radius:12px;font-family:'Montserrat';font-weight:900;font-size:17px;text-transform:uppercase;padding:14px;text-decoration:none;letter-spacing:.5px}
 
-  .cd{display:flex;gap:8px;justify-content:center;margin:16px 0}
-  .cd div{background:var(--branco);border:2px solid var(--borda);border-radius:12px;padding:10px 0;width:70px;text-align:center;box-shadow:0 4px 12px rgba(17,19,24,.06)}
-  .cd .n{font-family:'Montserrat';font-weight:900;font-size:26px;color:var(--azul);display:block}
-  .cd .l{font-size:10px;text-transform:uppercase;color:var(--cinza);letter-spacing:1px;font-weight:700}
-
   footer{padding:28px 18px 92px;text-align:center;font-size:11px;color:var(--cinza);line-height:1.6;background:var(--cinza-claro)}
   .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);
     border-top:1px solid var(--borda);z-index:50;box-shadow:0 -6px 20px rgba(17,19,24,.08)}
-  .sticky-cta a{display:block;text-align:center;background:var(--azul);color:#fff;font-family:'Montserrat';font-weight:900;font-size:17px;
+  .sticky-cta a{display:block;text-align:center;background:var(--verde);color:#fff;font-family:'Montserrat';font-weight:900;font-size:17px;
     text-transform:uppercase;letter-spacing:.5px;border-radius:12px;padding:15px;text-decoration:none}
 </style>
 </head>
 <body>
 
-<div class="topbar">⚠️ 40 primeiros a chegar levam o vale — Inauguração LOCAGORA Cuiabá • 22/08</div>
+<div class="topbar">🏍️ Moto no boleto em 18x — até negativado • Locagora Cuiabá</div>
 
 <header class="hero">
   <div class="wrap">
-    <span class="badge">⚡ Atenção motoboy / entregador de Cuiabá</span>
-    <h1>SUA MOTO <span class="azul">NO BOLETO</span>.<br>ATÉ <span class="marca">NEGATIVADO</span>.<br>SEM ENROLAÇÃO.</h1>
-    <p class="sub">Dia <b>22/08</b> a <b>LOCAGORA</b> abre as portas em Cuiabá — motos novas e seminovas pro seu corre. E os <b>40 PRIMEIROS QUE CHEGAREM</b> na porta levam:</p>
+    <span class="badge">⚡ Motoboy / entregador de Cuiabá</span>
+    <h1>SUA MOTO<br><span class="azul">NO BOLETO</span> EM <span class="marca">18X</span>.<br>ATÉ NEGATIVADO.</h1>
+    <p class="sub">Motos novas e seminovas prontas pro corre. <b>Análise na hora</b>, sem julgamento e sem banco enrolando você.</p>
 
-    <div class="oferta-box" style="margin-top:16px">
-      <div class="display">☕ CAFÉ DA MANHÃ GRÁTIS<br>+ ⛽ VALE R$50 DE COMBUSTÍVEL</div>
-      <p>É só se cadastrar, receber seu <b>QR Code</b> e chegar cedo pra validar na porta da loja.</p>
-      <p style="margin-top:12px;border-top:2px solid rgba(0,0,0,.15);padding-top:12px">🎁 <b>Chegou depois dos 40?</b> Não sai de mãos abanando: você concorre a <b>vários brindes</b> ao longo do dia.</p>
+    <div class="parcela-box">
+      <div class="display">💳 18X NO BOLETO</div>
+      <p>Parcela que cabe no corre da entrega — e cada boleto pago é um pedaço da moto que é <b>SUA</b>.</p>
     </div>
 
-    <div class="vagas" id="vagas-box">
-      <div class="vagas-top">
-        <span class="num pulse" id="vagas-num">0</span>
-        <span class="vagas-txt"><b>motoboys já inscritos</b><br>Quanto mais gente, mais cedo você tem que chegar.</span>
+    <div class="estoque" id="estoque-box">
+      <div class="estoque-top">
+        <span class="num pulse" id="estoque-num">--</span>
+        <span class="estoque-txt"><b>motos disponíveis</b><br>Estoque real, atualizado a cada venda.</span>
       </div>
-      <div class="vagas-alerta" id="vagas-alerta">🔥 Cadastro grátis de 15 segundos — o vale é dos 40 PRIMEIROS A CHEGAR</div>
+      <div class="estoque-alerta" id="estoque-alerta">🔥 Saiu uma, sai do contador. Quem chega primeiro escolhe.</div>
     </div>
 
-    <div class="prova" id="prova" style="display:none"><span class="prova-dot"></span><span id="prova-txt"></span></div>
-
-    <div class="form-card" id="form">
-      <div class="micro-oferta">☕ CAFÉ + ⛽ R$50 DE GASOLINA PELOS 15 SEGUNDOS DE CADASTRO</div>
-      <h2>Garanta seu <span class="azul">QR Code</span> agora</h2>
-      <p class="mini">Grátis. Sem pegadinha.</p>
-      <form id="lead-form" novalidate>
-        <label for="nome">Seu nome</label>
-        <input id="nome" name="nome" type="text" placeholder="Nome completo" autocomplete="name" required>
-        <label for="fone">Seu WhatsApp</label>
-        <input id="fone" name="fone" type="tel" placeholder="(65) 99999-9999" autocomplete="tel" inputmode="numeric" required>
-        <div class="erro" id="erro"></div>
-        <button class="btn" type="submit" id="btn-enviar">🔥 GARANTIR MEU VALE DE R$50</button>
-      </form>
-      <p class="seguro">🔒 Seus dados estão seguros. Sem spam, sem pegadinha.</p>
-    </div>
+    <a class="btn zap" id="cta-topo" href="#" target="_blank" rel="noopener">🔥 QUERO A MINHA NO BOLETO</a>
+    <p class="seguro">🔒 Chama no WhatsApp e fala direto com a gente. Sem burocracia.</p>
   </div>
 </header>
 
@@ -158,38 +130,11 @@
     <p class="punch">Tá pagando <span class="x">diária de moto alugada</span> e no fim do mês não sobra nada?</p>
     <p class="punch">Nome sujo te travou no banco? <span class="azul">Aqui a conversa é outra.</span></p>
     <ul class="beneficios">
+      <li><span class="ic">✅</span> <span><b>18x no boleto.</b> Parcela pensada pra quem vive de entrega.</span></li>
       <li><span class="ic">✅</span> <span><b>Negativado compra.</b> Análise na hora, de boa, sem julgamento.</span></li>
-      <li><span class="ic">✅</span> <span><b>Boleto que cabe no corre.</b> Parcela pensada pra quem vive de entrega.</span></li>
       <li><span class="ic">✅</span> <span><b>Motos novas e seminovas</b> prontas pra rodar de iFood, 99 e Lalamove no mesmo dia.</span></li>
-      <li><span class="ic">✅</span> <span><b>Sai da diária.</b> Cada boleto pago é um pedaço da moto que é SUA.</span></li>
+      <li><span class="ic">✅</span> <span><b>Sai da diária.</b> Deixa de pagar aluguel pra construir patrimônio seu.</span></li>
     </ul>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 style="font-size:26px;margin-bottom:18px">Como funciona <span class="azul">(simples assim)</span></h2>
-    <ol class="passos">
-      <li><b>Cadastra</b> teu nome e WhatsApp aqui na página.</li>
-      <li>Recebe teu <b>QR Code exclusivo</b> na tela, na hora.</li>
-      <li>Dia <b>22/08</b>, chega cedo na LOCAGORA (Av. Ten. Cel. Duarte, 1410 — Centro Sul).</li>
-      <li>Validou o QR entre os <b>40 primeiros a chegar</b>: <b>café da manhã grátis + vale R$50 de combustível</b> pra usar no posto parceiro.</li>
-      <li>Chegou depois? Seu QR vale pra <b>concorrer aos brindes</b> do dia — e a moto no boleto continua te esperando.</li>
-    </ol>
-    <p class="risco">⚠️ O vale é por ORDEM DE CHEGADA. Cadastro não reserva — quem chega cedo leva.</p>
-  </div>
-</section>
-
-<section class="cinza-bg">
-  <div class="wrap" style="text-align:center">
-    <h2 style="font-size:26px" id="cd-titulo">Faltam</h2>
-    <div class="cd" id="cd">
-      <div><span class="n" id="cd-d">--</span><span class="l">dias</span></div>
-      <div><span class="n" id="cd-h">--</span><span class="l">horas</span></div>
-      <div><span class="n" id="cd-m">--</span><span class="l">min</span></div>
-      <div><span class="n" id="cd-s">--</span><span class="l">seg</span></div>
-    </div>
-    <p style="font-weight:800;font-size:16px" id="cd-sub">para a inauguração — <span class="azul">22/08, a partir das 9h</span></p>
   </div>
 </section>
 
@@ -197,7 +142,28 @@
   <div class="wrap">
     <h2 style="font-size:26px;margin-bottom:14px">🏍️ As motos que <span class="azul">te esperam</span></h2>
     <div class="motos-foto" id="motos-foto"></div>
-    <p style="font-weight:800;font-size:15px;margin-top:12px;text-align:center">Todas no boleto. Todas prontas pro corre. <span class="azul">Vem ver de perto dia 22/08.</span></p>
+    <p style="font-weight:800;font-size:15px;margin-top:12px;text-align:center">Todas no boleto em 18x. <span class="azul">Vem ver de perto.</span></p>
+    <a class="btn zap" href="#" target="_blank" rel="noopener">🔥 Quero ver as disponíveis</a>
+  </div>
+</section>
+
+<section class="cinza-bg" id="mural-sec" style="display:none">
+  <div class="wrap">
+    <h2 style="font-size:26px;margin-bottom:6px">Quem já saiu <span class="azul">de moto nova</span></h2>
+    <p style="font-size:14px;font-weight:600;color:var(--cinza);margin-bottom:16px">Entregas reais da Locagora Cuiabá.</p>
+    <div class="mural" id="mural"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 style="font-size:26px;margin-bottom:18px">Como funciona <span class="azul">(simples assim)</span></h2>
+    <ol class="passos">
+      <li><b>Chama no WhatsApp</b> e diz qual moto te interessou.</li>
+      <li>A gente faz a <b>análise na hora</b> — negativado também passa.</li>
+      <li>Fechou? <b>18x no boleto</b>, sem banco no meio.</li>
+      <li>Você <b>sai rodando</b> e já começa a fazer corrida no mesmo dia.</li>
+    </ol>
   </div>
 </section>
 
@@ -205,12 +171,12 @@
   <div class="wrap">
     <h2 style="font-size:26px;margin-bottom:10px">Papo reto <span class="azul">(sem letra miúda)</span></h2>
     <ul class="faq">
-      <li>💸 <b>Custa algo?</b> Nada. Cadastro, café e vale são 100% grátis.</li>
-      <li>🏍️ <b>Sou obrigado a comprar moto?</b> Não. Vale e café são seus de qualquer jeito.</li>
-      <li>📉 <b>Tô negativado, posso ir?</b> Pode — e é exatamente pra você que a loja existe.</li>
-      <li>⛽ <b>Como recebo os R$50?</b> Chegou entre os 40 primeiros e validou o QR na porta: o vale aparece no seu celular na hora. É só usar no posto parceiro.</li>
-      <li>🎁 <b>E se eu chegar tarde?</b> Você concorre aos brindes do dia — vale a pena aparecer de qualquer jeito.</li>
+      <li>📉 <b>Tô negativado, consigo?</b> Consegue — é exatamente pra você que a loja existe.</li>
+      <li>⚡ <b>A análise demora?</b> Na hora, sem enrolação e sem fila de banco.</li>
+      <li>💳 <b>É boleto mesmo?</b> Sim, 18x no boleto. Sem cartão, sem financiamento de banco.</li>
+      <li>🏍️ <b>Serve pra trabalhar?</b> Sai rodando de iFood, 99 e Lalamove no mesmo dia.</li>
     </ul>
+    <a class="btn zap" href="#" target="_blank" rel="noopener">🔥 Chamar no WhatsApp agora</a>
   </div>
 </section>
 
@@ -227,71 +193,47 @@
 
 <footer>
   LOCAGORA Cuiabá — revenda de motos novas e seminovas.<br>
-  Promoção "Café dos 40" válida somente em 22/08/2026, na inauguração da unidade, para os 40 primeiros cadastrados que chegarem à loja e tiverem o QR Code validado pela equipe, por ordem de chegada. O cadastro não reserva vaga. Demais participantes concorrem a brindes distribuídos durante o evento. Vale-combustível de R$50 pessoal e intransferível, validado uma única vez no posto parceiro. Venda de motocicletas sujeita a análise de crédito.
+  Venda de motocicletas sujeita a análise e aprovação de crédito. Parcelamento em até 18x no boleto conforme análise. Estoque sujeito a alteração sem aviso prévio. Imagens meramente ilustrativas.
 </footer>
 
-<div class="sticky-cta" id="sticky"><a href="#form">🔥 Garantir meu vale de R$50</a></div>
+<div class="sticky-cta" id="sticky"><a class="zap" href="#" target="_blank" rel="noopener">🔥 Chamar no WhatsApp</a></div>
 
 <script>
-  // máscara de telefone
-  const fone = document.getElementById('fone');
-  fone.addEventListener('input', () => {
-    let d = fone.value.replace(/\D/g, '').slice(0, 11);
-    let out = '';
-    if (d.length > 0) out = '(' + d.slice(0, 2);
-    if (d.length >= 3) out += ') ' + d.slice(2, 7);
-    if (d.length >= 8) out += '-' + d.slice(7);
-    fone.value = out;
-  });
-
-  // envio do formulário
-  const form = document.getElementById('lead-form');
-  const erro = document.getElementById('erro');
-  const btn = document.getElementById('btn-enviar');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    erro.style.display = 'none';
-    btn.disabled = true; btn.textContent = 'GARANTINDO SUA VAGA...';
-    try {
-      const r = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ nome: document.getElementById('nome').value, fone: fone.value })
-      });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.erro || 'Erro. Tente de novo.');
-      localStorage.setItem('smb_code', j.code);
-      if (typeof fbq === 'function' && !j.jaCadastrado) fbq('track', 'Lead');
-      location.href = '/qr.html?c=' + encodeURIComponent(j.code) + (j.jaCadastrado ? '&ja=1' : '');
-    } catch (err) {
-      erro.textContent = err.message;
-      erro.style.display = 'block';
-      btn.disabled = false; btn.textContent = '🔥 GARANTIR MEU VALE DE R$50';
+  // WhatsApp: número vem do painel (env WHATSAPP_NUMERO no Netlify)
+  fetch('/api/config').then(r => r.json()).then(j => {
+    if (!j.ok) return;
+    if (j.whats) {
+      const texto = encodeURIComponent('Vi o site e quero minha moto no boleto em 18x. Pode me explicar?');
+      document.querySelectorAll('a.zap').forEach(a => { a.href = 'https://wa.me/' + j.whats + '?text=' + texto; });
     }
-  });
-
-  // se já tem cadastro salvo, leva direto pro QR
-  const salvo = localStorage.getItem('smb_code');
-  if (salvo) {
-    const s = document.getElementById('sticky');
-    s.innerHTML = '<a href="/qr.html?c=' + encodeURIComponent(salvo) + '">📲 Ver meu QR Code (já tô dentro)</a>';
-  }
-
-  // prova social: últimos cadastros rodando
-  fetch('/api/recentes').then(r => r.json()).then(j => {
-    if (!j.ok || !j.recentes.length) return;
-    const box = document.getElementById('prova'), txt = document.getElementById('prova-txt');
-    let i = 0;
-    const mostra = () => {
-      const p = j.recentes[i % j.recentes.length];
-      txt.textContent = p.nome + ' garantiu a vaga ' + (p.min < 1 ? 'agora mesmo' : 'há ' + p.min + ' min');
-      i++;
-    };
-    mostra(); box.style.display = 'flex';
-    setInterval(mostra, 4000);
+    if (j.pixel) {
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
+      s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', j.pixel); fbq('track', 'PageView');
+    }
   }).catch(() => {});
 
-  // fotos das motos (só aparece se o admin subiu fotos)
+  // clique no WhatsApp = conversão
+  document.querySelectorAll('a.zap').forEach(a => a.addEventListener('click', () => {
+    if (typeof fbq === 'function') fbq('track', 'Contact');
+  }));
+
+  // contador de estoque
+  fetch('/api/estoque').then(r => r.json()).then(j => {
+    if (!j.ok) return;
+    document.getElementById('estoque-num').textContent = j.disponiveis;
+    const alerta = document.getElementById('estoque-alerta');
+    if (j.disponiveis <= 0) {
+      alerta.textContent = '❌ Estoque esgotado — chama no WhatsApp pra entrar na fila da próxima leva';
+    } else if (j.disponiveis <= 10) {
+      alerta.textContent = '🚨 ÚLTIMAS ' + j.disponiveis + ' MOTOS — depois só na próxima leva';
+    } else if (j.vendidas > 0) {
+      alerta.textContent = '🔥 ' + j.vendidas + ' já saíram — restam ' + j.disponiveis + ' de ' + j.total;
+    }
+  }).catch(() => {});
+
+  // fotos das motos disponíveis
   fetch('/api/fotos').then(r => r.json()).then(j => {
     if (!j.ok || !j.ids.length) return;
     const box = document.getElementById('motos-foto');
@@ -305,46 +247,15 @@
     }
   }).catch(() => {});
 
-  // Meta Pixel: liga sozinho quando META_PIXEL_ID estiver configurado no Netlify
-  fetch('/api/config').then(r => r.json()).then(j => {
-    if (!j.ok || !j.pixel) return;
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
-    s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', j.pixel); fbq('track', 'PageView');
+  // mural das vendas
+  function esc(t){const d=document.createElement('div');d.textContent=t==null?'':String(t);return d.innerHTML}
+  fetch('/api/vendas').then(r => r.json()).then(j => {
+    if (!j.ok || !j.vendas.length) return;
+    document.getElementById('mural').innerHTML = j.vendas.map(v =>
+      '<div class="venda"><img loading="lazy" src="/api/foto?t=venda&id=' + encodeURIComponent(v.id) + '" alt="Entrega Locagora">' +
+      '<div class="leg">' + esc(v.nome) + ' levou a dele 🏍️' + (v.modelo ? '<span>' + esc(v.modelo) + '</span>' : '') + '</div></div>').join('');
+    document.getElementById('mural-sec').style.display = 'block';
   }).catch(() => {});
-
-  // contador real de inscritos (o vale é por ordem de chegada no dia)
-  fetch('/api/vagas').then(r => r.json()).then(j => {
-    if (!j.ok) return;
-    document.getElementById('vagas-num').textContent = j.inscritos;
-    const alerta = document.getElementById('vagas-alerta');
-    if (j.inscritos >= j.total) {
-      alerta.textContent = '🚨 ' + j.inscritos + ' inscritos disputando 40 vales — CHEGA CEDO ou fica sem';
-    } else if (j.inscritos > 0) {
-      alerta.textContent = '🔥 O vale é dos 40 PRIMEIROS A CHEGAR — cadastro grátis de 15 segundos';
-    }
-  }).catch(() => {});
-
-  // countdown 22/08/2026 09:00 Cuiabá (UTC-4)
-  const alvo = new Date('2026-08-22T09:00:00-04:00').getTime();
-  function tick() {
-    let ms = Math.max(0, alvo - Date.now());
-    if (ms === 0) {
-      document.getElementById('cd-titulo').textContent = '🔥 É AGORA!';
-      document.getElementById('cd-sub').innerHTML = 'A LOCAGORA <span class="azul">TÁ ABERTA</span> — corre pra Av. Ten. Cel. Duarte, 1410!';
-    }
-    const d = Math.floor(ms / 864e5); ms -= d * 864e5;
-    const h = Math.floor(ms / 36e5); ms -= h * 36e5;
-    const m = Math.floor(ms / 6e4); ms -= m * 6e4;
-    const sg = Math.floor(ms / 1e3);
-    document.getElementById('cd-d').textContent = d;
-    document.getElementById('cd-h').textContent = String(h).padStart(2, '0');
-    document.getElementById('cd-m').textContent = String(m).padStart(2, '0');
-    document.getElementById('cd-s').textContent = String(sg).padStart(2, '0');
-  }
-  tick();
-  setInterval(tick, 1000);
 </script>
 </body>
 </html>

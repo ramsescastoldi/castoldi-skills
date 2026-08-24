@@ -3,6 +3,7 @@ import { getStore } from "@netlify/blobs";
 
 const LIMITE_VAGAS = 40;
 const VALOR_VOUCHER = 50;
+const ESTOQUE_PADRAO = 58;
 
 const STAFF_PIN = Netlify.env.get("STAFF_PIN") || "2206";
 const POSTO_PIN = Netlify.env.get("POSTO_PIN") || "5050";
@@ -54,9 +55,9 @@ async function tgChats(s: ReturnType<typeof getStore>): Promise<number[]> {
 
 const TG_TECLADO = {
   keyboard: [
-    [{ text: "📋 Status dos cadastros" }, { text: "⛽ Vouchers usados no posto" }],
-    [{ text: "🛠️ Criar site" }, { text: "✅ Gerar página" }],
-    [{ text: "📸 Fotos da landing" }],
+    [{ text: "🏍️ Vendeu uma moto" }, { text: "📊 Estoque" }],
+    [{ text: "📸 Fotos da landing" }, { text: "🛠️ Criar site" }],
+    [{ text: "✅ Gerar página" }, { text: "⛽ Vouchers usados no posto" }],
   ],
   resize_keyboard: true,
   is_persistent: true,
@@ -83,6 +84,11 @@ async function tgNotify(s: ReturnType<typeof getStore>, texto: string) {
   } catch {
     // notificação é melhor-esforço
   }
+}
+
+async function estoque(s: ReturnType<typeof getStore>) {
+  const e = (await s.get("estoque", { type: "json" })) as { total: number; vendidas: number } | null;
+  return e || { total: ESTOQUE_PADRAO, vendidas: 0 };
 }
 
 async function contador(s: ReturnType<typeof getStore>) {
@@ -337,9 +343,45 @@ export default async (req: Request, context: Context) => {
       if (msg.photo?.length) {
         const draft = (await s.get(draftKey(chatId), { type: "json" })) as any;
         if (!draft) {
-          await tgSend(chatId, "Antes de mandar fotos, aperte 🛠️ Criar site (página de vendas) ou 📸 Fotos da landing (página oficial).", true);
+          await tgSend(chatId, "Antes de mandar foto, aperte um botão:\n🏍️ Vendeu uma moto (registra a venda)\n📸 Fotos da landing (motos disponíveis)\n🛠️ Criar site (página de vendas)", true);
           return json({ ok: true });
         }
+        if (draft.modo === "venda") {
+          const cap = String(msg.caption || "").trim();
+          if (!cap) {
+            await tgSend(chatId, "⚠️ Manda a foto DE NOVO com a legenda no formato:\n<code>Carlos | CG 160 Titan</code>\n(primeiro nome do comprador | modelo)", true);
+            return json({ ok: true });
+          }
+          const [nomeRaw, modelo] = cap.split("|").map((t) => t.trim());
+          const nome = (nomeRaw || "").split(" ")[0].slice(0, 20);
+          if (!nome) {
+            await tgSend(chatId, "⚠️ Faltou o nome do comprador na legenda: <code>Carlos | CG 160 Titan</code>", true);
+            return json({ ok: true });
+          }
+          const fileId = msg.photo[msg.photo.length - 1].file_id;
+          const fr = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getFile?file_id=${encodeURIComponent(fileId)}`);
+          const fd = (await fr.json()) as any;
+          if (!fd.ok) {
+            await tgSend(chatId, "⚠️ Não consegui baixar essa foto. Tenta de novo.", true);
+            return json({ ok: true });
+          }
+          const bin = await fetch(`https://api.telegram.org/file/bot${TG_TOKEN}/${fd.result.file_path}`);
+          const id = String(Date.now());
+          await s.set(`venda/foto/${id}`, await bin.arrayBuffer(), { metadata: { ct: "image/jpeg" } });
+          await s.setJSON(`venda/reg/${id}`, { id, nome, modelo: modelo || "", em: new Date().toISOString() });
+
+          const e = await estoque(s);
+          const vendidas = Math.min(e.total, e.vendidas + 1);
+          await s.setJSON("estoque", { total: e.total, vendidas });
+          const restam = Math.max(0, e.total - vendidas);
+          await s.delete(draftKey(chatId));
+          await tgNotify(
+            s,
+            `🎉 <b>MOTO VENDIDA!</b>\n👤 ${nome}${modelo ? `\n🏍️ ${modelo}` : ""}\n📉 Restam <b>${restam}</b> de ${e.total}\n📸 Já está no mural do site\n🕐 ${agoraCuiaba()}`
+          );
+          return json({ ok: true });
+        }
+
         if (draft.modo === "landing") {
           const fileId = msg.photo[msg.photo.length - 1].file_id;
           const fr = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getFile?file_id=${encodeURIComponent(fileId)}`);
@@ -392,6 +434,28 @@ export default async (req: Request, context: Context) => {
           `📋 <b>STATUS DOS CADASTROS</b>\n📝 Cadastrados: <b>${leads.length}</b>\n✅ Validados na loja: <b>${c.validados}/${LIMITE_VAGAS}</b>\n🎟️ Vagas restantes: <b>${Math.max(0, LIMITE_VAGAS - c.validados)}</b>\n⛽ Vouchers usados no posto: <b>${usados}</b>\n🕐 ${agoraCuiaba()}`,
           true
         );
+      } else if (texto.includes("vendeu")) {
+        await s.setJSON(draftKey(chatId), { modo: "venda" });
+        const e = await estoque(s);
+        await tgSend(
+          chatId,
+          `🏍️ <b>Registrar venda</b> (restam ${Math.max(0, e.total - e.vendidas)} de ${e.total})\nManda a FOTO da entrega com a legenda:\n<code>Carlos | CG 160 Titan</code>\n(primeiro nome do comprador | modelo)\n\nO site desconta 1 do estoque e publica a foto no mural na hora.`,
+          true
+        );
+      } else if (texto.includes("estoque")) {
+        const n = texto.match(/estoque\s+(\d{1,4})/);
+        const e = await estoque(s);
+        if (n) {
+          const total = parseInt(n[1], 10);
+          await s.setJSON("estoque", { total, vendidas: Math.min(e.vendidas, total) });
+          await tgSend(chatId, `✅ Estoque total ajustado para <b>${total}</b> motos.\nVendidas: ${Math.min(e.vendidas, total)} • Disponíveis: ${Math.max(0, total - Math.min(e.vendidas, total))}`, true);
+        } else {
+          await tgSend(
+            chatId,
+            `📊 <b>ESTOQUE</b>\n🏍️ Total: <b>${e.total}</b>\n✅ Vendidas: <b>${e.vendidas}</b>\n🔵 Disponíveis: <b>${Math.max(0, e.total - e.vendidas)}</b>\n🕐 ${agoraCuiaba()}\n\n<i>Para corrigir o total, mande: estoque 58</i>`,
+            true
+          );
+        }
       } else if (texto.includes("fotos da landing")) {
         await s.setJSON(draftKey(chatId), { modo: "landing" });
         await tgSend(
@@ -449,7 +513,30 @@ export default async (req: Request, context: Context) => {
 
     // ---------- CONFIG PÚBLICA (pixel etc.) ----------
     if (action === "config" && req.method === "GET") {
-      return json({ ok: true, pixel: Netlify.env.get("META_PIXEL_ID") || null });
+      return json({
+        ok: true,
+        pixel: Netlify.env.get("META_PIXEL_ID") || null,
+        whats: Netlify.env.get("WHATSAPP_NUMERO") || null,
+      });
+    }
+
+    // ---------- ESTOQUE DE MOTOS ----------
+    if (action === "estoque" && req.method === "GET") {
+      const e = await estoque(s);
+      return json({
+        ok: true,
+        total: e.total,
+        vendidas: e.vendidas,
+        disponiveis: Math.max(0, e.total - e.vendidas),
+      });
+    }
+
+    // ---------- MURAL DE VENDAS ----------
+    if (action === "vendas" && req.method === "GET") {
+      const { blobs } = await s.list({ prefix: "venda/reg/" });
+      const ids = blobs.map((b) => b.key.slice(10)).sort().reverse().slice(0, 12);
+      const vendas = await Promise.all(ids.map((id) => s.get(`venda/reg/${id}`, { type: "json" })));
+      return json({ ok: true, vendas: vendas.filter(Boolean) });
     }
 
     // ---------- FOTOS DAS MOTOS ----------
@@ -460,7 +547,8 @@ export default async (req: Request, context: Context) => {
 
     if (action === "foto" && req.method === "GET") {
       const id = (url.searchParams.get("id") || "").replace(/[^0-9]/g, "");
-      const prefixo = url.searchParams.get("t") === "promo" ? "promo/foto/" : "foto/";
+      const t = url.searchParams.get("t");
+      const prefixo = t === "promo" ? "promo/foto/" : t === "venda" ? "venda/foto/" : "foto/";
       const res = await s.getWithMetadata(`${prefixo}${id}`, { type: "arrayBuffer" });
       if (!res) return json({ ok: false, erro: "Foto não encontrada." }, 404);
       return new Response(res.data, {
