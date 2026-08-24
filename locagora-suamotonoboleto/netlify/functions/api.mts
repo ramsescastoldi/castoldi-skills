@@ -5,7 +5,6 @@ const LIMITE_VAGAS = 40;
 const VALOR_VOUCHER = 50;
 const ESTOQUE_PADRAO = 58;
 
-const STAFF_PIN = Netlify.env.get("STAFF_PIN") || "2206";
 const POSTO_PIN = Netlify.env.get("POSTO_PIN") || "5050";
 const ADMIN_KEY = Netlify.env.get("ADMIN_KEY") || "locagora-admin";
 const TG_TOKEN = Netlify.env.get("TELEGRAM_BOT_TOKEN") || "";
@@ -142,19 +141,6 @@ export default async (req: Request, context: Context) => {
       return json({ ok: true, code, jaCadastrado: false });
     }
 
-    // ---------- VAGAS RESTANTES ----------
-    if (action === "vagas" && req.method === "GET") {
-      const c = await contador(s);
-      const { blobs } = await s.list({ prefix: "lead/" });
-      return json({
-        ok: true,
-        total: LIMITE_VAGAS,
-        inscritos: blobs.length,
-        validados: c.validados,
-        restantes: Math.max(0, LIMITE_VAGAS - c.validados),
-      });
-    }
-
     // ---------- STATUS DO LEAD ----------
     if (action === "status" && req.method === "GET") {
       const code = (url.searchParams.get("c") || "").toUpperCase().trim();
@@ -172,66 +158,6 @@ export default async (req: Request, context: Context) => {
           ? { code: lead.voucher.code, valor: lead.voucher.valor, usadoEm: lead.voucher.usadoEm }
           : null,
         restantes: Math.max(0, LIMITE_VAGAS - c.validados),
-      });
-    }
-
-    // ---------- VALIDAÇÃO NA LOJA (café + libera voucher) ----------
-    if (action === "validar" && req.method === "POST") {
-      const body = await req.json().catch(() => ({}));
-      const pin = String(body.pin || "").trim();
-      const code = String(body.code || "").toUpperCase().trim();
-      if (pin !== STAFF_PIN) return json({ ok: false, erro: "PIN da equipe incorreto." }, 401);
-
-      const lead = (await s.get(`lead/${code}`, { type: "json" })) as any;
-      if (!lead) return json({ ok: false, erro: "QR Code / código não encontrado." }, 404);
-
-      if (lead.validado) {
-        return json({
-          ok: true,
-          jaValidado: true,
-          nome: lead.nome,
-          fone: foneBonito(lead.fone),
-          pos: lead.validado.pos,
-          em: agoraCuiaba(lead.validado.em),
-          dentroDoLimite: lead.validado.pos !== null,
-          voucher: lead.voucher ? { code: lead.voucher.code, valor: lead.voucher.valor } : null,
-        });
-      }
-
-      const c = await contador(s);
-      const dentro = c.validados < LIMITE_VAGAS;
-      const pos = dentro ? c.validados + 1 : null;
-      const em = new Date().toISOString();
-
-      let voucher = null as any;
-      if (dentro) {
-        let vcode = gerarCodigo("VALE50", 5);
-        while (await s.get(`voucher/${vcode}`, { type: "json" })) vcode = gerarCodigo("VALE50", 5);
-        voucher = { code: vcode, valor: VALOR_VOUCHER, criadoEm: em, usadoEm: null };
-        await s.setJSON(`voucher/${vcode}`, { leadCode: code });
-        await s.setJSON("contador", { validados: c.validados + 1 });
-      }
-
-      lead.validado = { pos, em };
-      lead.voucher = voucher;
-      await s.setJSON(`lead/${code}`, lead);
-
-      await tgNotify(
-        s,
-        dentro
-          ? `✅ <b>QR VALIDADO NA LOJA</b>\n👤 ${lead.nome}\n📱 ${foneBonito(lead.fone)}\n🏅 Posição: ${pos}/${LIMITE_VAGAS}\n💰 Voucher: <code>${voucher.code}</code> (R$ ${voucher.valor})\n🕐 ${agoraCuiaba(em)}`
-          : `⚠️ <b>QR VALIDADO FORA DO LIMITE</b>\n👤 ${lead.nome}\n📱 ${foneBonito(lead.fone)}\nAs ${LIMITE_VAGAS} vagas já foram preenchidas — sem voucher.\n🕐 ${agoraCuiaba(em)}`
-      );
-
-      return json({
-        ok: true,
-        jaValidado: false,
-        nome: lead.nome,
-        fone: foneBonito(lead.fone),
-        pos,
-        em: agoraCuiaba(em),
-        dentroDoLimite: dentro,
-        voucher: voucher ? { code: voucher.code, valor: voucher.valor } : null,
       });
     }
 
@@ -497,18 +423,6 @@ export default async (req: Request, context: Context) => {
         await tgSend(chatId, "Use os botões aqui embaixo 👇", true);
       }
       return json({ ok: true });
-    }
-
-    // ---------- ÚLTIMOS CADASTROS (prova social — só primeiro nome + inicial) ----------
-    if (action === "recentes" && req.method === "GET") {
-      const leads = await todosLeads(s);
-      const agora = Date.now();
-      const recentes = leads.slice(-5).reverse().map((l) => {
-        const partes = l.nome.split(" ");
-        const nome = partes[0] + (partes[1] ? " " + partes[1][0] + "." : "");
-        return { nome, min: Math.max(0, Math.round((agora - new Date(l.criadoEm).getTime()) / 60000)) };
-      });
-      return json({ ok: true, recentes });
     }
 
     // ---------- CONFIG PÚBLICA (pixel etc.) ----------
