@@ -476,6 +476,61 @@ export default async (req: Request, context: Context) => {
       });
     }
 
+    // ---------- EMITIR VALE AVULSO (admin) ----------
+    // /api/emitir?k=CHAVE&nome=Fulano%20de%20Tal&fone=65999999999
+    if (action === "emitir" && req.method === "GET") {
+      if (url.searchParams.get("k") !== ADMIN_KEY) return json({ ok: false, erro: "Chave inválida." }, 401);
+      const nome = String(url.searchParams.get("nome") || "").trim().replace(/\s+/g, " ").slice(0, 80);
+      const fone = normalizarFone(String(url.searchParams.get("fone") || ""));
+      if (nome.length < 3) return json({ ok: false, erro: "Informe o nome: &nome=Fulano de Tal" }, 400);
+      if (!fone) return json({ ok: false, erro: "WhatsApp inválido: &fone=65999999999" }, 400);
+
+      // reaproveita o cadastro se o telefone já existir
+      const ref = (await s.get(`fone/${fone}`, { type: "json" })) as { code: string } | null;
+      let code = ref?.code || "";
+      let lead: any = code ? await s.get(`lead/${code}`, { type: "json" }) : null;
+
+      if (lead?.voucher) {
+        return json({
+          ok: true,
+          jaTinha: true,
+          nome: lead.nome,
+          code: lead.code,
+          vale: lead.voucher.code,
+          usadoEm: lead.voucher.usadoEm ? agoraCuiaba(lead.voucher.usadoEm) : null,
+          link: `${url.origin}/vale.html?v=${lead.voucher.code}`,
+        });
+      }
+
+      if (!lead) {
+        code = gerarCodigo("MOTO", 4);
+        while (await s.get(`lead/${code}`, { type: "json" })) code = gerarCodigo("MOTO", 4);
+        lead = { code, nome, fone, criadoEm: new Date().toISOString(), validado: null, voucher: null };
+        await s.setJSON(`fone/${fone}`, { code });
+      }
+
+      let vcode = gerarCodigo("VALE50", 5);
+      while (await s.get(`voucher/${vcode}`, { type: "json" })) vcode = gerarCodigo("VALE50", 5);
+      const em = new Date().toISOString();
+      lead.validado = { pos: null, em };
+      lead.voucher = { code: vcode, valor: VALOR_VOUCHER, criadoEm: em, usadoEm: null };
+      await s.setJSON(`lead/${lead.code}`, lead);
+      await s.setJSON(`voucher/${vcode}`, { leadCode: lead.code });
+
+      await tgNotify(
+        s,
+        `🎟️ <b>VALE EMITIDO NA MÃO</b>\n👤 ${lead.nome}\n📱 ${foneBonito(fone)}\n💰 <code>${vcode}</code> (R$ ${VALOR_VOUCHER})\n🕐 ${agoraCuiaba(em)}`
+      );
+      return json({
+        ok: true,
+        jaTinha: false,
+        nome: lead.nome,
+        code: lead.code,
+        vale: vcode,
+        link: `${url.origin}/vale.html?v=${vcode}`,
+      });
+    }
+
     // ---------- ESTOQUE DE MOTOS ----------
     if (action === "estoque" && req.method === "GET") {
       await registrarVisita(s);
