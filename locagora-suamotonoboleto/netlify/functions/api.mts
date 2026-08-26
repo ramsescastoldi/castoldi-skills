@@ -490,7 +490,11 @@ export default async (req: Request, context: Context) => {
       let code = ref?.code || "";
       let lead: any = code ? await s.get(`lead/${code}`, { type: "json" }) : null;
 
+      const cru = url.searchParams.get("json") === "1";
+      const telaQR = (c: string) => Response.redirect(`${url.origin}/qr.html?c=${encodeURIComponent(c)}`, 302);
+
       if (lead?.voucher) {
+        if (!cru) return telaQR(lead.code);
         return json({
           ok: true,
           jaTinha: true,
@@ -521,6 +525,7 @@ export default async (req: Request, context: Context) => {
         s,
         `🎟️ <b>VALE EMITIDO NA MÃO</b>\n👤 ${lead.nome}\n📱 ${foneBonito(fone)}\n💰 <code>${vcode}</code> (R$ ${VALOR_VOUCHER})\n🕐 ${agoraCuiaba(em)}`
       );
+      if (!cru) return telaQR(lead.code);
       return json({
         ok: true,
         jaTinha: false,

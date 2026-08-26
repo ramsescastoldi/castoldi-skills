@@ -137,7 +137,11 @@
           $('tela-qr').classList.add('hide');
           $('tela-fora').classList.add('hide');
           $('tela-voucher').classList.remove('hide');
-          $('pos-num').textContent = j.validado.pos;
+          if (j.validado.pos) {
+            $('pos-num').textContent = j.validado.pos;
+          } else {
+            document.querySelector('#tela-voucher h1').innerHTML = '✅ VALE LIBERADO!<br><span class="amarelo">R$50 DE COMBUSTÍVEL</span>';
+          }
           $('codigo-vale').textContent = j.voucher.code;
           $('titular').textContent = 'Titular: ' + j.nome + ' • código ' + j.code;
           desenharQR($('qr-vale'), location.origin + '/vale.html?v=' + encodeURIComponent(j.voucher.code));
