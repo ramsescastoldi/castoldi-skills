@@ -1,0 +1,28 @@
+{
+  "capa": {
+    "foto": "/caminho/foto_capa.jpg",
+    "pos": "center",
+    "kicker": "SÁBADO · ESTRATÉGIA",
+    "titulo": "AS 7 DECISÕES QUE SEPARAM O DONO DO <span class=\"gold\">EMPRESÁRIO</span>"
+  },
+  "decisoes": [
+    {
+      "num": 1,
+      "foto": "/caminho/foto_1.jpg",
+      "pos": "center",
+      "texto": "1. Parar de vender <span class=\"red\">preço</span> e começar a vender resultado."
+    },
+    {
+      "num": 2,
+      "foto": "/caminho/foto_2.jpg",
+      "pos": "center",
+      "texto": "2. Trocar o faturamento de vaidade pelo <span class=\"gold\">lucro</span> de verdade."
+    }
+  ],
+  "cta": {
+    "topo": "O PRÓXIMO PASSO",
+    "linha": "Se você quer blindar a sua empresa e decidir como <span class=\"gold\">dono</span>, o caminho é este.",
+    "clube": "CLUBE EMPRESA BLINDADA",
+    "link": "blindada.lumenclubpainel.com.br"
+  }
+}
