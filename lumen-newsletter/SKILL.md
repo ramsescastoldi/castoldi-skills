@@ -90,7 +90,8 @@ Plataforma Verimo (Ramsés é franqueado), todas as seguradoras. Ramos: Auto · 
 
 ### 7. Montar HTML
 
-Copiar `template.html` para `/home/claude/PostoEmDia_Semana<N>.html` e substituir:
+Copiar o `template.html` do diretório desta skill para o diretório de trabalho
+(ex: `PostoEmDia_Semana<N>.html`) e substituir:
 
 | Placeholder | Conteúdo |
 |---|---|
@@ -110,7 +111,7 @@ Use Playwright + Chromium (script Python inline). Pré-requisito (uma vez): `pip
 import asyncio
 from playwright.async_api import async_playwright
 
-HTML = "/home/claude/PostoEmDia_SemanaNN.html"  # ajuste NN
+HTML = "PostoEmDia_SemanaNN.html"  # caminho absoluto do HTML montado; ajuste NN
 N = "16"  # número da edição
 OUT = "/mnt/user-data/outputs"
 
