@@ -63,7 +63,7 @@ Liste todos os emails com data, remetente e nome do anexo. Em seguida aguarde os
 
 Para cada arquivo `.xlsx` em `/mnt/user-data/uploads/`:
 
-1. **Leia primeiro o SKILL.md de xlsx**: `/mnt/skills/public/xlsx/SKILL.md`
+1. **Use a skill `xlsx`** (invoque-a antes de mexer nas planilhas)
 2. **Use o parser de referência**: ver `references/parser_relatorio.py`
 3. **Estrutura esperada do relatório** (ver `references/formato_relatorio.md`):
    - Linha "Filial: XXX - NOME DA FILIAL"
