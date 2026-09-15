@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validar Vale R$50 — Posto Parceiro</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛽</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--preto:#0a0a0d;--carbono:#141419;--laranja:#ff5a00;--amarelo:#ffcc00;--branco:#f5f5f5;--cinza:#9a9aa5;--verde:#22c55e;--vermelho:#ef4444}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--preto);color:var(--branco);font-family:'Inter',system-ui,sans-serif}
+  .wrap{max-width:480px;margin:0 auto;padding:24px 18px 60px}
+  h1{font-family:'Anton',Impact,sans-serif;text-transform:uppercase;line-height:1.1}
+  .card{background:var(--carbono);border:2px solid #2c2c35;border-radius:18px;padding:22px 18px;margin-top:16px}
+  label{display:block;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin:12px 0 6px}
+  input{width:100%;background:#0e0e13;border:1.5px solid #2c2c35;border-radius:12px;color:var(--branco);font-size:22px;font-weight:700;padding:14px;outline:none;text-align:center;letter-spacing:2px;text-transform:uppercase}
+  input:focus{border-color:var(--verde)}
+  .btn{display:block;width:100%;background:var(--verde);color:#000;border:none;border-radius:14px;font-family:'Anton';font-size:22px;text-transform:uppercase;letter-spacing:1px;padding:17px;margin-top:16px;cursor:pointer}
+  .btn:disabled{opacity:.6}
+  .resultado{border-radius:18px;padding:26px 18px;margin-top:16px;text-align:center;display:none}
+  .r-ok{background:rgba(34,197,94,.1);border:3px solid var(--verde)}
+  .r-bad{background:rgba(239,68,68,.1);border:3px solid var(--vermelho)}
+  .big{font-family:'Anton';font-size:34px;line-height:1.15}
+  .valor{font-family:'Anton';font-size:64px;color:var(--verde)}
+  .nome{font-size:20px;font-weight:800;margin:8px 0 2px}
+  .mini{font-size:13px;color:var(--cinza);margin-top:8px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 style="font-size:26px">⛽ Vale-Combustível <span style="color:var(--verde)">R$50</span> — Posto Parceiro</h1>
+  <p class="mini">Uso interno do posto. Escaneie o QR do voucher do cliente (ele abre essa tela) ou digite o código. A validação é ÚNICA — depois de confirmar, o vale não pode ser usado de novo.</p>
+
+  <div class="card">
+    <label for="code">Código do voucher</label>
+    <input id="code" placeholder="VALE50-XXXXX" autocomplete="off">
+    <label for="pin">PIN do posto</label>
+    <input id="pin" placeholder="••••" type="password" inputmode="numeric" autocomplete="off">
+    <button class="btn" id="btn">⛽ Confirmar abastecimento R$50</button>
+  </div>
+
+  <div class="resultado r-ok" id="r-ok">
+    <div class="big" style="color:var(--verde)">✅ VALE CONFIRMADO</div>
+    <div class="valor">R$ 50</div>
+    <div class="nome" id="ok-nome"></div>
+    <div class="mini" id="ok-info"></div>
+    <div class="mini" style="margin-top:14px;font-weight:800;color:var(--branco)">Pode liberar o abastecimento. 🏍️</div>
+  </div>
+
+  <div class="resultado r-bad" id="r-bad">
+    <div class="big" style="color:var(--vermelho)" id="bad-titulo">❌ NEGADO</div>
+    <div class="nome" id="bad-nome"></div>
+    <div class="mini" id="bad-info"></div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  if (params.get('v')) $('code').value = params.get('v').toUpperCase();
+  const pinSalvo = localStorage.getItem('smb_posto_pin');
+  if (pinSalvo) $('pin').value = pinSalvo;
+
+  $('btn').addEventListener('click', async () => {
+    $('r-ok').style.display = 'none'; $('r-bad').style.display = 'none';
+    const code = $('code').value.trim().toUpperCase();
+    const pin = $('pin').value.trim();
+    if (!code || !pin) { $('bad-titulo').textContent = '❌ PREENCHA TUDO'; $('bad-nome').textContent = ''; $('bad-info').textContent = 'Digite o código do voucher e o PIN do posto.'; $('r-bad').style.display = 'block'; return; }
+    $('btn').disabled = true; $('btn').textContent = 'VALIDANDO...';
+    try {
+      const r = await fetch('/api/vale', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ code, pin })
+      });
+      const j = await r.json();
+      if (j.ok) {
+        localStorage.setItem('smb_posto_pin', pin);
+        $('ok-nome').textContent = j.nome;
+        $('ok-info').textContent = j.fone + ' • validado em ' + j.em;
+        $('r-ok').style.display = 'block';
+        if (navigator.vibrate) navigator.vibrate(200);
+      } else {
+        $('bad-titulo').textContent = j.jaUsado ? '🚫 VALE JÁ UTILIZADO' : '❌ NEGADO';
+        $('bad-nome').textContent = j.nome || '';
+        $('bad-info').textContent = j.erro || 'Erro desconhecido.';
+        $('r-bad').style.display = 'block';
+      }
+    } catch (e) {
+      $('bad-titulo').textContent = '❌ SEM CONEXÃO';
+      $('bad-info').textContent = 'Verifique a internet e tente de novo.';
+      $('r-bad').style.display = 'block';
+    }
+    $('btn').disabled = false; $('btn').textContent = '⛽ Confirmar abastecimento R$50';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — suamotonoboleto</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--preto:#0a0a0d;--carbono:#141419;--laranja:#ff5a00;--amarelo:#ffcc00;--branco:#f5f5f5;--cinza:#9a9aa5;--verde:#22c55e;--vermelho:#ef4444}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--preto);color:var(--branco);font-family:'Inter',system-ui,sans-serif;padding:20px 14px 60px}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{font-family:'Anton';text-transform:uppercase;font-size:24px;margin-bottom:16px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+  .stat{background:var(--carbono);border:1px solid #2c2c35;border-radius:14px;padding:14px;text-align:center}
+  .stat .n{font-family:'Anton';font-size:34px;color:var(--laranja)}
+  .stat .l{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);font-weight:800}
+  .acoes{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .btn{background:var(--laranja);color:#000;border:none;border-radius:10px;font-weight:800;font-size:13px;padding:11px 16px;cursor:pointer;text-decoration:none;display:inline-block;text-transform:uppercase}
+  .btn.sec{background:transparent;border:1.5px solid var(--laranja);color:var(--laranja)}
+  .filtro{margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .filtro input{background:#0e0e13;border:1.5px solid #2c2c35;border-radius:10px;color:var(--branco);padding:10px 12px;font-size:14px;outline:none;flex:1;min-width:180px}
+  .filtro label{font-size:13px;font-weight:700;color:var(--cinza);display:flex;align-items:center;gap:6px}
+  .tabela-wrap{overflow-x:auto;background:var(--carbono);border:1px solid #2c2c35;border-radius:14px}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:820px}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);text-align:left;padding:12px 10px;border-bottom:1px solid #2c2c35;white-space:nowrap}
+  td{padding:11px 10px;border-bottom:1px solid #1e1e26;white-space:nowrap}
+  tr:hover td{background:#191922}
+  .pill{border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800}
+  .p-ok{background:rgba(34,197,94,.15);color:var(--verde)}
+  .p-esp{background:rgba(255,204,0,.12);color:var(--amarelo)}
+  .p-usado{background:rgba(239,68,68,.15);color:#fca5a5}
+  .p-fora{background:#2c2c35;color:var(--cinza)}
+  a.zap{color:#25d366;text-decoration:none;font-weight:700}
+  .login{max-width:380px;margin:60px auto;background:var(--carbono);border:1px solid #2c2c35;border-radius:16px;padding:24px;text-align:center}
+  .login input{width:100%;background:#0e0e13;border:1.5px solid #2c2c35;border-radius:10px;color:var(--branco);padding:13px;font-size:15px;outline:none;margin:12px 0}
+  .hide{display:none}
+  .atualizado{font-size:12px;color:var(--cinza);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="login" id="login">
+    <h1>🔐 Painel Admin</h1>
+    <p style="font-size:13px;color:var(--cinza)">Digite a chave de acesso</p>
+    <input id="key" type="password" placeholder="Chave admin">
+    <button class="btn" id="btn-entrar" style="width:100%">Entrar</button>
+  </div>
+
+  <div id="painel" class="hide">
+    <h1>📊 Leads — <span style="color:var(--laranja)">suamotonoboleto</span> • Locagora Cuiabá</h1>
+    <div class="cards">
+      <div class="stat"><div class="n" id="s-total">-</div><div class="l">Leads captados</div></div>
+      <div class="stat"><div class="n" id="s-val" style="color:var(--verde)">-</div><div class="l">Validados (café)</div></div>
+      <div class="stat"><div class="n" id="s-rest" style="color:var(--amarelo)">-</div><div class="l">Vagas restantes</div></div>
+      <div class="stat"><div class="n" id="s-vale" style="color:#fca5a5">-</div><div class="l">Vales R$50 usados</div></div>
+    </div>
+    <div class="acoes">
+      <a class="btn" id="btn-csv" href="#">⬇️ Baixar Excel (CSV)</a>
+      <button class="btn sec" id="btn-reload">🔄 Atualizar</button>
+      <button class="btn sec" id="btn-sair">Sair</button>
+    </div>
+    <div class="filtro">
+      <input id="busca" placeholder="Buscar nome, telefone ou código...">
+      <label><input type="checkbox" id="so40"> Só os 40 primeiros</label>
+    </div>
+    <div class="tabela-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Nome</th><th>WhatsApp</th><th>Código</th><th>Cadastro</th>
+          <th>Validado</th><th>Voucher R$50</th><th>Voucher usado</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="atualizado" id="atualizado"></p>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let dados = null;
+  let key = new URLSearchParams(location.search).get('k') || localStorage.getItem('smb_admin_key') || '';
+
+  function esc(t){const d=document.createElement('div');d.textContent=t==null?'':String(t);return d.innerHTML}
+
+  async function carregar() {
+    if (!key) { $('login').classList.remove('hide'); $('painel').classList.add('hide'); return; }
+    try {
+      const r = await fetch('/api/admin?k=' + encodeURIComponent(key));
+      const j = await r.json();
+      if (!j.ok) { localStorage.removeItem('smb_admin_key'); key=''; alert('Chave inválida.'); carregar(); return; }
+      localStorage.setItem('smb_admin_key', key);
+      dados = j;
+      $('login').classList.add('hide'); $('painel').classList.remove('hide');
+      $('s-total').textContent = j.total;
+      $('s-val').textContent = j.validados;
+      $('s-rest').textContent = j.restantes;
+      $('s-vale').textContent = j.vouchersUsados;
+      $('btn-csv').href = '/api/export?k=' + encodeURIComponent(key);
+      $('atualizado').textContent = 'Atualizado em ' + new Date().toLocaleString('pt-BR');
+      render();
+    } catch (e) { alert('Erro ao carregar. Tente de novo.'); }
+  }
+
+  function render() {
+    if (!dados) return;
+    const q = $('busca').value.toLowerCase();
+    const so40 = $('so40').checked;
+    let leads = dados.leads.slice();
+    if (so40) leads = leads.filter(l => l.pos !== null).sort((a,b) => a.pos - b.pos);
+    if (q) leads = leads.filter(l => (l.nome + l.fone + l.code).toLowerCase().includes(q));
+    $('tbody').innerHTML = leads.map((l, i) => {
+      const valid = l.pos !== null
+        ? '<span class="pill p-ok">#' + l.pos + ' • ' + esc(l.validadoEm) + '</span>'
+        : (l.validadoEm ? '<span class="pill p-fora">fora dos 40</span>' : '<span class="pill p-esp">aguardando</span>');
+      const vale = l.voucher ? esc(l.voucher) : '—';
+      const usado = l.voucherUsadoEm ? '<span class="pill p-usado">' + esc(l.voucherUsadoEm) + '</span>' : (l.voucher ? '<span class="pill p-esp">não usado</span>' : '—');
+      return '<tr><td>' + (so40 ? l.pos : i + 1) + '</td><td><b>' + esc(l.nome) + '</b></td>' +
+        '<td><a class="zap" target="_blank" href="https://wa.me/' + esc(l.foneLink) + '">' + esc(l.fone) + '</a></td>' +
+        '<td>' + esc(l.code) + '</td><td>' + esc(l.cadastro) + '</td><td>' + valid + '</td><td>' + vale + '</td><td>' + usado + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--cinza);padding:30px">Nenhum lead ainda.</td></tr>';
+  }
+
+  $('btn-entrar').addEventListener('click', () => { key = $('key').value.trim(); carregar(); });
+  $('key').addEventListener('keydown', e => { if (e.key === 'Enter') { key = $('key').value.trim(); carregar(); } });
+  $('btn-reload').addEventListener('click', carregar);
+  $('btn-sair').addEventListener('click', () => { localStorage.removeItem('smb_admin_key'); key=''; carregar(); });
+  $('busca').addEventListener('input', render);
+  $('so40').addEventListener('change', render);
+  carregar();
+  setInterval(carregar, 30000);
+</script>
+</body>
+</html>

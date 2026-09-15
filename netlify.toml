@@ -1,0 +1,10 @@
+# Configuração para o site suamotonoboleto (Locagora Cuiabá)
+# Permite conectar este repositório ao Netlify sem preencher nenhum campo:
+# o projeto vive em locagora-suamotonoboleto/.
+
+[build]
+  base = "locagora-suamotonoboleto"
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
