@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motos no Boleto — Locagora Cuiabá</title>
+<meta name="description" content="Motos novas e seminovas no boleto, até negativado. Locagora Cuiabá.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--azul:#0b46e6;--azul-escuro:#082f9e;--amarelo:#ffc400;--amarelo-claro:#fff3c4;--preto:#111318;
+    --branco:#fff;--cinza:#5b6270;--cinza-claro:#f2f4f9;--borda:#dde1ea;--verde:#16a34a;--vermelho:#e11d2e;--vermelho-claro:#fdecee}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--branco);color:var(--preto);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:480px;margin:0 auto;padding:0 18px}
+  h1,h2,.display{font-family:'Montserrat',system-ui,sans-serif;font-weight:900;text-transform:uppercase;line-height:1.12}
+  .azul{color:var(--azul)}
+  .marca{background:var(--amarelo);padding:0 6px;border-radius:4px}
+  .topbar{background:var(--vermelho);color:#fff;text-align:center;font-weight:800;font-size:13px;padding:9px 10px;text-transform:uppercase;letter-spacing:.5px}
+  .hero{padding:28px 0 20px;background:linear-gradient(180deg,var(--amarelo-claro),var(--branco) 70%)}
+  .hero h1{font-size:34px;margin-bottom:10px}
+  .hero p{font-size:16px;font-weight:600}
+  .hero p b{color:var(--azul)}
+  .card{background:var(--branco);border:2px solid var(--borda);border-radius:18px;overflow:hidden;margin:18px 0;box-shadow:0 8px 26px rgba(17,19,24,.08)}
+  .card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--cinza-claro)}
+  .card .info{padding:16px}
+  .card h2{font-size:22px}
+  .valor{font-family:'Montserrat';font-weight:900;font-size:28px;color:var(--azul);margin:6px 0 2px}
+  .cond{font-size:15px;font-weight:700}
+  .parcela{display:inline-block;background:var(--amarelo);border-radius:8px;padding:5px 10px;font-weight:900;margin-top:8px;font-size:16px}
+  .btn{display:block;width:100%;background:var(--verde);color:#fff;border:none;border-radius:14px;font-family:'Montserrat';font-weight:900;
+    font-size:18px;text-transform:uppercase;padding:16px;margin-top:14px;cursor:pointer;box-shadow:0 5px 0 #0d7a37}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #0d7a37}
+  .form-int{display:none;margin-top:12px;border-top:1.5px solid var(--borda);padding-top:12px}
+  .form-int input{width:100%;border:2px solid var(--borda);border-radius:12px;font-size:17px;font-weight:600;padding:13px;outline:none;margin-top:8px}
+  .form-int input:focus{border-color:var(--azul)}
+  .form-int .env{background:var(--azul);box-shadow:0 5px 0 var(--azul-escuro)}
+  .erro{display:none;background:var(--vermelho-claro);border:1.5px solid var(--vermelho);color:var(--vermelho);border-radius:10px;padding:9px 12px;font-size:14px;font-weight:600;margin-top:10px}
+  .okmsg{display:none;background:#e8f9ee;border:1.5px solid var(--verde);color:var(--verde);border-radius:10px;padding:11px 12px;font-size:15px;font-weight:800;margin-top:10px;text-align:center}
+  .faq{list-style:none;padding:6px 0 30px}
+  .faq li{padding:10px 0;border-bottom:1px solid var(--borda);font-size:15px;font-weight:600}
+  .faq li:last-child{border:none}
+  .faq b{color:var(--azul)}
+  .cinza-bg{background:var(--cinza-claro)}
+  footer{padding:24px 18px;text-align:center;font-size:11px;color:var(--cinza);background:var(--cinza-claro)}
+  .vazio{text-align:center;padding:60px 20px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="topbar">🏍️ MOTO NO BOLETO ATÉ PRA NEGATIVADO — LOCAGORA CUIABÁ</div>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>ESCOLHE A SUA.<br><span class="azul">O BOLETO CABE</span> NO <span class="marca">CORRE</span>.</h1>
+    <p><b>Análise na hora</b>, sem julgamento, até negativado. Escolhe a moto, chama a gente e sai rodando.</p>
+  </div>
+</header>
+
+<main class="wrap" id="lista"><p class="vazio">Carregando motos...</p></main>
+
+<section class="cinza-bg">
+  <div class="wrap">
+    <h2 style="font-size:24px;padding-top:24px">Papo reto</h2>
+    <ul class="faq">
+      <li>📉 <b>Nome sujo?</b> Pode. É pra você que a loja existe.</li>
+      <li>⚡ <b>Análise demora?</b> Na hora, sem enrolação.</li>
+      <li>🏍️ <b>Pronta pro corre?</b> Sai rodando de iFood, 99 e Lalamove no mesmo dia.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>LOCAGORA Cuiabá — Av. Tenente Coronel Duarte, 1410 — Centro Sul. Venda sujeita a análise de crédito.</footer>
+
+<script>
+  const p = new URLSearchParams(location.search).get('p') || '';
+  const lista = document.getElementById('lista');
+
+  function mask(el){el.addEventListener('input',()=>{let d=el.value.replace(/\D/g,'').slice(0,11),o='';
+    if(d.length>0)o='('+d.slice(0,2);if(d.length>=3)o+=') '+d.slice(2,7);if(d.length>=8)o+='-'+d.slice(7);el.value=o;});}
+
+  fetch('/api/promo?p=' + encodeURIComponent(p)).then(r => r.json()).then(j => {
+    if (!j.ok) { lista.innerHTML = '<p class="vazio">😕 Página não encontrada.<br>Confira o link.</p>'; return; }
+    lista.innerHTML = j.motos.map((m, i) =>
+      '<div class="card">' +
+      (m.foto ? '<img loading="lazy" src="/api/foto?t=promo&id=' + m.foto + '" alt="' + m.modelo + '">' : '') +
+      '<div class="info"><h2>' + m.modelo + '</h2>' +
+      (m.valor ? '<div class="valor">' + m.valor + '</div>' : '') +
+      (m.entrada ? '<div class="cond">' + m.entrada + '</div>' : '') +
+      (m.parcelas ? '<div class="parcela">💳 ' + m.parcelas + ' no boleto</div>' : '') +
+      '<button class="btn" onclick="abrir(' + i + ')">🔥 QUERO ESSA NO BOLETO</button>' +
+      '<div class="form-int" id="f' + i + '">' +
+      '<input id="n' + i + '" placeholder="Seu nome completo">' +
+      '<input id="w' + i + '" type="tel" inputmode="numeric" placeholder="(65) 99999-9999">' +
+      '<div class="erro" id="e' + i + '"></div>' +
+      '<button class="btn env" onclick="enviar(' + i + ',\'' + m.modelo.replace(/'/g, '') + '\')">✅ CHAMA EU NO WHATSAPP</button>' +
+      '<div class="okmsg" id="k' + i + '">✅ Recebido! Já já a gente te chama no WhatsApp.</div>' +
+      '</div></div></div>').join('');
+    j.motos.forEach((_, i) => mask(document.getElementById('w' + i)));
+  }).catch(() => { lista.innerHTML = '<p class="vazio">Erro ao carregar. Tenta de novo.</p>'; });
+
+  function abrir(i){ const f = document.getElementById('f' + i); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
+
+  async function enviar(i, moto){
+    const erro = document.getElementById('e' + i);
+    erro.style.display = 'none';
+    try {
+      const r = await fetch('/api/interesse', { method: 'POST', headers: {'content-type':'application/json'},
+        body: JSON.stringify({ moto, nome: document.getElementById('n' + i).value, fone: document.getElementById('w' + i).value }) });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.erro || 'Erro. Tenta de novo.');
+      document.getElementById('k' + i).style.display = 'block';
+    } catch (err) { erro.textContent = err.message; erro.style.display = 'block'; }
+  }
+</script>
+</body>
+</html>
