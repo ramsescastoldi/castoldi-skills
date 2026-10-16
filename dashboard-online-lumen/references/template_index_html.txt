@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Lumen — Vendas Multi-Filial</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0F1419;
+    color: #E8ECF1;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  #root { min-height: 100vh; }
+  .boot {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; gap: 12px; color: #8A97A8; font-size: 14px; text-align: center; padding: 24px;
+  }
+  .boot strong { color: #E8ECF1; font-size: 18px; }
+  button { font-family: inherit; }
+</style>
+
+<!-- ============================================================ -->
+<!-- BIBLIOTECAS — SEMPRE cdn.jsdelivr.net (NUNCA unpkg.com).     -->
+<!-- ORDEM OBRIGATÓRIA: React -> ReactDOM -> PropTypes -> Recharts -->
+<!-- (PropTypes ANTES da Recharts, senão: "reading 'oneOfType'")  -->
+<!-- Recharts 2.12.7 no caminho /umd/Recharts.js (SEM .min)       -->
+<!-- ============================================================ -->
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.10/babel.min.js"></script>
+</head>
+<body>
+<div id="root">
+  <div class="boot"><strong>Inicializando…</strong><span>Carregando o dashboard da rede Lumen.</span></div>
+</div>
+
+<!-- Fallback: biblioteca não carregou (CDN bloqueada, sem internet, versão errada) -->
+<script>
+  window.addEventListener("load", function () {
+    if (typeof React === "undefined" || typeof ReactDOM === "undefined" ||
+        typeof PropTypes === "undefined" || typeof Recharts === "undefined") {
+      var faltando = [];
+      if (typeof React === "undefined") faltando.push("React");
+      if (typeof ReactDOM === "undefined") faltando.push("ReactDOM");
+      if (typeof PropTypes === "undefined") faltando.push("PropTypes");
+      if (typeof Recharts === "undefined") faltando.push("Recharts");
+      document.getElementById("root").innerHTML =
+        '<div class="boot"><strong>Não consegui carregar as bibliotecas do dashboard</strong>' +
+        '<span>Faltou carregar: ' + faltando.join(", ") + '.</span>' +
+        '<span>Verifique sua conexão com a internet e recarregue a página (F5).<br/>' +
+        'Se persistir, abra o Console (F12) e mande um print pro Claude.</span></div>';
+    }
+  });
+</script>
+
+<script type="text/babel">
+// ================================================================
+// CONFIGURAÇÃO — URL da API (Apps Script Web App, terminada em /exec)
+// ATENÇÃO: manter o "=" entre API_URL e a string ao trocar a URL!
+// ================================================================
+const API_URL = "https://script.google.com/macros/s/AKfycby4ID9LBmCjLNVgbKb4btcq1NCXNIx8OudWEKOc3Yj4xagJiJi4QZCMulEzjZEGYKQN/exec";
+
+// --- Paleta Lumen ---
+const CORES = {
+  bg: "#0F1419",
+  card: "#1A2330",
+  borda: "#2A3441",
+  acento: "#C8102E",   // vermelho combustível
+  verde: "#2D7D46",    // verde lucro
+  azul: "#1B4D8C",
+  amarelo: "#E89923",
+  texto: "#E8ECF1",
+  textoSuave: "#8A97A8",
+};
+const PALETA_FILIAIS = ["#C8102E", "#1B4D8C", "#2D7D46", "#E89923", "#7C3AED", "#06B6D4", "#DC2626", "#059669"];
+
+const { useState, useEffect, useMemo } = React;
+const {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ReferenceLine, AreaChart, Area, Cell,
+} = Recharts;
+
+// ================================================================
+// parseDate — parser de datas ROBUSTO.
+// Aceita: Date nativo, ISO ("2026-09-01" / "2026-09-01T03:00:00.000Z"),
+// BR ("01/09/2026"), e Date serializado ("Mon Sep 01 2026 ...").
+// Rejeita: ano puro (ex: 2026, o bug conhecido do Apps Script) -> null.
+// ================================================================
+function parseDate(valor) {
+  if (valor === null || valor === undefined || valor === "") return null;
+  if (valor instanceof Date) return isNaN(valor.getTime()) ? null : valor;
+
+  // Ano puro (número ou "2026") = bug do Apps Script -> data inválida
+  if (typeof valor === "number") return null;
+  const s = String(valor).trim();
+  if (/^\d{4}$/.test(s)) return null;
+
+  // ISO: 2026-09-01 ou 2026-09-01T...
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) {
+    const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // BR: 01/09/2026 (ou 01/09/26)
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if (m) {
+    let ano = Number(m[3]);
+    if (ano < 100) ano += 2000;
+    const d = new Date(ano, Number(m[2]) - 1, Number(m[1]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // Date serializado ("Mon Sep 01 2026 00:00:00 GMT-0400") e afins
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// --- Formatadores pt-BR ---
+const fmtBRL = (v) => (v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const fmtNum = (v, dec) => (v || 0).toLocaleString("pt-BR", { minimumFractionDigits: dec || 0, maximumFractionDigits: dec || 0 });
+const fmtPct = (v) => fmtNum(v, 2) + "%";
+const fmtDataCurta = (d) => {
+  if (!d) return "-";
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yy = String(d.getFullYear()).slice(2);
+  return dd + "/" + mm + "/" + yy; // DD/MM/YY
+};
+const chaveDia = (d) =>
+  d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const num = (v) => {
+  if (typeof v === "number" && !isNaN(v)) return v;
+  const n = parseFloat(String(v).replace(",", "."));
+  return isNaN(n) ? 0 : n;
+};
+
+// ================================================================
+// Heatmap: gradiente PROPORCIONAL ao min/max REAL dos dados
+// (vermelho -> amarelo -> verde). NUNCA usar fórmula fixa tipo v/30.
+// ================================================================
+function corHeatmap(valor, min, max) {
+  if (max <= min) return CORES.verde;
+  const t = Math.max(0, Math.min(1, (valor - min) / (max - min)));
+  const paradas = [[200, 16, 46], [232, 153, 35], [45, 125, 70]]; // vermelho, amarelo, verde
+  const seg = t < 0.5 ? 0 : 1;
+  const tt = t < 0.5 ? t * 2 : (t - 0.5) * 2;
+  const a = paradas[seg], b = paradas[seg + 1];
+  const r = Math.round(a[0] + (b[0] - a[0]) * tt);
+  const g = Math.round(a[1] + (b[1] - a[1]) * tt);
+  const bl = Math.round(a[2] + (b[2] - a[2]) * tt);
+  return "rgb(" + r + "," + g + "," + bl + ")";
+}
+
+// --- Componentes visuais ---
+function Card({ titulo, subtitulo, children }) {
+  return (
+    <div style={{ background: CORES.card, border: "1px solid " + CORES.borda, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+      {titulo && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: CORES.texto }}>{titulo}</div>
+          {subtitulo && <div style={{ fontSize: 12, color: CORES.textoSuave, marginTop: 2 }}>{subtitulo}</div>}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+function KPI({ rotulo, valor, cor }) {
+  return (
+    <div style={{ background: CORES.card, border: "1px solid " + CORES.borda, borderRadius: 12, padding: "14px 16px", flex: "1 1 150px", minWidth: 150 }}>
+      <div style={{ fontSize: 11, color: CORES.textoSuave, textTransform: "uppercase", letterSpacing: 0.8 }}>{rotulo}</div>
+      <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6, color: cor || CORES.texto }}>{valor}</div>
+    </div>
+  );
+}
+
+function BotaoFiltro({ ativo, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: ativo ? CORES.acento : "transparent",
+        color: ativo ? "#fff" : CORES.textoSuave,
+        border: "1px solid " + (ativo ? CORES.acento : CORES.borda),
+        borderRadius: 20, padding: "6px 14px", fontSize: 12, cursor: "pointer",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TelaAviso({ titulo, linhas }) {
+  return (
+    <div className="boot">
+      <strong>{titulo}</strong>
+      {linhas.map((l, i) => <span key={i}>{l}</span>)}
+    </div>
+  );
+}
+
+// ================================================================
+// APP — REGRA DE OURO: TODOS os hooks (useState/useEffect/useMemo)
+// ficam AQUI NO TOPO, ANTES de QUALQUER return condicional.
+// Nunca adicione um hook depois dos ifs de carregando/erro.
+// ================================================================
+function App() {
+  // ---------- Hooks de estado ----------
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState(null); // { tipo, detalhe }
+  const [registros, setRegistros] = useState([]);
+  const [filialSel, setFilialSel] = useState("Todas");
+  const [produtoSel, setProdutoSel] = useState("Todos");
+
+  // ---------- Hook de efeito: busca na API ao vivo ----------
+  useEffect(() => {
+    // Hipótese 1: URL não configurada
+    if (!API_URL || API_URL.indexOf("script.google.com/macros/s/") === -1 || API_URL.indexOf("COLE_AQUI") !== -1) {
+      setErro({ tipo: "url", detalhe: API_URL || "(vazia)" });
+      setCarregando(false);
+      return;
+    }
+    let ativo = true;
+    // redirect:'follow' é OBRIGATÓRIO — o Google redireciona o /exec
+    fetch(API_URL, { redirect: "follow" })
+      .then((resp) => resp.text())
+      .then((texto) => {
+        if (!ativo) return;
+        // Parse JSON MANUAL com try/catch — alguns ambientes retornam
+        // content-type errado, e URL errada devolve HTML de login do Google.
+        let json;
+        try {
+          json = JSON.parse(texto);
+        } catch (e) {
+          setErro({ tipo: "json", detalhe: texto.slice(0, 200) });
+          setCarregando(false);
+          return;
+        }
+        const lista = Array.isArray(json) ? json : (json && json.dados) || [];
+        setRegistros(lista);
+        setCarregando(false);
+      })
+      .catch((e) => {
+        if (!ativo) return;
+        // Hipótese 2: CORS / rede (fetch rejeitado antes de resposta)
+        setErro({ tipo: "cors", detalhe: String(e) });
+        setCarregando(false);
+      });
+    return () => { ativo = false; };
+  }, []);
+
+  // ---------- dadosBrutos: useMemo que NORMALIZA os registros ----------
+  // Inclui o campo DataNormalizada (Date válido ou null) calculado via parseDate.
+  // Período e timeline usam SEMPRE DataNormalizada, nunca Data direto.
+  const dadosBrutos = useMemo(() => {
+    return registros.map((r) => ({
+      Filial: String(r.Filial || "").trim(),
+      Produto: String(r.Produto || "").trim(),
+      P_Custo: num(r.P_Custo),
+      P_Venda: num(r.P_Venda),
+      Margem_Bruta_Pct: num(r.Margem_Bruta_Pct),
+      Markup_Pct: num(r.Markup_Pct),
+      Litragem: num(r.Litragem),
+      Total_Custo: num(r.Total_Custo),
+      Total_Venda: num(r.Total_Venda),
+      Lucro_Bruto: num(r.Lucro_Bruto),
+      Data: r.Data,
+      DataNormalizada: parseDate(r.Data),
+    }));
+  }, [registros]);
+
+  const filiais = useMemo(
+    () => [...new Set(dadosBrutos.map((d) => d.Filial).filter(Boolean))].sort(),
+    [dadosBrutos]
+  );
+  const produtos = useMemo(
+    () => [...new Set(dadosBrutos.map((d) => d.Produto).filter(Boolean))].sort(),
+    [dadosBrutos]
+  );
+
+  const dados = useMemo(
+    () => dadosBrutos.filter(
+      (d) => (filialSel === "Todas" || d.Filial === filialSel) &&
+             (produtoSel === "Todos" || d.Produto === produtoSel)
+    ),
+    [dadosBrutos, filialSel, produtoSel]
+  );
+
+  const kpis = useMemo(() => {
+    const receita = dados.reduce((s, d) => s + d.Total_Venda, 0);
+    const lucro = dados.reduce((s, d) => s + d.Lucro_Bruto, 0);
+    const custo = dados.reduce((s, d) => s + d.Total_Custo, 0);
+    const volume = dados.reduce((s, d) => s + d.Litragem, 0);
+    return {
+      receita, lucro, custo, volume,
+      margem: receita > 0 ? (lucro / receita) * 100 : 0,
+      precoMedio: volume > 0 ? receita / volume : 0,
+    };
+  }, [dados]);
+
+  const porFilial = useMemo(() => {
+    return filiais.map((f) => {
+      const linhas = dadosBrutos.filter((d) => d.Filial === f);
+      const receita = linhas.reduce((s, d) => s + d.Total_Venda, 0);
+      const lucro = linhas.reduce((s, d) => s + d.Lucro_Bruto, 0);
+      return { filial: f, receita, lucro, margem: receita > 0 ? (lucro / receita) * 100 : 0 };
+    });
+  }, [dadosBrutos, filiais]);
+
+  const mediaRede = useMemo(() => {
+    const receita = porFilial.reduce((s, f) => s + f.receita, 0);
+    const lucro = porFilial.reduce((s, f) => s + f.lucro, 0);
+    return receita > 0 ? (lucro / receita) * 100 : 0;
+  }, [porFilial]);
+
+  const ranking = useMemo(() => [...porFilial].sort((a, b) => b.margem - a.margem), [porFilial]);
+
+  // Heatmap Produto x Filial com min/max REAL
+  const heatmap = useMemo(() => {
+    const celulas = {};
+    let min = Infinity, max = -Infinity;
+    produtos.forEach((p) => {
+      filiais.forEach((f) => {
+        const linhas = dadosBrutos.filter((d) => d.Produto === p && d.Filial === f);
+        if (!linhas.length) return;
+        const receita = linhas.reduce((s, d) => s + d.Total_Venda, 0);
+        const lucro = linhas.reduce((s, d) => s + d.Lucro_Bruto, 0);
+        const m = receita > 0 ? (lucro / receita) * 100 : 0;
+        celulas[p + "|" + f] = m;
+        if (m < min) min = m;
+        if (m > max) max = m;
+      });
+    });
+    if (min === Infinity) { min = 0; max = 0; }
+    return { celulas, min, max };
+  }, [dadosBrutos, produtos, filiais]);
+
+  // Datas válidas (usa DataNormalizada; ignora registros com data inválida)
+  const datasValidas = useMemo(
+    () => dadosBrutos.map((d) => d.DataNormalizada).filter(Boolean).sort((a, b) => a - b),
+    [dadosBrutos]
+  );
+
+  // Período no header em DD/MM/YY — SEMPRE via DataNormalizada
+  const periodo = useMemo(() => {
+    if (!datasValidas.length) return null;
+    return fmtDataCurta(datasValidas[0]) + " a " + fmtDataCurta(datasValidas[datasValidas.length - 1]);
+  }, [datasValidas]);
+
+  // Timeline de receita diária — SEMPRE via DataNormalizada
+  const timeline = useMemo(() => {
+    const porDia = {};
+    dadosBrutos.forEach((d) => {
+      if (!d.DataNormalizada) return; // data inválida não entra na timeline
+      const k = chaveDia(d.DataNormalizada);
+      porDia[k] = (porDia[k] || 0) + d.Total_Venda;
+    });
+    return Object.keys(porDia).sort().map((k) => ({
+      dia: fmtDataCurta(parseDate(k)),
+      receita: Math.round(porDia[k]),
+    }));
+  }, [dadosBrutos]);
+
+  const datasInvalidas = dadosBrutos.length > 0 && datasValidas.length === 0;
+
+  // ================================================================
+  // RETURNS CONDICIONAIS — só DAQUI PRA BAIXO (nenhum hook abaixo!)
+  // ================================================================
+  if (carregando) {
+    return <TelaAviso titulo="Carregando dados da rede…" linhas={["Buscando as vendas ao vivo na planilha Base Master Vendas — Lumen."]} />;
+  }
+
+  if (erro && erro.tipo === "url") {
+    return <TelaAviso titulo="A URL da API não está configurada" linhas={[
+      "O campo API_URL no topo do arquivo precisa apontar para a implantação do Apps Script.",
+      "Formato correto: https://script.google.com/macros/s/…/exec",
+      "Pegue a URL em: Apps Script → Implantar → Gerenciar implantações.",
+    ]} />;
+  }
+
+  if (erro && erro.tipo === "cors") {
+    return <TelaAviso titulo="Não consegui falar com a API (CORS ou conexão)" linhas={[
+      "Isso costuma acontecer quando o Apps Script não está público.",
+      "Verifique: Apps Script → Implantar → 'Quem tem acesso: Qualquer pessoa'.",
+      "Depois crie uma NOVA implantação e atualize a URL aqui no arquivo.",
+      "Detalhe técnico: " + erro.detalhe,
+    ]} />;
+  }
+
+  if (erro && erro.tipo === "json") {
+    return <TelaAviso titulo="A API respondeu, mas não veio JSON" linhas={[
+      "Geralmente é URL errada (script.googleusercontent.com em vez de script.google.com)",
+      "ou a implantação pedindo login do Google.",
+      "Confira a URL em: Apps Script → Implantar → Gerenciar implantações.",
+      "Começo da resposta recebida: " + erro.detalhe,
+    ]} />;
+  }
+
+  if (!dadosBrutos.length) {
+    return <TelaAviso titulo="A API respondeu, mas sem registros" linhas={[
+      "A aba 'Vendas' da planilha Base Master pode estar vazia,",
+      "ou o doGet() do Apps Script não está lendo a aba certa.",
+    ]} />;
+  }
+
+  if (datasInvalidas) {
+    return <TelaAviso titulo="Os dados chegaram, mas as datas vieram inválidas" linhas={[
+      "A API está mandando datas como ano puro (ex: 2026) — bug conhecido do Apps Script.",
+      "Correção: atualizar o doGet() com Utilities.formatDate() e criar NOVA implantação.",
+      "Ver references/apps_script_correcoes.md na skill dashboard-online-lumen.",
+    ]} />;
+  }
+
+  const estiloTooltip = { background: CORES.card, border: "1px solid " + CORES.borda, borderRadius: 8, fontSize: 12, color: CORES.texto };
+
+  return (
+    <div style={{ background: CORES.bg, minHeight: "100vh", padding: 24 }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+
+        {/* HEADER — período em DD/MM/YY via DataNormalizada */}
+        <div style={{ marginBottom: 20, borderBottom: "1px solid " + CORES.borda, paddingBottom: 16 }}>
+          <h1 style={{ fontSize: 26, margin: 0, color: CORES.texto }}>
+            Lumen Posto Club — <span style={{ color: CORES.acento }}>Vendas Multi-Filial</span>
+          </h1>
+          <div style={{ fontSize: 13, color: CORES.textoSuave, marginTop: 6 }}>
+            Período: {periodo || "-"} · dados ao vivo da Base Master Vendas
+          </div>
+        </div>
+
+        {/* FILTROS */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+          <BotaoFiltro ativo={filialSel === "Todas"} onClick={() => setFilialSel("Todas")}>Todas as filiais</BotaoFiltro>
+          {filiais.map((f) => (
+            <BotaoFiltro key={f} ativo={filialSel === f} onClick={() => setFilialSel(f)}>{f}</BotaoFiltro>
+          ))}
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+          <BotaoFiltro ativo={produtoSel === "Todos"} onClick={() => setProdutoSel("Todos")}>Todos os produtos</BotaoFiltro>
+          {produtos.map((p) => (
+            <BotaoFiltro key={p} ativo={produtoSel === p} onClick={() => setProdutoSel(p)}>{p}</BotaoFiltro>
+          ))}
+        </div>
+
+        {/* KPIs */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
+          <KPI rotulo="Receita" valor={fmtBRL(kpis.receita)} />
+          <KPI rotulo="Lucro" valor={fmtBRL(kpis.lucro)} cor={CORES.verde} />
+          <KPI rotulo="Margem Média" valor={fmtPct(kpis.margem)} cor={CORES.amarelo} />
+          <KPI rotulo="Volume (L)" valor={fmtNum(kpis.volume)} />
+          <KPI rotulo="Custo" valor={fmtBRL(kpis.custo)} cor={CORES.acento} />
+          <KPI rotulo="Preço Médio R$/L" valor={fmtNum(kpis.precoMedio, 2)} />
+        </div>
+
+        {/* RANKING DE FILIAIS */}
+        <Card titulo="Ranking de Filiais" subtitulo={"Ordenado por margem média · média da rede: " + fmtPct(mediaRede)}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <thead>
+                <tr style={{ color: CORES.textoSuave, textAlign: "left" }}>
+                  <th style={{ padding: "8px 10px" }}>#</th>
+                  <th style={{ padding: "8px 10px" }}>Filial</th>
+                  <th style={{ padding: "8px 10px", textAlign: "right" }}>Receita</th>
+                  <th style={{ padding: "8px 10px", textAlign: "right" }}>Lucro</th>
+                  <th style={{ padding: "8px 10px", textAlign: "right" }}>Margem %</th>
+                  <th style={{ padding: "8px 10px", textAlign: "center" }}>vs Rede</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ranking.map((f, i) => {
+                  const delta = f.margem - mediaRede;
+                  const seta = Math.abs(delta) < 0.05 ? "—" : (delta > 0 ? "▲" : "▼");
+                  const corSeta = seta === "▲" ? CORES.verde : (seta === "▼" ? CORES.acento : CORES.textoSuave);
+                  return (
+                    <tr key={f.filial} style={{ borderTop: "1px solid " + CORES.borda }}>
+                      <td style={{ padding: "8px 10px" }}>{i + 1}</td>
+                      <td style={{ padding: "8px 10px" }}>{f.filial}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right" }}>{fmtBRL(f.receita)}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", color: CORES.verde }}>{fmtBRL(f.lucro)}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right" }}>{fmtPct(f.margem)}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "center", color: corSeta }}>{seta}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        {/* RECEITA POR FILIAL */}
+        <Card titulo="Receita por Filial">
+          <ResponsiveContainer width="100%" height={60 + porFilial.length * 48}>
+            <BarChart data={porFilial} layout="vertical" margin={{ left: 40, right: 20 }}>
+              <CartesianGrid stroke={CORES.borda} horizontal={false} />
+              <XAxis type="number" stroke={CORES.textoSuave} fontSize={11} tickFormatter={(v) => fmtBRL(v)} />
+              <YAxis type="category" dataKey="filial" stroke={CORES.textoSuave} fontSize={11} width={160} />
+              <Tooltip contentStyle={estiloTooltip} formatter={(v) => fmtBRL(v)} />
+              <Bar dataKey="receita" name="Receita" radius={[0, 6, 6, 0]}>
+                {porFilial.map((f, i) => (
+                  <Cell key={f.filial} fill={PALETA_FILIAIS[i % PALETA_FILIAIS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* MARGEM POR FILIAL */}
+        <Card titulo="Margem Média % por Filial" subtitulo="Linha tracejada: média da rede">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={porFilial} margin={{ right: 20 }}>
+              <CartesianGrid stroke={CORES.borda} vertical={false} />
+              <XAxis dataKey="filial" stroke={CORES.textoSuave} fontSize={11} />
+              <YAxis stroke={CORES.textoSuave} fontSize={11} unit="%" />
+              <Tooltip contentStyle={estiloTooltip} formatter={(v) => fmtPct(v)} />
+              <ReferenceLine y={mediaRede} stroke={CORES.amarelo} strokeDasharray="6 4"
+                label={{ value: "Média " + fmtPct(mediaRede), fill: CORES.amarelo, fontSize: 11, position: "insideTopRight" }} />
+              <Bar dataKey="margem" name="Margem %" radius={[6, 6, 0, 0]}>
+                {porFilial.map((f) => (
+                  <Cell key={f.filial} fill={f.margem >= mediaRede ? CORES.verde : CORES.acento} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* HEATMAP PRODUTO x FILIAL — gradiente proporcional + faixa real no subtítulo */}
+        <Card titulo="Margem por Produto × Filial"
+          subtitulo={"Vermelho = pior, verde = melhor · Faixa: " + fmtPct(heatmap.min) + " a " + fmtPct(heatmap.max)}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ borderCollapse: "separate", borderSpacing: 4, fontSize: 12, width: "100%" }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "left", color: CORES.textoSuave, padding: 6 }}>Produto</th>
+                  {filiais.map((f) => (
+                    <th key={f} style={{ color: CORES.textoSuave, padding: 6, fontWeight: 500 }}>{f}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {produtos.map((p) => (
+                  <tr key={p}>
+                    <td style={{ padding: 6, color: CORES.texto }}>{p}</td>
+                    {filiais.map((f) => {
+                      const v = heatmap.celulas[p + "|" + f];
+                      return (
+                        <td key={f} style={{
+                          padding: "10px 6px", textAlign: "center", borderRadius: 6,
+                          background: v === undefined ? CORES.card : corHeatmap(v, heatmap.min, heatmap.max),
+                          color: v === undefined ? CORES.textoSuave : "#fff",
+                        }}>
+                          {v === undefined ? "—" : fmtPct(v)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        {/* TIMELINE — via DataNormalizada, com fallback amigável */}
+        <Card titulo="Evolução Diária de Receita" subtitulo="Todas as filiais somadas">
+          {timeline.length > 1 ? (
+            <ResponsiveContainer width="100%" height={240}>
+              <AreaChart data={timeline} margin={{ right: 20 }}>
+                <defs>
+                  <linearGradient id="gradReceita" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={CORES.acento} stopOpacity={0.5} />
+                    <stop offset="100%" stopColor={CORES.acento} stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke={CORES.borda} vertical={false} />
+                <XAxis dataKey="dia" stroke={CORES.textoSuave} fontSize={11} />
+                <YAxis stroke={CORES.textoSuave} fontSize={11} tickFormatter={(v) => fmtBRL(v)} width={80} />
+                <Tooltip contentStyle={estiloTooltip} formatter={(v) => fmtBRL(v)} />
+                <Area type="monotone" dataKey="receita" name="Receita" stroke={CORES.acento} strokeWidth={2} fill="url(#gradReceita)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ color: CORES.textoSuave, fontSize: 13, padding: "20px 0", textAlign: "center" }}>
+              Ainda não há dias suficientes com datas válidas para desenhar a evolução.
+              Se a planilha tem vários dias, as datas podem estar chegando erradas da API —
+              nesse caso é preciso corrigir o doGet() do Apps Script.
+            </div>
+          )}
+        </Card>
+
+        {/* FOOTER */}
+        <div style={{ textAlign: "center", fontSize: 12, color: CORES.textoSuave, padding: "12px 0 24px" }}>
+          {filiais.length} filiais · {produtos.length} produtos · {dadosBrutos.length} registros · período {periodo || "-"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const raiz = ReactDOM.createRoot(document.getElementById("root"));
+raiz.render(<App />);
+</script>
+</body>
+</html>

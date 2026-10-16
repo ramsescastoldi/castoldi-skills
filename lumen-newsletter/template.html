@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Posto em Dia — Edição {{EDICAO}}</title>
+<style>
+  /* ===== Padrão visual Posto em Dia (NÃO alterar sem pedido) =====
+     Paleta navy #0D1B2A + gold #C9A84C · container 640px mobile-first
+     Fontes: 19px base · 22px títulos de card · 24px valores de indicador */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #0D1B2A; color: #1a1a1a;
+    font-size: 19px; line-height: 1.55;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .container { max-width: 640px; margin: 0 auto; background: #f7f4ee; }
+
+  /* ---- Cabeçalho ---- */
+  .masthead { background: #0D1B2A; color: #fff; padding: 34px 28px 26px; text-align: center; }
+  .masthead .club { color: #C9A84C; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; }
+  .masthead h1 { font-size: 40px; letter-spacing: 1px; margin: 8px 0 4px; color: #fff; }
+  .masthead .rule { width: 70px; height: 3px; background: #C9A84C; margin: 12px auto; }
+  .masthead .edicao { font-size: 15px; color: #cfd8e3; }
+  .masthead .edicao b { color: #C9A84C; }
+
+  /* ---- Seções ---- */
+  .section { padding: 26px 22px; }
+  .section-title {
+    font-size: 15px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: #0D1B2A; border-bottom: 2px solid #C9A84C;
+    padding-bottom: 8px; margin-bottom: 18px; font-weight: bold;
+  }
+
+  /* ---- Indicadores (cards empilhados, não tabela) ---- */
+  .ind-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ind-card {
+    background: #fff; border: 1px solid #e2dccc; border-left: 4px solid #0D1B2A;
+    padding: 12px 14px; border-radius: 6px;
+  }
+  .ind-card.up { border-left-color: #b03a2e; }
+  .ind-card.down { border-left-color: #2D7D46; }
+  .ind-card.pending { border-left-color: #b8b09a; }
+  .ind-name { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #6b6455; }
+  .ind-row { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 2px; }
+  .ind-value { font-size: 24px; font-weight: bold; color: #0D1B2A; }
+  .ind-pending-value { font-size: 17px; font-style: italic; color: #8d8571; margin: 6px 0 2px; }
+  .ind-var { font-size: 14px; font-weight: bold; }
+  .ind-var.up { color: #b03a2e; }
+  .ind-var.down { color: #2D7D46; }
+  .ind-var.neutral { color: #6b6455; }
+  .ind-source { font-size: 11.5px; color: #8d8571; }
+  .source-note {
+    margin-top: 14px; background: #fdf6e3; border: 1px solid #e6d9a8;
+    padding: 10px 14px; font-size: 14px; border-radius: 6px; color: #6b5d2e;
+  }
+
+  /* ---- Cards editoriais ---- */
+  .card {
+    background: #fff; border: 1px solid #e2dccc; border-radius: 8px;
+    padding: 20px; margin-bottom: 18px; border-top: 5px solid #0D1B2A;
+  }
+  .card.red { border-top-color: #b03a2e; }
+  .card.yellow { border-top-color: #d9a516; }
+  .card.green { border-top-color: #2D7D46; }
+  .card.blue { border-top-color: #1B4D8C; }
+  .card-tag {
+    display: inline-block; font-size: 12px; font-weight: bold;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+  }
+  .tag-red { background: #f6e0dc; color: #b03a2e; }
+  .tag-yellow { background: #faf0cd; color: #8a6a0d; }
+  .tag-green { background: #ddeada; color: #2D7D46; }
+  .tag-blue { background: #dbe6f3; color: #1B4D8C; }
+  .card-title { font-size: 22px; font-weight: bold; color: #0D1B2A; line-height: 1.3; margin-bottom: 14px; }
+  .card-block { margin-bottom: 12px; }
+  .card-block:last-child { margin-bottom: 0; }
+  .block-label {
+    display: block; font-size: 12px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #C9A84C; font-weight: bold; margin-bottom: 3px;
+  }
+  .card-block p { font-size: 17px; color: #2b2b2b; }
+
+  /* ---- O Que Fazer Hoje ---- */
+  .acoes { background: #0D1B2A; border-radius: 8px; padding: 22px; }
+  .acoes .section-title { color: #C9A84C; border-bottom-color: #C9A84C; }
+  .acoes ul { list-style: none; }
+  .acoes li {
+    color: #eef2f7; font-size: 17px; padding: 8px 0 8px 26px;
+    position: relative; border-bottom: 1px solid #1c2f44;
+  }
+  .acoes li:last-child { border-bottom: none; }
+  .acoes li::before { content: "▸"; color: #C9A84C; position: absolute; left: 4px; }
+
+  /* ---- Bloco Verimo (FIXO) ---- */
+  .verimo {
+    background: #fff; border: 2px solid #C9A84C; border-radius: 8px;
+    padding: 20px; text-align: center;
+  }
+  .verimo .kicker { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #C9A84C; font-weight: bold; }
+  .verimo h3 { font-size: 21px; color: #0D1B2A; margin: 6px 0 8px; }
+  .verimo .ramos { font-size: 14.5px; color: #55503f; margin-bottom: 10px; }
+  .verimo .economia { font-size: 17px; color: #0D1B2A; margin-bottom: 12px; }
+  .verimo .economia b { color: #2D7D46; }
+  .verimo a.zap {
+    display: inline-block; background: #0D1B2A; color: #C9A84C;
+    text-decoration: none; font-weight: bold; font-size: 17px;
+    padding: 10px 26px; border-radius: 30px;
+  }
+
+  /* ---- Rodapé ---- */
+  .footer { background: #0D1B2A; color: #9fb0c3; padding: 22px 28px; text-align: center; font-size: 13px; }
+  .footer .fontes { margin-bottom: 8px; }
+  .footer .brand { color: #C9A84C; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; }
+
+  @media print { body { background: #f7f4ee; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="masthead">
+    <div class="club">Lumen Posto Club</div>
+    <h1>Posto em Dia</h1>
+    <div class="rule"></div>
+    <div class="edicao">Edição <b>{{EDICAO}}</b> · {{PERIODO}}</div>
+  </header>
+
+  <section class="section">
+    <div class="section-title">Painel de Indicadores</div>
+    <div class="ind-grid">
+{{INDICADORES}}
+    </div>
+{{NOTA_FONTE}}
+  </section>
+
+  <section class="section">
+    <div class="section-title">A Semana do Revendedor</div>
+{{CARDS}}
+  </section>
+
+  <section class="section">
+    <div class="acoes">
+      <div class="section-title">O Que Fazer Hoje</div>
+      <ul>
+{{ACOES_HOJE}}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Bloco Verimo — FIXO, não alterar a menos que pedido -->
+  <section class="section">
+    <div class="verimo">
+      <div class="kicker">Parceiro do Clube</div>
+      <h3>Verimo Seguros — todas as seguradoras, um só lugar</h3>
+      <div class="ramos">Auto · Patrimonial · Vida · Frota · RC Ambiental · RC Geral ·
+        Lucros Cessantes · Saúde &amp; Odonto · Vida em Grupo</div>
+      <div class="economia">Economia média de <b>25%</b> na renovação dos seus seguros.</div>
+      <a class="zap" href="https://wa.me/5565992657008">Falar agora · (65) 99265-7008</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="fontes">Fontes desta edição: {{FONTES}}</div>
+    <div class="brand">Posto em Dia · Lumen Posto Club</div>
+  </footer>
+
+</div>
+</body>
+</html>
