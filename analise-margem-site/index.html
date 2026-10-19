@@ -296,9 +296,127 @@
     .sticky-bar .t { display: none; }
     .sticky-bar .btn { width: 100%; text-align: center; }
   }
+
+/* ===== PÁGINA DIAGNÓSTICO (escopada) ===== */
+#pagina-diagnostico { display: none; }
+#pagina-diagnostico .topo { background: var(--dark); color: var(--paper); text-align: center; padding: 34px 20px 30px; }
+
+#pagina-diagnostico .kicker { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--gold-bright);
+    border: 1px solid rgba(232,184,75,.45); border-radius: 999px; padding: 5px 14px; margin-bottom: 14px; }
+
+#pagina-diagnostico .topo h1 { font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 900; margin: 0 0 8px; letter-spacing: -0.01em; }
+
+#pagina-diagnostico .topo p { margin: 0 auto; max-width: 560px; color: #cfc6b4; font-size: 14.5px; }
+
+#pagina-diagnostico .topo p strong { color: #fff; }
+
+#pagina-diagnostico .container { max-width: 680px; margin: 0 auto; padding: 30px 20px 70px; }
+
+#pagina-diagnostico .bloco { background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+    padding: 26px 26px 20px; margin-bottom: 18px; }
+
+#pagina-diagnostico .bloco-titulo { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+
+#pagina-diagnostico .bloco-num { width: 30px; height: 30px; border-radius: 50%; background: var(--dark); color: var(--gold-bright);
+    font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; flex: none; }
+
+#pagina-diagnostico .bloco-titulo h2 { font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 700; margin: 0; }
+
+#pagina-diagnostico .bloco-sub { font-size: 12.5px; color: var(--muted); margin: -12px 0 16px 42px; }
+
+#pagina-diagnostico label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); margin-bottom: 6px; }
+
+#pagina-diagnostico label .opc { color: var(--muted); font-weight: 600; text-transform: none; letter-spacing: 0; }
+
+#pagina-diagnostico input[type=text], #pagina-diagnostico input[type=email], #pagina-diagnostico input[type=tel], #pagina-diagnostico input[type=number], #pagina-diagnostico select, #pagina-diagnostico textarea { width: 100%; padding: 13px 14px; font: inherit; font-size: 16px;
+    background: #fff; color: var(--ink); border: 1.5px solid var(--line); border-radius: 9px;
+    transition: border-color .15s; }
+
+#pagina-diagnostico input:focus, #pagina-diagnostico select:focus, #pagina-diagnostico textarea:focus { outline: none; border-color: var(--gold); }
+
+#pagina-diagnostico textarea { resize: vertical; min-height: 90px; }
+
+#pagina-diagnostico .campo { margin-bottom: 15px; }
+
+#pagina-diagnostico .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+#pagina-diagnostico .ajuda { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+#pagina-diagnostico .radio-prod { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+#pagina-diagnostico .radio-prod input { display: none; }
+
+#pagina-diagnostico .radio-prod span { display: block; padding: 14px; border: 1.5px solid var(--line); border-radius: 10px;
+    text-align: center; cursor: pointer; font-weight: 700; font-size: 14px; background: var(--paper); }
+
+#pagina-diagnostico .radio-prod small { display: block; font-weight: 600; color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+
+#pagina-diagnostico .radio-prod input:checked + span { border-color: var(--gold); background: rgba(169,123,30,.08); color: var(--gold-strong); }
+
+#pagina-diagnostico .btn { display: inline-block; padding: 17px 30px; border-radius: 10px;
+    background: var(--gold-strong); color: #fff; font-weight: 900; font-size: 16px;
+    border: none; cursor: pointer; text-decoration: none; font-family: inherit; width: 100%;
+    transition: opacity .15s; }
+
+#pagina-diagnostico .btn:hover { opacity: .92; }
+
+#pagina-diagnostico .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+#pagina-diagnostico .form-erro { color: var(--red); font-size: 13.5px; margin-top: 12px; display: none; font-weight: 700; text-align: center; }
+
+#pagina-diagnostico .priv { font-size: 11px; color: var(--muted); text-align: center; margin-top: 14px; }
+
+#pagina-diagnostico /* sucesso + upsell call */
+  #sucesso { display: none; }
+
+#pagina-diagnostico .ok-box { background: #fff; border: 1.5px solid var(--green); border-radius: 14px;
+    padding: 30px; text-align: center; margin-bottom: 20px; }
+
+#pagina-diagnostico .ok-box h2 { font-family: 'Fraunces', serif; color: var(--green); font-size: 24px; margin: 0 0 8px; }
+
+#pagina-diagnostico .ok-box p { margin: 0; color: var(--ink-soft); font-size: 14.5px; }
+
+#pagina-diagnostico .call-ring { background: linear-gradient(135deg, #0d1f14 0%, #10281a 100%);
+    border: 2px solid var(--green-call); border-radius: 16px;
+    padding: 26px; text-align: center; position: relative; color: #fff;
+    animation: nada 1s; }
+
+#pagina-diagnostico .call-ring::after { content: ""; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+    box-shadow: 0 0 0 0 rgba(31,174,94,.55); animation: ringpulse 1.6s ease-out infinite; }
+
+#pagina-diagnostico .call-icon { width: 58px; height: 58px; border-radius: 50%; background: var(--green-call); margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 27px;
+    animation: shake 1.1s ease-in-out infinite; }
+
+#pagina-diagnostico .chamando { font-size: 11.5px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; color: var(--green-call); animation: blink 1.1s steps(2, start) infinite; }
+
+#pagina-diagnostico .call-ring h3 { font-family: 'Fraunces', serif; font-size: 21px; margin: 6px 0 8px; }
+
+#pagina-diagnostico .call-ring p { font-size: 13.5px; color: #b9d6c4; max-width: 440px; margin: 0 auto 12px; }
+
+#pagina-diagnostico .deal { font-size: 15px; margin-bottom: 16px; }
+
+#pagina-diagnostico .deal s { color: #86a893; }
+
+#pagina-diagnostico .deal strong { font-family: 'Fraunces', serif; font-size: 23px; color: var(--gold-bright); }
+
+#pagina-diagnostico .deal .off { display: inline-block; background: var(--red); color: #fff; font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 6px; margin-left: 7px; }
+
+#pagina-diagnostico .btn-atender { background: var(--green-call); color: #06240f; width: auto; padding: 16px 34px;
+    border-radius: 12px; animation: ringpulse 1.6s ease-out infinite; position: relative; z-index: 1; }
+
+#pagina-diagnostico footer { text-align: center; color: var(--muted); font-size: 11px; padding: 0 20px 40px; }
+
+
+  @media (max-width: 560px) {#pagina-diagnostico .duas, #pagina-diagnostico .radio-prod { grid-template-columns: 1fr; }
+
+#pagina-diagnostico .topo h1 { font-size: 24px; }
+}
 </style>
 </head>
 <body>
+<div id="pagina-landing">
 
 <!-- ============ HERO ============ -->
 <div class="hero">
@@ -620,6 +738,196 @@
   <a class="btn btn-red" data-checkout="997" href="#ofertas">Minha margem real → R$ 9,97</a>
 </div>
 
+</div>
+<div id="pagina-diagnostico">
+
+<div class="topo">
+  <div class="kicker">Ramsés Castoldi · Margem Real</div>
+  <h1 class="serif">Agora sim: os dados do seu diagnóstico.</h1>
+  <p>Leva <strong>3 minutos</strong>. Quanto mais perto da realidade os números, mais preciso
+  o seu relatório. Pode usar valores aproximados — <strong>ninguém além de mim vê</strong>.</p>
+</div>
+
+<div class="container">
+
+  <form id="form-diag" name="diagnostico-margem" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+    <input type="hidden" name="form-name" value="diagnostico-margem">
+    <p style="display:none"><label>Não preencha: <input name="bot-field"></label></p>
+
+    <!-- 1. IDENTIFICAÇÃO -->
+    <div class="bloco">
+      <div class="bloco-titulo"><div class="bloco-num">1</div><h2>Quem é você</h2></div>
+      <div class="campo">
+        <label>Qual diagnóstico você comprou?</label>
+        <div class="radio-prod">
+          <label><input type="radio" name="produto" value="Margem Real R$ 9,97" required><span>Margem Real<small>R$ 9,97</small></span></label>
+          <label><input type="radio" name="produto" value="Diagnóstico de Margem R$ 49,66"><span>Diagnóstico de Margem<small>R$ 49,66</small></span></label>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="d-nome">Seu nome</label>
+        <input type="text" id="d-nome" name="nome" autocomplete="name" required placeholder="Nome e sobrenome">
+      </div>
+      <div class="duas">
+        <div class="campo">
+          <label for="d-email">E-mail usado na compra</label>
+          <input type="email" id="d-email" name="email" autocomplete="email" required placeholder="voce@suaempresa.com.br">
+        </div>
+        <div class="campo">
+          <label for="d-wpp">WhatsApp (recebe o relatório)</label>
+          <input type="tel" id="d-wpp" name="whatsapp" autocomplete="tel" required placeholder="(65) 99999-9999">
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SEU NEGÓCIO -->
+    <div class="bloco">
+      <div class="bloco-titulo"><div class="bloco-num">2</div><h2>Seu negócio</h2></div>
+      <div class="duas">
+        <div class="campo">
+          <label for="d-empresa">Nome da empresa <span class="opc">(opcional)</span></label>
+          <input type="text" id="d-empresa" name="empresa" placeholder="Ex.: Mercado Bom Preço">
+        </div>
+        <div class="campo">
+          <label for="d-cidade">Cidade / UF</label>
+          <input type="text" id="d-cidade" name="cidade" required placeholder="Ex.: Cuiabá / MT">
+        </div>
+      </div>
+      <div class="duas">
+        <div class="campo">
+          <label for="d-seg">Ramo</label>
+          <select id="d-seg" name="segmento" required></select>
+        </div>
+        <div class="campo">
+          <label for="d-subseg">Descreva o que vende <span class="opc">(1 linha)</span></label>
+          <input type="text" id="d-subseg" name="descricao" required placeholder="Ex.: açaí e lanches, roupas femininas, estética automotiva…">
+        </div>
+      </div>
+      <div class="duas">
+        <div class="campo">
+          <label for="d-tempo">Tempo de empresa</label>
+          <select id="d-tempo" name="tempo_empresa">
+            <option>Menos de 1 ano</option>
+            <option>1 a 3 anos</option>
+            <option selected>3 a 10 anos</option>
+            <option>Mais de 10 anos</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="d-func">Funcionários</label>
+          <select id="d-func" name="funcionarios">
+            <option>Só eu</option>
+            <option>1 a 5</option>
+            <option selected>6 a 20</option>
+            <option>21 a 50</option>
+            <option>Mais de 50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. NÚMEROS -->
+    <div class="bloco">
+      <div class="bloco-titulo"><div class="bloco-num">3</div><h2>Os números do mês</h2></div>
+      <p class="bloco-sub">Use a média dos últimos 3 meses. Aproximado serve.</p>
+      <div class="duas">
+        <div class="campo">
+          <label for="d-fat">Faturamento mensal (R$)</label>
+          <input type="number" id="d-fat" name="faturamento_mensal" min="0" step="1000" required placeholder="Ex.: 120000" inputmode="numeric">
+        </div>
+        <div class="campo">
+          <label for="d-cmv">Custo do que você vende (R$/mês)</label>
+          <input type="number" id="d-cmv" name="custo_mercadorias" min="0" step="1000" required placeholder="Ex.: 70000" inputmode="numeric">
+          <div class="ajuda">Compras de mercadoria / matéria-prima / custo direto do serviço.</div>
+        </div>
+      </div>
+      <div class="duas">
+        <div class="campo">
+          <label for="d-fixas">Despesas fixas mensais (R$)</label>
+          <input type="number" id="d-fixas" name="despesas_fixas" min="0" step="500" required placeholder="Ex.: 25000" inputmode="numeric">
+          <div class="ajuda">Aluguel + folha + energia + sistemas + tudo que paga todo mês.</div>
+        </div>
+        <div class="campo">
+          <label for="d-regime">Regime tributário</label>
+          <select id="d-regime" name="regime">
+            <option>MEI</option>
+            <option selected>Simples Nacional</option>
+            <option>Lucro Presumido</option>
+            <option>Lucro Real</option>
+            <option>Não sei</option>
+          </select>
+        </div>
+      </div>
+      <div class="duas">
+        <div class="campo">
+          <label for="d-ticket">Ticket médio (R$) <span class="opc">(opcional)</span></label>
+          <input type="number" id="d-ticket" name="ticket_medio" min="0" placeholder="Ex.: 85" inputmode="numeric">
+        </div>
+        <div class="campo">
+          <label for="d-desc">Desconto que costuma dar</label>
+          <select id="d-desc" name="desconto_medio">
+            <option>Não dou desconto</option>
+            <option selected>Até 5%</option>
+            <option>5% a 10%</option>
+            <option>10% a 20%</option>
+            <option>Mais de 20%</option>
+          </select>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="d-preco">Como você define seus preços hoje?</label>
+        <select id="d-preco" name="como_precifica">
+          <option>Custo + uma margem que eu escolho</option>
+          <option selected>Olho o preço da concorrência</option>
+          <option>Sigo tabela do fornecedor</option>
+          <option>No feeling / sempre foi assim</option>
+          <option>Misturo tudo isso</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 4. CONTEXTO -->
+    <div class="bloco">
+      <div class="bloco-titulo"><div class="bloco-num">4</div><h2>Última pergunta</h2></div>
+      <div class="campo">
+        <label for="d-dor">O que mais te incomoda hoje no resultado da empresa? <span class="opc">(opcional, 2 linhas)</span></label>
+        <textarea id="d-dor" name="maior_incomodo" placeholder="Ex.: vendo bem mas não sobra dinheiro; concorrente cobra mais barato que meu custo; não sei se meu preço está certo…"></textarea>
+      </div>
+    </div>
+
+    <button class="btn" type="submit" id="btn-diag">ENVIAR MEUS DADOS → gerar diagnóstico</button>
+    <div class="form-erro" id="diag-erro"></div>
+    <p class="priv">Seus dados são usados exclusivamente para calcular o seu diagnóstico de margem.
+    Nada é compartilhado com terceiros.</p>
+  </form>
+
+  <!-- SUCESSO + UPSELL CALL -->
+  <div id="sucesso">
+    <div class="ok-box">
+      <h2 class="serif">Dados recebidos ✓</h2>
+      <p>Seu diagnóstico entra em produção agora. O relatório da sua <strong>margem real +
+      benchmark do seu mercado</strong> chega no seu e-mail e WhatsApp em até <strong>24h úteis</strong>.</p>
+    </div>
+
+    <div class="call-ring">
+      <div class="call-icon">📞</div>
+      <div class="chamando">● Call chamando…</div>
+      <h3 class="serif">Sua janela de agenda está ABERTA</h3>
+      <p>Por ter feito o diagnóstico, você destravou — <strong>por tempo limitado</strong> — a
+      condição exclusiva da Call de Margem 1:1: uma hora, ao vivo, comigo, revisando a precificação
+      do SEU negócio com o relatório na mesa.</p>
+      <div class="deal">Condição de urgência: <s>R$ 387</s> <strong>R$ 297</strong> <span class="off">R$ 90 OFF · 23%</span></div>
+      <a class="btn btn-atender" href="https://mpago.li/2ej3uUc" target="_blank" rel="noopener">GARANTIR MINHA VAGA ➜</a>
+      <p style="margin-top:12px;font-size:11.5px;color:#86a893">Agenda individual e limitada — horário confirmado
+      no WhatsApp na sequência do pagamento. Depois que a janela fecha, o acesso volta ao valor cheio.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>RAMSÉS CASTOLDI · MARGEM — As informações enviadas alimentam exclusivamente o seu diagnóstico.</footer>
+
+</div>
 <script>
 // ================= CONFIG =================
 // Links de checkout (Mercado Pago). Vazio → botão marca interesse e cai no formulário.
@@ -769,6 +1077,90 @@ document.getElementById('form-lead').addEventListener('submit', async (e) => {
     erro.style.display = 'block';
   }
 });
+
+// ================= ROTEADOR (página única) =================
+// /?pg=diagnostico mostra o formulário pós-compra; sem o parâmetro, a landing.
+const PG_DIAG = new URLSearchParams(location.search).get('pg') === 'diagnostico';
+if (PG_DIAG) {
+  document.getElementById('pagina-landing').style.display = 'none';
+  document.querySelector('.sticky-bar').style.display = 'none';
+  document.getElementById('pagina-diagnostico').style.display = 'block';
+  document.title = 'Formulário do Diagnóstico — Margem Real';
+}
+
+if (PG_DIAG) {
+
+
+
+const SEGS_DIAG = Object.keys(SEGMENTOS);
+document.getElementById('d-seg').innerHTML =
+  '<option value="">Escolha…</option>' + SEGS_DIAG.map(s => '<option>'+s+'</option>').join('');
+
+// Pré-marca o produto via ?p=997 ou ?p=4966 (dá pra mandar o link já configurado)
+const qp = new URLSearchParams(location.search).get('p');
+if (qp === '997') document.querySelector('input[name=produto][value^="Margem Real"]').checked = true;
+if (qp === '4966') document.querySelector('input[name=produto][value^="Diagnóstico"]').checked = true;
+
+document.getElementById('form-diag').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const erro = document.getElementById('diag-erro');
+  erro.style.display = 'none';
+
+  const nome = f.nome.value.trim();
+  const email = f.email.value.trim();
+  const wpp = f.whatsapp.value.replace(/\D/g, '');
+  const produto = (f.querySelector('input[name=produto]:checked') || {}).value || '';
+
+  if (!produto) { erro.textContent = 'Marque qual diagnóstico você comprou.'; erro.style.display = 'block'; return; }
+  if (!nome) { erro.textContent = 'Informe seu nome.'; erro.style.display = 'block'; return; }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { erro.textContent = 'Informe um e-mail válido.'; erro.style.display = 'block'; return; }
+  if (wpp.length < 10) { erro.textContent = 'Informe um WhatsApp válido com DDD.'; erro.style.display = 'block'; return; }
+  if (!f.segmento.value || !f.cidade.value.trim() || !f.descricao.value.trim()) { erro.textContent = 'Preencha os dados do seu negócio (bloco 2).'; erro.style.display = 'block'; return; }
+  if (!f.faturamento_mensal.value || !f.custo_mercadorias.value || !f.despesas_fixas.value) { erro.textContent = 'Preencha os números do mês (bloco 3).'; erro.style.display = 'block'; return; }
+
+  const btn = document.getElementById('btn-diag');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+
+  // 1) Netlify Forms: tenta no próprio site; se o formulário não estiver
+  //    registrado aqui, envia pro projeto reserva onde ele ESTÁ registrado
+  //    (margem-castoldi-antigo — as respostas caem na aba Forms de lá).
+  const dados = new URLSearchParams(new FormData(f));
+  let enviado = false;
+  try {
+    const r = await fetch('/', { method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
+    enviado = r.ok;
+  } catch (_) {}
+  if (!enviado) {
+    try {
+      await fetch('https://margem-castoldi-antigo.netlify.app/', { method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
+      enviado = true;
+    } catch (_) {}
+  }
+  if (!enviado) {
+    btn.disabled = false; btn.textContent = 'ENVIAR MEUS DADOS → gerar diagnóstico';
+    erro.textContent = 'Não foi possível enviar agora. Confira sua conexão e tente de novo.';
+    erro.style.display = 'block';
+    return;
+  }
+
+  // 2) Aviso no CRM com os números principais (melhor esforço — não bloqueia)
+  try {
+    const cargo = ['DIAG', produto.replace('Diagnóstico de Margem ','').replace('Margem Real ',''),
+      f.segmento.value, 'fat:' + f.faturamento_mensal.value, 'cmv:' + f.custo_mercadorias.value,
+      'fix:' + f.despesas_fixas.value].join('|').slice(0, 118);
+    await fetch(WEBHOOK_LEAD, { method: 'POST', mode: 'no-cors',
+      body: new URLSearchParams({ nome, email, whatsapp: wpp, cargo, origem: 'direct' }) });
+  } catch (_) {}
+
+  document.getElementById('form-diag').style.display = 'none';
+  document.getElementById('sucesso').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+}
 </script>
 </body>
 </html>
