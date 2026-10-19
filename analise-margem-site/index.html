@@ -1122,22 +1122,35 @@ document.getElementById('form-diag').addEventListener('submit', async (e) => {
   const btn = document.getElementById('btn-diag');
   btn.disabled = true; btn.textContent = 'Enviando…';
 
-  // 1) Netlify Forms (todas as respostas, visíveis no painel do Netlify)
+  // 1) Netlify Forms: tenta no próprio site; se o formulário não estiver
+  //    registrado aqui, envia pro projeto reserva onde ele ESTÁ registrado
+  //    (margem-castoldi-antigo — as respostas caem na aba Forms de lá).
   const dados = new URLSearchParams(new FormData(f));
+  let enviado = false;
   try {
     const r = await fetch('/', { method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
-    if (!r.ok) throw new Error('netlify ' + r.status);
-  } catch (err) {
+    enviado = r.ok;
+  } catch (_) {}
+  if (!enviado) {
+    try {
+      await fetch('https://margem-castoldi-antigo.netlify.app/', { method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
+      enviado = true;
+    } catch (_) {}
+  }
+  if (!enviado) {
     btn.disabled = false; btn.textContent = 'ENVIAR MEUS DADOS → gerar diagnóstico';
     erro.textContent = 'Não foi possível enviar agora. Confira sua conexão e tente de novo.';
     erro.style.display = 'block';
     return;
   }
 
-  // 2) Aviso no CRM (melhor esforço — não bloqueia o sucesso)
+  // 2) Aviso no CRM com os números principais (melhor esforço — não bloqueia)
   try {
-    const cargo = ['DIAG RESPONDIDO', produto, f.segmento.value].join(' | ').slice(0, 118);
+    const cargo = ['DIAG', produto.replace('Diagnóstico de Margem ','').replace('Margem Real ',''),
+      f.segmento.value, 'fat:' + f.faturamento_mensal.value, 'cmv:' + f.custo_mercadorias.value,
+      'fix:' + f.despesas_fixas.value].join('|').slice(0, 118);
     await fetch(WEBHOOK_LEAD, { method: 'POST', mode: 'no-cors',
       body: new URLSearchParams({ nome, email, whatsapp: wpp, cargo, origem: 'direct' }) });
   } catch (_) {}
