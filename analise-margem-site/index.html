@@ -551,12 +551,12 @@
 
 <script>
 // ================= CONFIG =================
-// Links de checkout (Kiwify ou outro). Enquanto vazios, o botão leva ao
+// Links de checkout (Mercado Pago). Enquanto vazios, o botão leva ao
 // formulário e marca o interesse do lead — nenhum clique se perde.
 const CHECKOUT = {
-  '997':  '',   // Margem Real — R$ 9,97
-  '4966': '',   // Diagnóstico de Margem — R$ 49,66
-  '387':  ''    // Call de Margem 1:1 — R$ 387
+  '997':  'https://mpago.la/2w1tYxX',   // Margem Real — R$ 9,97
+  '4966': 'https://mpago.li/2NLByZA',   // Diagnóstico de Margem — R$ 49,66
+  '387':  'https://mpago.li/2ej3uUc'    // Call de Margem 1:1 — R$ 387
 };
 const WEBHOOK_LEAD = 'https://n8n.srv1662375.hstgr.cloud/webhook/crm-lead-add';
 const INDICE_PERDA = 0.2866; // margem média não capturada (metodologia Castoldi)
@@ -625,9 +625,9 @@ document.getElementById('c-seg').addEventListener('change', calcular);
 const NOMES_PRODUTO = { '997':'Margem Real R$9,97', '4966':'Diagnóstico R$49,66', '387':'Call 1:1 R$387' };
 let interesse = '';
 document.querySelectorAll('[data-checkout]').forEach(a => {
-  a.addEventListener('click', (e) => {
-    const k = a.getAttribute('data-checkout');
-    if (CHECKOUT[k]) { a.href = CHECKOUT[k]; return; } // segue pro checkout
+  const k = a.getAttribute('data-checkout');
+  if (CHECKOUT[k]) { a.href = CHECKOUT[k]; a.target = '_blank'; a.rel = 'noopener'; return; }
+  a.addEventListener('click', () => {
     interesse = NOMES_PRODUTO[k];
     const pill = document.getElementById('interesse-pill');
     pill.textContent = 'Interesse marcado: ' + interesse + ' — preencha e eu te mando o link de pagamento no WhatsApp.';
