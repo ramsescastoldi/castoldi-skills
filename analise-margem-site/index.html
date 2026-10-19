@@ -650,30 +650,12 @@
       </div>
       <div class="form-2col">
         <div class="form-campo">
-          <label for="f-email">E-mail</label>
-          <input type="email" id="f-email" autocomplete="email" required placeholder="voce@suaempresa.com.br">
-        </div>
-        <div class="form-campo">
           <label for="f-wpp">WhatsApp</label>
           <input type="tel" id="f-wpp" autocomplete="tel" required placeholder="(65) 99999-9999">
         </div>
-      </div>
-      <div class="form-2col">
         <div class="form-campo">
           <label for="f-seg">Seu ramo</label>
           <select id="f-seg"></select>
-        </div>
-        <div class="form-campo">
-          <label for="f-fat">Faturamento mensal</label>
-          <select id="f-fat">
-            <option value="">Prefiro não informar</option>
-            <option>Até R$ 50 mil</option>
-            <option>R$ 50 a 150 mil</option>
-            <option>R$ 150 a 500 mil</option>
-            <option>R$ 500 mil a 1 mi</option>
-            <option>R$ 1 a 5 mi</option>
-            <option>Acima de R$ 5 mi</option>
-          </select>
         </div>
       </div>
       <button class="btn btn-gold" type="submit" id="btn-enviar" style="width:100%">RECEBER MEU DIAGNÓSTICO GRÁTIS</button>
@@ -1056,15 +1038,12 @@ document.querySelectorAll('[data-checkout]').forEach(a => {
 document.getElementById('form-lead').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nome = document.getElementById('f-nome').value.trim();
-  const email = document.getElementById('f-email').value.trim();
   const wpp = document.getElementById('f-wpp').value.replace(/\D/g, '');
   const seg = document.getElementById('f-seg').value;
-  const fat = document.getElementById('f-fat').value;
   const erro = document.getElementById('form-erro');
   erro.style.display = 'none';
 
   if (!nome) { erro.textContent = 'Informe seu nome.'; erro.style.display = 'block'; return; }
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { erro.textContent = 'Informe um e-mail válido.'; erro.style.display = 'block'; return; }
   if (wpp.length < 10) { erro.textContent = 'Informe um WhatsApp válido com DDD.'; erro.style.display = 'block'; return; }
 
   const btn = document.getElementById('btn-enviar');
@@ -1072,8 +1051,8 @@ document.getElementById('form-lead').addEventListener('submit', async (e) => {
 
   // POST urlencoded simples (sem preflight). Resposta opaca (no-cors), mas o
   // webhook processa e o lead cai na lista do CRM.
-  const cargo = ['Margem', seg || 's/segmento', fat || 's/fat', interesse].filter(Boolean).join(' | ').slice(0, 118);
-  const body = new URLSearchParams({ nome, email, whatsapp: wpp, cargo, origem: 'direct' });
+  const cargo = ['Margem', seg || 's/segmento', interesse].filter(Boolean).join(' | ').slice(0, 118);
+  const body = new URLSearchParams({ nome, email: '', whatsapp: wpp, cargo, origem: 'direct' });
   try {
     await fetch(WEBHOOK_LEAD, { method: 'POST', mode: 'no-cors', body });
     document.getElementById('form-lead').style.display = 'none';
