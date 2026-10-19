@@ -909,6 +909,11 @@
       benchmark do seu mercado</strong> chega no seu e-mail e WhatsApp em até <strong>24h úteis</strong>.</p>
     </div>
 
+    <div class="ok-box" id="ia-previa" style="display:none;text-align:left">
+      <h2 class="serif" style="font-size:19px">⚡ Prévia instantânea do seu diagnóstico</h2>
+      <p id="ia-previa-texto" style="white-space:pre-line"></p>
+    </div>
+
     <div class="call-ring">
       <div class="call-icon">📞</div>
       <div class="chamando">● Call chamando…</div>
@@ -937,6 +942,8 @@ const CHECKOUT = {
   '297':  'https://mpago.li/2ej3uUc'    // Call 1:1 URGÊNCIA — R$ 297
 };
 const WEBHOOK_LEAD = 'https://n8n.srv1662375.hstgr.cloud/webhook/crm-lead-add';
+// IA na nuvem (Cloudflare Worker /api/diagnostico). Vazio = sem prévia instantânea.
+const IA_ENDPOINT = 'https://margem.ramses-79e.workers.dev/api/diagnostico';
 const INDICE_PERDA = 0.2866; // margem média não capturada (metodologia Castoldi)
 
 // Segmento: [margem líquida típica mín, máx, margem dos melhores] (faixas educativas, %)
@@ -1158,6 +1165,24 @@ document.getElementById('form-diag').addEventListener('submit', async (e) => {
   document.getElementById('form-diag').style.display = 'none';
   document.getElementById('sucesso').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // 3) Prévia instantânea pela IA na nuvem (melhor esforço — silencioso se falhar)
+  if (IA_ENDPOINT) {
+    try {
+      const box = document.getElementById('ia-previa');
+      const txt = document.getElementById('ia-previa-texto');
+      box.style.display = 'block';
+      txt.textContent = 'Calculando sua margem real com IA… (até 1 minuto)';
+      const resp = await fetch(IA_ENDPOINT, { method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(f))) });
+      const j = await resp.json();
+      if (j && j.ok && j.previa) {
+        txt.textContent = 'Sua margem líquida calculada: ' + String(j.margem_liquida_pct).replace('.', ',') +
+          '% (bruta: ' + String(j.margem_bruta_pct).replace('.', ',') + '%)\n\n' + j.previa;
+      } else { box.style.display = 'none'; }
+    } catch (_) { document.getElementById('ia-previa').style.display = 'none'; }
+  }
 });
 
 }
