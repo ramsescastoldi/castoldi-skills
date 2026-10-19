@@ -1,21 +1,33 @@
-# Análise de Margem — analise.lumenclubpainel.com.br
+# Margem Real — Ramsés Castoldi (analise.lumenclubpainel.com.br)
 
-Landing page pública de captação de leads do **Lumen Posto Club**.
+Landing page do posicionamento **"especialista em MARGEM para qualquer negócio"**
+(varejo e serviços), com escada de produtos (boi de piranha):
 
-A página faz uma chamada direta sobre o problema de margem: mostra a **margem de
-referência da região** do revendedor (preço médio de bomba ANP − custo médio de
-distribuidora, os mesmos dados do Monitor), pergunta **"você tem essa margem?"**,
-calcula quanto ele está deixando na mesa por mês, e converte com o CTA
-**"Quer mudar esse jogo? Entre para o Lumen Posto Club"** + formulário de
-nome / e-mail / WhatsApp que cai direto na lista de Leads do CRM.
+| Degrau | Preço | Entrega |
+|---|---|---|
+| Diagnóstico-relâmpago | grátis | leitura inicial no WhatsApp (form → CRM) |
+| Margem Real | R$ 9,97 | margem real da empresa + benchmark do setor via IA |
+| Diagnóstico de Margem | R$ 49,66 | + curva de upside + plano de ação + desbloqueia agenda da call |
+| Call de Margem 1:1 | R$ 387 | 1h diagnóstico+mentoria, agendamento manual mediante pagamento |
+
+Na call é ofertada a mentoria high ticket. Tese da copy: empresa boa tem margem,
+desconto é desespero; a maioria perde ~28,66% de margem por não conhecer o
+benchmark do mercado (calculadora mostra a perda anual a partir do faturamento).
+
+**Checkout:** os links de pagamento ficam na const `CHECKOUT` no topo do
+`<script>` do `index.html`. Enquanto vazios, os botões de compra marcam o
+interesse do lead e caem no formulário (nenhum clique se perde).
 
 ## Arquitetura
 
 ```
-index.html (HTML único, sem build)
+index.html (HTML único, sem build, sem dependência externa de dados)
    │
-   ├─ dados: fetch em https://monitor.lumenclubpainel.com.br/data.json
-   │         (fallback: snapshot embutido no próprio HTML, const FALLBACK)
+   ├─ calculadora de perda: faturamento × margem típica do setor × 28,66%
+   │  (faixas por segmento na const SEGMENTOS; índice na const INDICE_PERDA)
+   │
+   ├─ checkout: const CHECKOUT {997, 4966, 387} — links Kiwify/outro.
+   │  Vazio → botão marca interesse e envia pro formulário.
    │
    └─ lead:  POST x-www-form-urlencoded (sem preflight, mode no-cors)
              → https://n8n.srv1662375.hstgr.cloud/webhook/crm-lead-add
@@ -24,8 +36,8 @@ index.html (HTML único, sem build)
 ```
 
 Campos enviados ao webhook: `nome`, `email`, `whatsapp` (só dígitos, o workflow
-prefixa 55), `cargo = "Site Análise de Margem"` (serve de tag de origem no CRM)
-e `origem = "direct"`.
+prefixa 55), `cargo = "Margem | <segmento> | <faixa fat> | <interesse>"` (tag de
+origem/qualificação no CRM) e `origem = "direct"`.
 
 ## Status do deploy
 
@@ -49,11 +61,8 @@ criação) — pode deletar na UI.
      Cloudflare o CNAME `analise` → `analise-margem-lumen.netlify.app`
      (modo "DNS only").
 
-2. **CORS do Monitor** — pro site puxar os dados AO VIVO, o
-   `monitor.lumenclubpainel.com.br/data.json` precisa responder com
-   `Access-Control-Allow-Origin: *`. Há um PR no repo
-   `monitor-precos-lumen-painel` adicionando isso no `_headers`.
-   **Sem esse header o site continua funcionando** — usa o snapshot embutido.
+2. **Links de checkout** — criar os produtos (R$ 9,97 / R$ 49,66 / R$ 387)
+   na Kiwify (ou outro) e colar as URLs na const `CHECKOUT` do `index.html`.
 
 3. **(Opcional) n8n** — o webhook `crm-lead-add` tem `allowedOrigins` restrito a
    `https://crm.lumenclubpainel.com.br`. O envio funciona mesmo assim (POST
@@ -62,20 +71,3 @@ criação) — pode deletar na UI.
    `https://analise.lumenclubpainel.com.br` no allowedOrigins do node
    "Webhook Lead Add" do workflow `crm-leads` (`p3P0xMU60CZ0Tr7P`).
 
-## Atualizar o snapshot embutido (fallback)
-
-O snapshot é só um seguro pra quando o fetch do Monitor falhar. Pra renovar:
-
-1. Baixe `https://monitor.lumenclubpainel.com.br/data.json`
-2. Reduza para as chaves `atualizado_em`, `semana_referencia`,
-   `distribuicao_ultima_data`, `kpis`, `agregados_estado`, `distribuicao_estado`
-3. Substitua o objeto na linha `const FALLBACK = {...};` do `index.html`
-
-(Ou peça no Cowork: "atualiza o snapshot do site de análise de margem".)
-
-## Regras de dados usadas na página
-
-- Margem de referência = `distribuicao_estado[UF].margem[produto]` do Monitor.
-- Estado sem cotação de distribuidora (ou margem ≤ 0, dado sujo): usa a
-  **mediana nacional** dos estados monitorados e avisa o visitante.
-- Calculadora: `(margem_ref − margem_informada) × litros/mês` = dinheiro na mesa.
