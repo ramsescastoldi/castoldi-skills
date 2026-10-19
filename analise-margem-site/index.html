@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Margem Real — Ramsés Castoldi</title>
-<meta name="description" content="Empresa boa não vive de desconto. Vive de margem. Descubra sua margem real e a margem real do seu setor — calculada por IA — e pare de perder lucro precificando no escuro.">
+<meta name="description" content="Sua empresa perde lucro todos os dias — você só nunca fez a conta. Descubra em 10 segundos quanto você deixa na mesa por mês e destrave sua margem real por R$ 9,97.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper: #f6f2ea;
@@ -17,12 +17,14 @@
     --muted: #8a8276;
     --gold: #a97b1e;
     --gold-strong: #8f6512;
-    --red: #c0262d;
+    --gold-bright: #e8b84b;
+    --red: #d1222a;
+    --red-dark: #a51920;
     --green: #1d6b4f;
+    --green-call: #1fae5e;
     --line: #ddd5c6;
     --dark: #16130f;
     --dark-2: #211d17;
-    --paper-on-dark: #f6f2ea;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -31,212 +33,268 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--paper);
     color: var(--ink);
-    line-height: 1.6;
+    line-height: 1.55;
     font-size: 16px;
+    padding-bottom: 68px; /* sticky bar */
   }
-  .container { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
   .serif { font-family: 'Fraunces', Georgia, serif; }
 
-  /* ---------- HERO ---------- */
-  .hero { padding: 64px 0 56px; border-bottom: 1px solid var(--line); }
+  /* ---------- HERO (dark, impacto) ---------- */
+  .hero {
+    background: radial-gradient(900px 420px at 50% -8%, rgba(232,184,75,0.16), transparent 60%), var(--dark);
+    color: var(--paper); text-align: center; padding: 58px 0 54px;
+  }
   .kicker {
-    display: inline-block; font-size: 12px; font-weight: 700;
-    letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-strong);
-    border: 1px solid var(--gold); border-radius: 999px; padding: 6px 16px;
-    margin-bottom: 26px; background: rgba(169,123,30,0.06);
+    display: inline-block; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-bright);
+    border: 1px solid rgba(232,184,75,.45); border-radius: 999px; padding: 6px 16px;
+    margin-bottom: 24px;
   }
   h1 {
     font-family: 'Fraunces', Georgia, serif;
-    font-size: 54px; font-weight: 900; line-height: 1.06;
-    letter-spacing: -0.015em; margin: 0 0 22px; max-width: 820px;
+    font-size: 50px; font-weight: 900; line-height: 1.07;
+    letter-spacing: -0.015em; margin: 0 auto 18px; max-width: 800px;
   }
-  h1 .red { color: var(--red); }
-  h1 .gold { color: var(--gold-strong); }
-  .hero-sub { font-size: 19px; color: var(--ink-soft); max-width: 680px; margin: 0 0 32px; }
-  .hero-sub strong { color: var(--ink); }
+  h1 .red { color: #ff5a56; }
+  h1 .gold { color: var(--gold-bright); }
+  .hero-sub { font-size: 18px; color: #cfc6b4; max-width: 620px; margin: 0 auto 28px; }
+  .hero-sub strong { color: #fff; }
   .btn {
-    display: inline-block; padding: 16px 30px; border-radius: 8px;
-    background: var(--ink); color: var(--paper); font-weight: 700; font-size: 16px;
+    display: inline-block; padding: 17px 32px; border-radius: 10px;
+    background: var(--ink); color: var(--paper); font-weight: 800; font-size: 16px;
     border: none; cursor: pointer; text-decoration: none; font-family: inherit;
-    transition: transform .08s, opacity .15s;
+    transition: transform .08s, opacity .15s, box-shadow .15s;
   }
-  .btn:hover { opacity: .92; }
+  .btn:hover { opacity: .93; }
   .btn:active { transform: translateY(1px); }
   .btn-gold { background: var(--gold-strong); color: #fff; }
-  .btn-red { background: var(--red); color: #fff; }
+  .btn-red { background: var(--red); color: #fff; box-shadow: 0 6px 24px rgba(209,34,42,.35); }
   .btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
-  .btn-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-  .btn-note { font-size: 13px; color: var(--muted); }
+  .hero-foot { margin-top: 14px; font-size: 13px; color: #9a9080; }
 
-  /* ---------- MANIFESTO ---------- */
-  section { padding: 64px 0; }
+  /* ---------- SEÇÕES ---------- */
+  section { padding: 56px 0; }
   .section-kicker {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
-    text-transform: uppercase; color: var(--gold-strong); margin-bottom: 12px;
+    font-size: 11.5px; font-weight: 800; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--gold-strong); margin-bottom: 10px;
   }
   h2 {
     font-family: 'Fraunces', Georgia, serif;
-    font-size: 36px; font-weight: 700; line-height: 1.15;
-    letter-spacing: -0.01em; margin: 0 0 16px; max-width: 760px;
+    font-size: 34px; font-weight: 700; line-height: 1.12;
+    letter-spacing: -0.01em; margin: 0 0 14px; max-width: 760px;
   }
-  .lead { font-size: 17px; color: var(--ink-soft); max-width: 700px; }
-  .stat-callout {
-    margin: 40px 0 8px; padding: 34px 36px;
-    background: var(--dark); color: var(--paper-on-dark); border-radius: 14px;
-    display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center;
-  }
-  .stat-number {
-    font-family: 'Fraunces', Georgia, serif; font-weight: 900;
-    font-size: 72px; line-height: 1; color: #e8b84b; white-space: nowrap;
-  }
-  .stat-text { font-size: 17px; }
-  .stat-text strong { color: #fff; }
-  .stat-foot { font-size: 11.5px; color: var(--muted); margin-top: 10px; max-width: 720px; }
-  .tres-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
-  .t-card {
-    background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 24px;
-  }
-  .t-card h3 {
-    font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 700;
-    margin: 0 0 10px;
-  }
-  .t-card h3 .x { color: var(--red); }
-  .t-card p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+  .lead { font-size: 16.5px; color: var(--ink-soft); max-width: 680px; }
 
   /* ---------- CALCULADORA ---------- */
-  .calc-section { background: var(--paper-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 640px; margin: 30px 0 0; }
-  label { display: block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); margin-bottom: 7px; }
+  .calc-section { background: var(--paper); }
+  .calc-card {
+    background: #fff; border: 1.5px solid var(--line); border-radius: 16px;
+    padding: 30px 32px; max-width: 720px; margin-top: 26px;
+    box-shadow: 0 10px 40px rgba(22,19,15,.06);
+  }
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); margin-bottom: 7px; }
   select, input[type=text], input[type=email], input[type=tel], input[type=number] {
     width: 100%; padding: 14px 15px; font: inherit; font-size: 16px;
     background: #fff; color: var(--ink);
-    border: 1.5px solid var(--line); border-radius: 8px;
+    border: 1.5px solid var(--line); border-radius: 9px;
     transition: border-color .15s;
   }
   select:focus, input:focus { outline: none; border-color: var(--gold); }
-  .calc-out {
-    display: none; margin-top: 26px; padding: 28px 32px; max-width: 640px;
-    background: #fff; border: 1.5px solid var(--red); border-radius: 12px;
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .chip {
+    font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+    border: 1.5px solid var(--line); background: var(--paper); cursor: pointer; color: var(--ink-soft);
   }
-  .calc-out .big {
-    font-family: 'Fraunces', Georgia, serif; font-weight: 900;
-    font-size: 40px; color: var(--red); line-height: 1.1; margin: 4px 0 10px;
-  }
-  .calc-out p { margin: 0; font-size: 15px; color: var(--ink-soft); }
-  .calc-out .cta-line { margin-top: 18px; }
-  .calc-foot { font-size: 11.5px; color: var(--muted); margin-top: 14px; max-width: 640px; }
+  .chip:hover { border-color: var(--gold); color: var(--gold-strong); }
 
-  /* ---------- BENCHMARK TEASER ---------- */
-  .bench-table { width: 100%; border-collapse: collapse; margin-top: 28px; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-  .bench-table th, .bench-table td { text-align: left; padding: 13px 18px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
-  .bench-table th { background: var(--dark); color: var(--paper-on-dark); font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; }
+  .calc-out { display: none; margin-top: 24px; border-top: 1.5px dashed var(--line); padding-top: 22px; }
+  .perda-mes-label { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--red); }
+  .perda-mes {
+    font-family: 'Fraunces', Georgia, serif; font-weight: 900;
+    font-size: 54px; color: var(--red); line-height: 1.05; margin: 6px 0 2px;
+  }
+  .perda-mes small { font-size: 20px; font-weight: 700; color: var(--red-dark); }
+  .perda-ano { font-size: 15px; color: var(--ink-soft); }
+  .perda-ano strong { color: var(--ink); }
+  .ticker {
+    margin-top: 16px; padding: 14px 18px; border-radius: 10px;
+    background: rgba(209,34,42,.06); border: 1px solid rgba(209,34,42,.25);
+    font-size: 14.5px; color: var(--ink-soft);
+  }
+  .ticker strong { color: var(--red); font-variant-numeric: tabular-nums; font-size: 17px; }
+  .calc-cta { margin-top: 20px; }
+  .calc-foot { font-size: 11px; color: var(--muted); margin-top: 14px; max-width: 700px; }
+
+  /* ---------- VERDADE / 28,66 ---------- */
+  .verdade { background: var(--paper-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat-callout {
+    margin: 30px 0 8px; padding: 30px 34px;
+    background: var(--dark); color: var(--paper); border-radius: 14px;
+    display: grid; grid-template-columns: auto 1fr; gap: 26px; align-items: center;
+  }
+  .stat-number { font-family: 'Fraunces', serif; font-weight: 900; font-size: 64px; line-height: 1; color: var(--gold-bright); white-space: nowrap; }
+  .stat-text { font-size: 16px; }
+  .stat-text strong { color: #fff; }
+  .stat-foot { font-size: 11px; color: var(--muted); margin-top: 10px; max-width: 700px; }
+  .tres-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 30px; }
+  .t-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  .t-card h3 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; margin: 0 0 8px; }
+  .t-card h3 .x { color: var(--red); }
+  .t-card p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+
+  /* ---------- BENCHMARK ---------- */
+  .bench-table { width: 100%; border-collapse: collapse; margin-top: 26px; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .bench-table th, .bench-table td { text-align: left; padding: 12px 18px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .bench-table th { background: var(--dark); color: var(--paper); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; }
   .bench-table td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
   .bench-locked td { filter: blur(4.5px); user-select: none; pointer-events: none; }
-  .bench-locked-label td { filter: none !important; color: var(--gold-strong); font-weight: 700; text-align: center !important; cursor: pointer; }
-  .bench-wrap { position: relative; }
-  .bench-foot { font-size: 11.5px; color: var(--muted); margin-top: 12px; }
+  .bench-locked-label td { filter: none !important; color: var(--gold-strong); font-weight: 800; text-align: center !important; cursor: pointer; }
+  .bench-foot { font-size: 11px; color: var(--muted); margin-top: 12px; }
 
-  /* ---------- ESCADA ---------- */
-  .escada { background: var(--dark); color: var(--paper-on-dark); }
-  .escada h2, .escada .section-kicker { color: var(--paper-on-dark); }
-  .escada .section-kicker { color: #e8b84b; }
+  /* ---------- OFERTAS ---------- */
+  .escada { background: var(--dark); color: var(--paper); }
+  .escada h2 { color: var(--paper); }
+  .escada .section-kicker { color: var(--gold-bright); }
   .escada .lead { color: #bdb4a4; }
-  .oferta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; align-items: stretch; }
+  .oferta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 38px; align-items: stretch; max-width: 820px; }
   .oferta {
-    background: var(--dark-2); border: 1px solid #3a342a; border-radius: 14px;
-    padding: 28px 24px; display: flex; flex-direction: column;
+    background: var(--dark-2); border: 1px solid #3a342a; border-radius: 16px;
+    padding: 30px 26px; display: flex; flex-direction: column; position: relative;
   }
-  .oferta.destaque { border: 2px solid #e8b84b; position: relative; }
+  .oferta.destaque { border: 2px solid var(--gold-bright); }
   .oferta .tag {
-    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-    background: #e8b84b; color: var(--dark); font-size: 11px; font-weight: 800;
-    text-transform: uppercase; letter-spacing: .08em; padding: 4px 14px; border-radius: 999px;
-    white-space: nowrap;
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--gold-bright); color: var(--dark); font-size: 11px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: .08em; padding: 5px 16px; border-radius: 999px; white-space: nowrap;
   }
-  .oferta .nome { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #e8b84b; margin-bottom: 10px; }
-  .oferta .preco { font-family: 'Fraunces', Georgia, serif; font-size: 42px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
-  .oferta .preco small { font-size: 16px; font-weight: 600; }
+  .oferta .nome { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-bright); margin-bottom: 10px; }
+  .oferta .preco { font-family: 'Fraunces', serif; font-size: 46px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+  .oferta .preco small { font-size: 17px; font-weight: 700; }
   .oferta .sub { font-size: 13px; color: #bdb4a4; margin-bottom: 18px; }
   .oferta ul { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
   .oferta li { padding: 7px 0 7px 26px; position: relative; font-size: 14px; }
-  .oferta li::before { content: "✓"; position: absolute; left: 0; color: #e8b84b; font-weight: 800; }
-  .oferta li.lock::before { content: "🔓"; font-size: 12px; }
-  .oferta .btn { width: 100%; text-align: center; }
-  .oferta-nota { margin-top: 22px; font-size: 13px; color: #bdb4a4; max-width: 760px; }
-  .gratis-strip {
-    margin-top: 18px; padding: 20px 24px; border: 1.5px dashed #5a523f; border-radius: 12px;
-    display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  .oferta li::before { content: "✓"; position: absolute; left: 0; color: var(--gold-bright); font-weight: 800; }
+  .oferta li.agenda { background: rgba(232,184,75,.08); border: 1px dashed rgba(232,184,75,.45); border-radius: 8px; padding: 10px 10px 10px 32px; margin-top: 8px; }
+  .oferta li.agenda::before { content: "🔓"; left: 9px; top: 9px; }
+  .oferta .btn { width: 100%; text-align: center; font-size: 17px; }
+
+  /* ---------- CALL CHAMANDO ---------- */
+  .call-ring {
+    margin: 26px 0 0; max-width: 820px;
+    background: linear-gradient(135deg, #0d1f14 0%, #10281a 100%);
+    border: 2px solid var(--green-call); border-radius: 16px;
+    padding: 28px 30px; display: grid; grid-template-columns: auto 1fr auto; gap: 22px; align-items: center;
+    position: relative; overflow: hidden;
   }
-  .gratis-strip p { margin: 0; font-size: 14.5px; color: #ddd5c6; }
+  .call-ring::after {
+    content: ""; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+    box-shadow: 0 0 0 0 rgba(31,174,94,.55); animation: ringpulse 1.6s ease-out infinite;
+  }
+  @keyframes ringpulse {
+    0% { box-shadow: 0 0 0 0 rgba(31,174,94,.55); }
+    70% { box-shadow: 0 0 0 18px rgba(31,174,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(31,174,94,0); }
+  }
+  .call-icon {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--green-call);
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+    animation: shake 1.1s ease-in-out infinite;
+  }
+  @keyframes shake {
+    0%, 55%, 100% { transform: rotate(0); }
+    60% { transform: rotate(-14deg); } 66% { transform: rotate(12deg); }
+    72% { transform: rotate(-10deg); } 78% { transform: rotate(8deg); } 84% { transform: rotate(0); }
+  }
+  .call-txt .chamando {
+    font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--green-call); animation: blink 1.1s steps(2, start) infinite;
+  }
+  @keyframes blink { 0%, 60% { opacity: 1; } 61%, 100% { opacity: .25; } }
+  .call-txt h3 { font-family: 'Fraunces', serif; font-size: 23px; margin: 4px 0 8px; color: #fff; }
+  .call-txt p { margin: 0; font-size: 13.5px; color: #b9d6c4; max-width: 480px; }
+  .call-txt .deal { margin-top: 8px; font-size: 15px; color: #fff; }
+  .call-txt .deal s { color: #86a893; font-weight: 600; }
+  .call-txt .deal strong { font-family: 'Fraunces', serif; font-size: 24px; color: var(--gold-bright); }
+  .call-txt .deal .off { display: inline-block; background: var(--red); color: #fff; font-size: 11.5px; font-weight: 900; padding: 3px 9px; border-radius: 6px; margin-left: 8px; letter-spacing: .04em; }
+  .btn-atender {
+    background: var(--green-call); color: #06240f; font-weight: 900; font-size: 16px;
+    padding: 18px 26px; border-radius: 12px; white-space: nowrap;
+    animation: ringpulse 1.6s ease-out infinite;
+  }
+  .oferta-nota { margin-top: 20px; font-size: 13px; color: #bdb4a4; max-width: 800px; }
+  .gratis-strip {
+    margin-top: 16px; padding: 18px 22px; border: 1.5px dashed #5a523f; border-radius: 12px;
+    display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; max-width: 820px;
+  }
+  .gratis-strip p { margin: 0; font-size: 14px; color: #ddd5c6; }
   .gratis-strip strong { color: #fff; }
 
-  /* ---------- POR QUE 9,97 ---------- */
+  /* ---------- PORQUE / BIO ---------- */
   .porque blockquote {
-    font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 600;
-    line-height: 1.35; margin: 26px 0 0; padding-left: 26px;
-    border-left: 4px solid var(--gold); max-width: 760px;
+    font-family: 'Fraunces', serif; font-size: 24px; font-weight: 600; line-height: 1.35;
+    margin: 24px 0 0; padding-left: 24px; border-left: 4px solid var(--gold); max-width: 740px;
   }
-  .porque blockquote .assin { display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); margin-top: 16px; }
-
-  /* ---------- CALL ---------- */
-  .call-box {
-    margin-top: 34px; background: #fff; border: 1px solid var(--line); border-radius: 14px;
-    padding: 34px 36px; display: grid; grid-template-columns: 1fr auto; gap: 26px; align-items: center;
+  .porque blockquote .assin { display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); margin-top: 14px; }
+  .bio { display: grid; grid-template-columns: 2fr 1fr; gap: 36px; align-items: start; }
+  .bio p { font-size: 15.5px; color: var(--ink-soft); }
+  .bio p strong { color: var(--ink); }
+  .bio-quote {
+    background: var(--dark); color: var(--paper); border-radius: 12px; padding: 24px;
+    font-family: 'Fraunces', serif; font-size: 18px; line-height: 1.4;
   }
-  .call-box h3 { font-family: 'Fraunces', Georgia, serif; font-size: 24px; margin: 0 0 10px; }
-  .call-box p { margin: 0; font-size: 14.5px; color: var(--ink-soft); max-width: 560px; }
-  .call-preco { text-align: center; }
-  .call-preco .v { font-family: 'Fraunces', Georgia, serif; font-size: 40px; font-weight: 900; }
-  .call-preco .b { margin-top: 12px; }
+  .bio-quote span { color: var(--gold-bright); }
 
   /* ---------- FORM ---------- */
   .form-section { background: var(--paper-2); border-top: 1px solid var(--line); }
   form { max-width: 560px; }
-  .form-campo { margin-bottom: 16px; }
-  .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .form-erro { color: var(--red); font-size: 13.5px; margin-top: 12px; display: none; font-weight: 600; }
-  .form-sucesso {
-    display: none; padding: 30px; border-radius: 12px; max-width: 560px;
-    background: #fff; border: 1.5px solid var(--green);
-  }
-  .form-sucesso h3 { margin: 0 0 8px; font-family: 'Fraunces', Georgia, serif; font-size: 22px; color: var(--green); }
+  .form-campo { margin-bottom: 15px; }
+  .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .form-erro { color: var(--red); font-size: 13.5px; margin-top: 12px; display: none; font-weight: 700; }
+  .form-sucesso { display: none; padding: 28px; border-radius: 12px; max-width: 560px; background: #fff; border: 1.5px solid var(--green); }
+  .form-sucesso h3 { margin: 0 0 8px; font-family: 'Fraunces', serif; font-size: 21px; color: var(--green); }
   .form-sucesso p { margin: 0; color: var(--ink-soft); font-size: 14.5px; }
   .interesse-pill {
-    display: none; margin-bottom: 16px; padding: 10px 16px; border-radius: 8px;
-    background: rgba(169,123,30,0.1); border: 1px solid var(--gold);
-    font-size: 13.5px; font-weight: 600; color: var(--gold-strong);
+    display: none; margin-bottom: 15px; padding: 11px 16px; border-radius: 9px;
+    background: rgba(169,123,30,0.12); border: 1.5px solid var(--gold);
+    font-size: 13.5px; font-weight: 700; color: var(--gold-strong);
   }
 
-  /* ---------- AUTORIDADE / FAQ / FOOTER ---------- */
-  .bio { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: start; }
-  .bio p { font-size: 16px; color: var(--ink-soft); }
-  .bio p strong { color: var(--ink); }
-  .bio-quote {
-    background: var(--dark); color: var(--paper-on-dark); border-radius: 12px; padding: 26px;
-    font-family: 'Fraunces', Georgia, serif; font-size: 19px; line-height: 1.4;
-  }
-  .bio-quote span { color: #e8b84b; }
-  details { border-bottom: 1px solid var(--line); padding: 4px 0; max-width: 760px; }
-  summary { cursor: pointer; font-weight: 700; font-size: 16px; padding: 14px 0; list-style: none; position: relative; padding-right: 30px; }
+  /* ---------- FAQ / FOOTER / STICKY ---------- */
+  details { border-bottom: 1px solid var(--line); padding: 2px 0; max-width: 760px; }
+  summary { cursor: pointer; font-weight: 700; font-size: 15.5px; padding: 14px 0; list-style: none; position: relative; padding-right: 30px; }
   summary::after { content: "+"; position: absolute; right: 4px; font-family: 'Fraunces', serif; font-size: 22px; color: var(--gold-strong); }
   details[open] summary::after { content: "–"; }
-  details p { margin: 0 0 16px; font-size: 14.5px; color: var(--ink-soft); }
-  footer { padding: 44px 20px 60px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: 12px; }
+  details p { margin: 0 0 16px; font-size: 14px; color: var(--ink-soft); }
+  footer { padding: 40px 20px 56px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: 11.5px; }
   footer .marca { font-family: 'Fraunces', serif; font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 8px; }
+  .sticky-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: var(--dark); border-top: 2px solid var(--gold-bright);
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+    padding: 10px 16px;
+  }
+  .sticky-bar .t { color: var(--paper); font-size: 13.5px; font-weight: 700; }
+  .sticky-bar .t em { color: var(--gold-bright); font-style: normal; }
+  .sticky-bar .btn { padding: 11px 20px; font-size: 14px; }
 
   @media (max-width: 760px) {
-    h1 { font-size: 36px; }
-    h2 { font-size: 28px; }
-    .hero { padding: 44px 0 40px; }
-    section { padding: 48px 0; }
-    .tres-cards, .oferta-grid { grid-template-columns: 1fr; }
-    .oferta.destaque { order: -1; }
-    .stat-callout { grid-template-columns: 1fr; gap: 10px; padding: 26px; }
-    .stat-number { font-size: 56px; }
-    .calc-grid, .form-2col { grid-template-columns: 1fr; }
-    .call-box { grid-template-columns: 1fr; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 27px; }
+    .hero { padding: 42px 0 40px; }
+    section { padding: 44px 0; }
+    .tres-cards, .oferta-grid, .calc-grid, .form-2col { grid-template-columns: 1fr; }
+    .stat-callout { grid-template-columns: 1fr; gap: 10px; padding: 24px; }
+    .stat-number { font-size: 52px; }
+    .perda-mes { font-size: 40px; }
+    .call-ring { grid-template-columns: 1fr; text-align: center; }
+    .call-icon { margin: 0 auto; }
+    .btn-atender { width: 100%; }
     .bio { grid-template-columns: 1fr; }
-    .calc-out .big { font-size: 30px; }
+    .calc-card { padding: 24px 20px; }
+    .sticky-bar .t { display: none; }
+    .sticky-bar .btn { width: 100%; text-align: center; }
   }
 </style>
 </head>
@@ -246,87 +304,93 @@
 <div class="hero">
   <div class="container">
     <div class="kicker">Ramsés Castoldi · Especialista em Margem</div>
-    <h1 class="serif">Empresa boa não vive de desconto.<br>Vive de <span class="gold">MARGEM</span>.</h1>
-    <p class="hero-sub">A maioria dos empresários briga por mercado cortando preço — e entrega o lucro
-    no balcão. Quem conhece a <strong>margem real do seu setor</strong> cobra certo, cresce com caixa
-    e não precisa do desespero do desconto. <strong>Pricing é gestão. Não é aposta.</strong></p>
-    <div class="btn-row">
-      <a class="btn btn-red" href="#calculadora">Quanto estou perdendo por ano?</a>
-      <a class="btn btn-ghost" href="#diagnostico-gratis">Diagnóstico grátis de margem</a>
-    </div>
+    <h1 class="serif">Sua empresa perde lucro <span class="red">todos os dias</span>.<br>Você só nunca fez a conta.</h1>
+    <p class="hero-sub">Não é falta de venda. É <strong>preço errado</strong>. Empresa boa não vive de
+    desconto — vive de <strong>margem</strong>. Faça a conta em 10 segundos e veja quanto dinheiro
+    está escapando <strong>por mês</strong> do seu caixa.</p>
+    <a class="btn btn-red" href="#calculadora">FAZER A CONTA AGORA → 10 segundos</a>
+    <div class="hero-foot">Grátis · sem cadastro · qualquer negócio de varejo ou serviços</div>
   </div>
 </div>
 
-<!-- ============ A VERDADE ============ -->
-<section id="verdade">
+<!-- ============ CALCULADORA ============ -->
+<section class="calc-section" id="calculadora">
   <div class="container">
-    <div class="section-kicker">A verdade incômoda</div>
-    <h2 class="serif">Você sabe a sua margem. Mas não sabe a margem do seu <em>mercado</em>.</h2>
-    <p class="lead">E é aí que o lucro vaza. Sem referência, todo preço é chute: você copia o
-    concorrente (que também está chutando), “arredonda pra baixo pra girar” e chama sobrevivência
-    de estratégia. Precificar olhando só pro próprio custo é dirigir olhando só pro painel — sem
-    nunca olhar a estrada.</p>
+    <div class="section-kicker">A conta que ninguém te mostrou</div>
+    <h2 class="serif">Quanto você está perdendo POR MÊS?</h2>
+    <p class="lead">Dois campos. Sem e-mail, sem cadastro. A conta usa a margem típica do seu setor
+    e o índice médio de margem não capturada (28,66%).</p>
+
+    <div class="calc-card">
+      <div class="calc-grid">
+        <div>
+          <label for="c-fat">Faturamento mensal (R$)</label>
+          <input type="number" id="c-fat" min="0" step="1000" placeholder="Ex.: 120000" inputmode="numeric">
+          <div class="chips">
+            <span class="chip" data-v="50000">50 mil</span>
+            <span class="chip" data-v="150000">150 mil</span>
+            <span class="chip" data-v="500000">500 mil</span>
+            <span class="chip" data-v="1000000">1 milhão</span>
+          </div>
+        </div>
+        <div>
+          <label for="c-seg">Seu ramo</label>
+          <select id="c-seg"></select>
+        </div>
+      </div>
+
+      <div class="calc-out" id="calc-out">
+        <div class="perda-mes-label">Você pode estar perdendo até</div>
+        <div class="perda-mes" id="perda-mes">—</div>
+        <div class="perda-ano">Isso dá <strong id="perda-ano">—</strong> por ano saindo do seu bolso —
+        sem vender uma unidade a menos. Só por precificar no escuro.</div>
+        <div class="ticker">⏱️ Só neste mês, já escaparam aproximadamente
+        <strong id="ticker-valor">R$ 0,00</strong> — e o contador não para.</div>
+        <div class="calc-cta">
+          <a class="btn btn-red" data-checkout="997" href="#ofertas">PARAR DE PERDER → minha margem real por R$ 9,97</a>
+        </div>
+      </div>
+    </div>
+    <p class="calc-foot">Estimativa educativa com faixas médias de margem líquida por segmento e o
+    índice de margem não capturada da metodologia Castoldi. O número exato da SUA empresa sai no
+    diagnóstico.</p>
+  </div>
+</section>
+
+<!-- ============ A VERDADE ============ -->
+<section class="verdade" id="verdade">
+  <div class="container">
+    <div class="section-kicker">Por que isso acontece</div>
+    <h2 class="serif">Você conhece o seu custo. Mas não conhece a margem do seu mercado.</h2>
+    <p class="lead">Sem referência, todo preço é chute: você copia o concorrente (que também está
+    chutando) e dá desconto pra "girar". Resultado: trabalha muito, fatura até bem — e sobra pouco.</p>
 
     <div class="stat-callout">
       <div class="stat-number">28,66%</div>
       <div class="stat-text">é quanto de margem, em média, uma empresa <strong>deixa de capturar</strong>
       quando precifica sem conhecer o benchmark real do seu setor. Não é vender pouco.
-      É <strong>cobrar errado</strong> — todos os dias, em todas as vendas.</div>
+      É <strong>cobrar errado</strong> — todo dia, em toda venda.</div>
     </div>
     <p class="stat-foot">* Estimativa da metodologia Castoldi de diagnóstico de margem, a partir de
-    análises de precificação em empresas de varejo e serviços. Valores variam por segmento e operação.</p>
+    análises de precificação em empresas de varejo e serviços.</p>
 
     <div class="tres-cards">
       <div class="t-card">
         <h3 class="serif"><span class="x">✕</span> Desconto é desespero</h3>
-        <p>Baixar preço pra “ganhar mercado” é alugar cliente com o seu lucro. Quem chega pelo
-        desconto, vai embora pelo desconto — e leva a sua margem junto.</p>
+        <p>Baixar preço pra "ganhar mercado" é alugar cliente com o seu lucro. Quem chega pelo
+        desconto vai embora pelo desconto.</p>
       </div>
       <div class="t-card">
         <h3 class="serif"><span class="x">✕</span> Faturamento é vaidade</h3>
-        <p>Faturar alto com margem rasa é trabalhar mais para ganhar menos. Empresa sustentável
-        se mede pelo que sobra, não pelo que passa pelo caixa.</p>
+        <p>Faturar alto com margem rasa é trabalhar mais pra ganhar menos. O que importa é o que
+        sobra, não o que passa pelo caixa.</p>
       </div>
       <div class="t-card">
         <h3 class="serif"><span class="x">✕</span> Margem não é sobra</h3>
-        <p>Margem é decisão. Quem não decide a própria margem aceita a margem que o mercado —
-        e a concorrência desesperada — deixar sobrar.</p>
+        <p>Margem é decisão. Quem não decide a própria margem aceita a que o mercado desesperado
+        deixar sobrar.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ============ CALCULADORA ============ -->
-<section class="calc-section" id="calculadora">
-  <div class="container">
-    <div class="section-kicker">Faça a conta — dói, mas cura</div>
-    <h2 class="serif">Quanto a precificação no escuro está custando pra você?</h2>
-    <p class="lead">Informe seu faturamento e seu segmento. A conta usa a margem típica do setor e o
-    índice médio de margem não capturada (28,66%).</p>
-
-    <div class="calc-grid">
-      <div>
-        <label for="c-fat">Faturamento mensal (R$)</label>
-        <input type="number" id="c-fat" min="0" step="1000" placeholder="Ex.: 120000" inputmode="numeric">
-      </div>
-      <div>
-        <label for="c-seg">Segmento</label>
-        <select id="c-seg"></select>
-      </div>
-    </div>
-
-    <div class="calc-out" id="calc-out">
-      <p>Com base na margem típica do seu setor, você pode estar deixando</p>
-      <div class="big" id="calc-valor">—</div>
-      <p><strong>por ano na mesa</strong> — sem vender uma unidade a mais. Só por precificar sem
-      conhecer a margem real do seu mercado. Essa pode ser a forma mais rápida — e talvez a única
-      sem investir um real a mais — de aumentar o LUCRO da sua empresa: <strong>olhando para os
-      seus preços.</strong></p>
-      <p class="cta-line"><a class="btn btn-red" href="#ofertas">Quero minha margem real — R$ 9,97</a></p>
-    </div>
-    <p class="calc-foot">Estimativa educativa baseada em faixas médias de margem líquida por segmento
-    e no índice de margem não capturada da metodologia Castoldi. O número exato da SUA empresa sai
-    no diagnóstico.</p>
   </div>
 </section>
 
@@ -336,128 +400,128 @@
     <div class="section-kicker">Benchmark de margem</div>
     <h2 class="serif">A margem real do seu setor existe. Você só nunca viu.</h2>
     <p class="lead">Nossa IA cruza dados de mercado, market share e estrutura de preços de vários
-    players para estimar a margem real praticada em cada segmento de varejo e serviços. Uma amostra:</p>
+    players para estimar a margem real praticada em cada segmento. Uma amostra:</p>
 
-    <div class="bench-wrap">
-      <table class="bench-table">
-        <thead><tr><th>Segmento</th><th style="text-align:right">Margem líquida típica</th><th style="text-align:right">Margem dos melhores</th></tr></thead>
-        <tbody id="bench-body"></tbody>
-      </table>
-    </div>
+    <table class="bench-table">
+      <thead><tr><th>Segmento</th><th style="text-align:right">Margem típica</th><th style="text-align:right">Margem dos melhores</th></tr></thead>
+      <tbody id="bench-body"></tbody>
+    </table>
     <p class="bench-foot">Faixas médias estimadas para o mercado brasileiro — referência educativa.
-    No diagnóstico, a IA calcula o benchmark específico do SEU segmento e região.</p>
+    No diagnóstico, a IA calcula o benchmark específico do SEU segmento.</p>
   </div>
 </section>
 
-<!-- ============ ESCADA DE OFERTAS ============ -->
+<!-- ============ OFERTAS ============ -->
 <section class="escada" id="ofertas">
   <div class="container">
-    <div class="section-kicker">Comece por aqui</div>
-    <h2 class="serif">Descubra sua margem real. A partir de R$ 9,97.</h2>
-    <p class="lead">Sem curso de 40 horas, sem consultoria de 6 meses. Diagnóstico direto,
-    com dados — no nível de profundidade que você escolher.</p>
+    <div class="section-kicker">Pare de perder — comece por aqui</div>
+    <h2 class="serif">Descubra sua margem real. Agora. Por menos que um lanche.</h2>
+    <p class="lead">Sem curso de 40 horas, sem consultoria de 6 meses. Diagnóstico direto, com dados.
+    E os dois destravam o acesso à agenda da Call 1:1 comigo.</p>
 
     <div class="oferta-grid">
       <div class="oferta">
         <div class="nome">Margem Real</div>
         <div class="preco"><small>R$</small> 9,97</div>
-        <div class="sub">Pagamento único · qualquer segmento de varejo ou serviços</div>
+        <div class="sub">Pagamento único · qualquer ramo de varejo ou serviços</div>
         <ul>
-          <li>Sua <strong>margem real</strong> calculada a partir de dados simples da sua operação</li>
-          <li><strong>Margem real do seu mercado</strong>: benchmark do setor com análise de market share de vários players, processada por IA</li>
-          <li>Veredito direto: você está acima, na média ou abaixo do seu mercado</li>
-          <li>Entrega no seu e-mail e WhatsApp</li>
+          <li>Sua <strong>margem real</strong> calculada com dados simples da sua operação</li>
+          <li><strong>Margem real do seu mercado</strong>: benchmark do setor por IA (market share de vários players)</li>
+          <li>Veredito direto: você está acima, na média ou abaixo</li>
+          <li>Entrega no e-mail e WhatsApp</li>
+          <li class="agenda"><strong>Destrava o acesso à agenda</strong> da Call de Margem 1:1 com condição exclusiva, revelada junto do diagnóstico</li>
         </ul>
-        <a class="btn btn-gold" data-checkout="997" href="#diagnostico-gratis">Descobrir minha margem real</a>
+        <a class="btn btn-gold" data-checkout="997" href="#diagnostico-gratis">DESCOBRIR MINHA MARGEM</a>
       </div>
 
       <div class="oferta destaque">
-        <div class="tag">Mais escolhido</div>
+        <div class="tag">Mais completo · mais escolhido</div>
         <div class="nome">Diagnóstico de Margem</div>
         <div class="preco"><small>R$</small> 49,66</div>
-        <div class="sub">Pagamento único · relatório completo</div>
+        <div class="sub">Pagamento único · relatório completo + plano de ação</div>
         <ul>
           <li><strong>Tudo</strong> do Margem Real, e mais:</li>
-          <li><strong>Curva de upside</strong>: quanto de margem dá pra recuperar, e em que ordem</li>
-          <li><strong>Plano de ação de pricing</strong> para começar a subir margem já no próximo mês</li>
-          <li class="lock"><strong>Desbloqueia o acesso à agenda</strong> da Call de Margem 1:1 (abaixo)</li>
+          <li><strong>Curva de upside</strong>: quanto de margem dá pra recuperar — e em que ordem</li>
+          <li><strong>Plano de ação de pricing</strong> pra subir margem já no próximo mês</li>
+          <li class="agenda"><strong>Prioridade na agenda</strong> da Call de Margem 1:1 com condição exclusiva, revelada junto do diagnóstico</li>
         </ul>
-        <a class="btn btn-gold" data-checkout="4966" href="#diagnostico-gratis">Quero o diagnóstico completo</a>
-      </div>
-
-      <div class="oferta">
-        <div class="nome">Call de Margem 1:1</div>
-        <div class="preco"><small>R$</small> 387</div>
-        <div class="sub">1 hora, ao vivo, comigo · mediante diagnóstico pago</div>
-        <ul>
-          <li><strong>1 hora de diagnóstico + mentoria</strong> sobre a margem do seu negócio — qualquer segmento</li>
-          <li>Revisão da sua precificação com o relatório na mesa</li>
-          <li>Direção prática: o que mudar primeiro, quanto cobrar, como segurar</li>
-          <li>Agendamento <strong>manual, conforme agenda</strong> (ou pré-agenda), confirmado após o pagamento</li>
-        </ul>
-        <a class="btn btn-ghost" style="border-color:#e8b84b;color:#e8b84b" data-checkout="387" href="#diagnostico-gratis">Entrar na agenda</a>
+        <a class="btn btn-gold" data-checkout="4966" href="#diagnostico-gratis">QUERO O DIAGNÓSTICO COMPLETO</a>
       </div>
     </div>
 
-    <p class="oferta-nota">Como funciona a ordem: o <strong>Diagnóstico de Margem (R$ 49,66)</strong> é o
-    que abre a possibilidade de agendar a Call 1:1 — você recebe o relatório detalhado e, junto dele, o
-    acesso à agenda (sujeito a disponibilidade). A call é confirmada mediante o pagamento. Vagas de
-    agenda são limitadas porque cada call é individual, comigo.</p>
+    <!-- CALL CHAMANDO -->
+    <div class="call-ring" id="call-chamando">
+      <div class="call-icon">📞</div>
+      <div class="call-txt">
+        <div class="chamando">● Call chamando…</div>
+        <h3 class="serif">Call de Margem 1:1 — vaga de agenda aberta</h3>
+        <p>Quem recebe o diagnóstico ganha uma janela <strong>por tempo limitado</strong> pra entrar
+        na agenda da call de 1 hora comigo — diagnóstico ao vivo + mentoria de pricing sobre o SEU
+        negócio. Agenda individual, confirmada na sequência do pagamento.</p>
+        <div class="deal">Condição de urgência: <s>R$ 387</s> <strong>R$ 297</strong>
+        <span class="off">R$ 90 OFF · 23%</span></div>
+      </div>
+      <a class="btn btn-atender" data-checkout="297" href="#diagnostico-gratis">ATENDER AGORA ➜</a>
+    </div>
+
+    <p class="oferta-nota">A condição de R$ 297 vale enquanto a janela da sua vaga estiver aberta
+    após a entrega do diagnóstico — depois, o acesso à agenda volta ao valor cheio. Vagas limitadas:
+    cada call é individual, comigo.</p>
 
     <div class="gratis-strip">
-      <p><strong>Ainda não está pronto pra pagar nem R$ 9,97?</strong> Ok. Faça o diagnóstico-relâmpago
+      <p><strong>Ainda não está pronto pra investir R$ 9,97?</strong> Faça o diagnóstico-relâmpago
       gratuito e receba uma primeira leitura da sua margem no WhatsApp.</p>
       <a class="btn btn-ghost" style="border-color:#f6f2ea;color:#f6f2ea" href="#diagnostico-gratis">Diagnóstico grátis</a>
     </div>
   </div>
 </section>
 
-<!-- ============ POR QUE TÃO BARATO ============ -->
+<!-- ============ POR QUE 9,97 ============ -->
 <section class="porque">
   <div class="container">
     <div class="section-kicker">Por que R$ 9,97?</div>
     <h2 class="serif">Porque esse não é o produto. É a porta.</h2>
-    <p class="lead">R$ 9,97 não paga o meu café da semana. É o preço de te provar, com números e não
-    com discurso, que a sua margem está errada — e que dá pra consertar. Eu ganho de verdade quando
-    você enxerga o jogo e decide jogar ele a fundo. Até lá, o risco é meu.</p>
+    <p class="lead">R$ 9,97 não paga meu café da semana. É o preço de te provar, com números e não com
+    discurso, que a sua margem está errada — e que dá pra consertar. Eu ganho de verdade quando você
+    enxerga o jogo e decide jogar a fundo. Até lá, o risco é meu.</p>
     <blockquote>
-      “Eu não vendo motivação. Vendo a conta que ninguém te mostrou.
+      "Eu não vendo motivação. Vendo a conta que ninguém te mostrou.
       Se depois de ver a conta você não quiser mais nada, já sai ganhando —
-      vai precificar melhor amanhã de manhã.”
+      vai precificar melhor amanhã de manhã."
       <span class="assin">— Ramsés Castoldi</span>
     </blockquote>
   </div>
 </section>
 
 <!-- ============ AUTORIDADE ============ -->
-<section id="quem">
+<section id="quem" style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
   <div class="container">
     <div class="section-kicker">Quem está do outro lado</div>
     <h2 class="serif">Margem é o jogo que eu jogo todos os dias — com o meu próprio dinheiro.</h2>
     <div class="bio">
       <div>
-        <p><strong>Ramsés Castoldi</strong> é empresário do varejo — um dos setores de margem mais
-        apertada e competição mais suja do Brasil: combustíveis. É fundador do <strong>Lumen Posto
+        <p><strong>Ramsés Castoldi</strong> é empresário do varejo — de um dos setores de margem mais
+        apertada e concorrência mais suja do Brasil: combustíveis. Fundador do <strong>Lumen Posto
         Club</strong>, clube de inteligência de pricing que monitora diariamente preços, custos e
         margens de mercado, e mentor de empresários de varejo e serviços.</p>
-        <p>Quem opera margem apertada aprende o que empresário de margem gorda nunca precisou
-        aprender: <strong>centavos são estratégia</strong>. É essa disciplina de pricing — dados,
-        benchmark e decisão — que o diagnóstico aplica a qualquer negócio.</p>
+        <p>Quem opera margem apertada aprende o que empresário de margem gorda nunca precisou aprender:
+        <strong>centavos são estratégia</strong>. É essa disciplina — dados, benchmark e decisão — que
+        o diagnóstico aplica a qualquer negócio.</p>
       </div>
       <div class="bio-quote">
-        “Mercado não respeita quem <span>precisa</span> vender.<br>
-        Respeita quem <span>sabe</span> quanto cobrar.”
+        "Mercado não respeita quem <span>precisa</span> vender.<br>
+        Respeita quem <span>sabe</span> quanto cobrar."
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ FORM / DIAGNÓSTICO GRÁTIS ============ -->
+<!-- ============ FORM GRÁTIS ============ -->
 <section class="form-section" id="diagnostico-gratis">
   <div class="container">
     <div class="section-kicker">Diagnóstico-relâmpago · grátis</div>
     <h2 class="serif">Comece agora: primeira leitura da sua margem, no seu WhatsApp.</h2>
-    <p class="lead" style="margin-bottom:28px">Preencha os campos abaixo. Você recebe uma leitura
+    <p class="lead" style="margin-bottom:26px">Preencha os campos abaixo. Você recebe uma leitura
     inicial da sua situação de margem e o caminho do diagnóstico completo.</p>
 
     <form id="form-lead" novalidate>
@@ -478,7 +542,7 @@
       </div>
       <div class="form-2col">
         <div class="form-campo">
-          <label for="f-seg">Segmento</label>
+          <label for="f-seg">Seu ramo</label>
           <select id="f-seg"></select>
         </div>
         <div class="form-campo">
@@ -494,13 +558,13 @@
           </select>
         </div>
       </div>
-      <button class="btn btn-gold" type="submit" id="btn-enviar" style="width:100%">Receber meu diagnóstico grátis</button>
+      <button class="btn btn-gold" type="submit" id="btn-enviar" style="width:100%">RECEBER MEU DIAGNÓSTICO GRÁTIS</button>
       <div class="form-erro" id="form-erro"></div>
     </form>
     <div class="form-sucesso" id="form-sucesso">
       <h3>Recebido ✓</h3>
       <p>Seus dados chegaram aqui. Em breve você recebe no WhatsApp a primeira leitura da sua margem
-      — e o link pra destravar o diagnóstico completo, se fizer sentido pra você.</p>
+      — e o caminho pra destravar o diagnóstico completo, se fizer sentido pra você.</p>
     </div>
   </div>
 </section>
@@ -511,7 +575,7 @@
     <div class="section-kicker">Perguntas diretas</div>
     <h2 class="serif">O que todo mundo pergunta antes de pagar R$ 9,97</h2>
     <details>
-      <summary>Serve pro meu segmento?</summary>
+      <summary>Serve pro meu ramo?</summary>
       <p>Se a sua empresa é de varejo ou serviços — loja, clínica, restaurante, oficina, farmácia,
       e-commerce, agência, posto, salão, qualquer uma — serve. A IA calcula o benchmark do SEU
       segmento a partir da análise de mercado e market share dos players do setor.</p>
@@ -523,21 +587,22 @@
     </details>
     <details>
       <summary>Como funciona a Call de Margem 1:1?</summary>
-      <p>Ela é liberada para quem fez o Diagnóstico de Margem (R$ 49,66). Junto do relatório
-      detalhado você recebe acesso à agenda (ou pré-agenda, conforme disponibilidade). A call de 1
-      hora é confirmada mediante o pagamento de R$ 387 — e é individual, comigo, sobre o seu negócio.</p>
+      <p>Quem faz o diagnóstico (R$ 9,97 ou R$ 49,66) recebe, junto do relatório, uma janela por
+      tempo limitado pra entrar na agenda da call de 1 hora comigo — com condição exclusiva de
+      urgência. O agendamento é individual e confirmado na sequência do pagamento, conforme agenda
+      ou pré-agenda disponível.</p>
     </details>
     <details>
       <summary>E depois da call?</summary>
-      <p>Depende de você. Muitos saem da call com o plano na mão e executam sozinhos. Pra quem quer
-      acompanhamento de perto na reconstrução da margem, eu apresento na própria call como funciona a
-      minha mentoria — sem compromisso.</p>
+      <p>Depende de você. Muitos saem com o plano na mão e executam sozinhos. Pra quem quer
+      acompanhamento de perto na reconstrução da margem, eu apresento na própria call como funciona
+      a minha mentoria — sem compromisso.</p>
     </details>
     <details>
       <summary>Isso é promessa de resultado?</summary>
-      <p>Não. É diagnóstico com dados e método. Os números do seu relatório são estimativas calculadas
-      a partir das informações que você fornecer e de referências de mercado — quem decide e executa o
-      preço é você.</p>
+      <p>Não. É diagnóstico com dados e método. Os números são estimativas calculadas a partir das
+      informações que você fornecer e de referências de mercado — quem decide e executa o preço é
+      você.</p>
     </details>
   </div>
 </section>
@@ -549,14 +614,19 @@
   recomendação de preço — cada empresa define seus preços de forma independente.</p>
 </footer>
 
+<!-- ============ STICKY CTA ============ -->
+<div class="sticky-bar">
+  <span class="t">Cada dia no escuro custa margem. <em>Descubra a sua agora.</em></span>
+  <a class="btn btn-red" data-checkout="997" href="#ofertas">Minha margem real → R$ 9,97</a>
+</div>
+
 <script>
 // ================= CONFIG =================
-// Links de checkout (Mercado Pago). Enquanto vazios, o botão leva ao
-// formulário e marca o interesse do lead — nenhum clique se perde.
+// Links de checkout (Mercado Pago). Vazio → botão marca interesse e cai no formulário.
 const CHECKOUT = {
   '997':  'https://mpago.la/2w1tYxX',   // Margem Real — R$ 9,97
   '4966': 'https://mpago.li/2NLByZA',   // Diagnóstico de Margem — R$ 49,66
-  '387':  'https://mpago.li/2ej3uUc'    // Call de Margem 1:1 — R$ 387
+  '297':  ''                            // Call 1:1 URGÊNCIA — R$ 297 (link enviado na sequência)
 };
 const WEBHOOK_LEAD = 'https://n8n.srv1662375.hstgr.cloud/webhook/crm-lead-add';
 const INDICE_PERDA = 0.2866; // margem média não capturada (metodologia Castoldi)
@@ -580,49 +650,81 @@ const SEGMENTOS = {
 const BENCH_VISIVEIS = ['Supermercado / minimercado','Restaurante / food service','Serviços profissionais / agência'];
 
 const fmtBRL = v => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits: 0 });
+const fmtBRL2 = v => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 // ================= SELECTS =================
 function popularSegmentos(sel, placeholder) {
   sel.innerHTML = (placeholder ? '<option value="">'+placeholder+'</option>' : '') +
     Object.keys(SEGMENTOS).map(s => '<option>'+s+'</option>').join('');
 }
-popularSegmentos(document.getElementById('c-seg'), 'Escolha o segmento…');
-popularSegmentos(document.getElementById('f-seg'), 'Escolha o segmento…');
+popularSegmentos(document.getElementById('c-seg'), 'Escolha o ramo…');
+popularSegmentos(document.getElementById('f-seg'), 'Escolha o ramo…');
 
-// ================= CALCULADORA =================
+// ================= CALCULADORA + TICKER =================
+let perdaAnoAtual = 0, tickerInicio = 0, tickerTimer = null;
+
 function calcular() {
   const fat = parseFloat(document.getElementById('c-fat').value);
   const seg = document.getElementById('c-seg').value;
   const out = document.getElementById('calc-out');
-  if (!fat || fat <= 0 || !seg) { out.style.display = 'none'; return; }
+  if (!fat || fat <= 0 || !seg) { out.style.display = 'none'; pararTicker(); return; }
   const [mMin, mMax] = SEGMENTOS[seg];
   const mMedia = (mMin + mMax) / 2 / 100;
-  const perdaAno = fat * 12 * mMedia * INDICE_PERDA;
-  document.getElementById('calc-valor').textContent = 'até ' + fmtBRL(perdaAno);
+  perdaAnoAtual = fat * 12 * mMedia * INDICE_PERDA;
+  const perdaMes = perdaAnoAtual / 12;
+  document.getElementById('perda-mes').innerHTML = fmtBRL(perdaMes) + ' <small>/ mês</small>';
+  document.getElementById('perda-ano').textContent = fmtBRL(perdaAnoAtual);
   out.style.display = 'block';
+  iniciarTicker();
 }
+function iniciarTicker() {
+  // Base: perda acumulada do mês até este exato segundo; anima do zero até lá,
+  // depois segue correndo ao vivo (centavo a centavo).
+  pararTicker();
+  const el = document.getElementById('ticker-valor');
+  const porSegundo = perdaAnoAtual / (365 * 24 * 3600);
+  const agora = new Date();
+  const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).getTime();
+  const animInicio = Date.now();
+  const ANIM_MS = 1400;
+  tickerTimer = setInterval(() => {
+    const t = Date.now();
+    const baseSegundos = (t - inicioMes) / 1000;
+    const alvo = baseSegundos * porSegundo;
+    const p = Math.min(1, (t - animInicio) / ANIM_MS);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmtBRL2(alvo * ease);
+  }, 80);
+}
+function pararTicker() { if (tickerTimer) { clearInterval(tickerTimer); tickerTimer = null; } }
+
 document.getElementById('c-fat').addEventListener('input', calcular);
 document.getElementById('c-seg').addEventListener('change', calcular);
+document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
+  document.getElementById('c-fat').value = ch.getAttribute('data-v');
+  calcular();
+}));
 
 // ================= BENCHMARK TABLE =================
 (function montarBench() {
   const tb = document.getElementById('bench-body');
   let html = '';
+  const fp = v => String(v).replace('.', ',');
   for (const s of BENCH_VISIVEIS) {
     const [mn, mx, top] = SEGMENTOS[s];
-    html += '<tr><td>'+s+'</td><td class="num">'+String(mn).replace('.',',')+'% – '+String(mx).replace('.',',')+'%</td><td class="num" style="color:var(--green)">'+String(top).replace('.',',')+'%+</td></tr>';
+    html += '<tr><td>'+s+'</td><td class="num">'+fp(mn)+'% – '+fp(mx)+'%</td><td class="num" style="color:var(--green)">'+fp(top)+'%+</td></tr>';
   }
   const ocultos = Object.keys(SEGMENTOS).filter(s => !BENCH_VISIVEIS.includes(s));
   for (const s of ocultos.slice(0, 4)) {
     const [mn, mx, top] = SEGMENTOS[s];
-    html += '<tr class="bench-locked"><td>'+s+'</td><td class="num">'+String(mn).replace('.',',')+'% – '+String(mx).replace('.',',')+'%</td><td class="num">'+String(top).replace('.',',')+'%+</td></tr>';
+    html += '<tr class="bench-locked"><td>'+s+'</td><td class="num">'+fp(mn)+'% – '+fp(mx)+'%</td><td class="num">'+fp(top)+'%+</td></tr>';
   }
   html += '<tr class="bench-locked-label"><td colspan="3" onclick="location.href=\'#ofertas\'">🔒 Benchmark completo do seu segmento — desbloqueie por R$ 9,97 →</td></tr>';
   tb.innerHTML = html;
 })();
 
 // ================= CHECKOUT / INTERESSE =================
-const NOMES_PRODUTO = { '997':'Margem Real R$9,97', '4966':'Diagnóstico R$49,66', '387':'Call 1:1 R$387' };
+const NOMES_PRODUTO = { '997':'Margem Real R$9,97', '4966':'Diagnóstico R$49,66', '297':'Call 1:1 URGÊNCIA R$297' };
 let interesse = '';
 document.querySelectorAll('[data-checkout]').forEach(a => {
   const k = a.getAttribute('data-checkout');
@@ -630,7 +732,7 @@ document.querySelectorAll('[data-checkout]').forEach(a => {
   a.addEventListener('click', () => {
     interesse = NOMES_PRODUTO[k];
     const pill = document.getElementById('interesse-pill');
-    pill.textContent = 'Interesse marcado: ' + interesse + ' — preencha e eu te mando o link de pagamento no WhatsApp.';
+    pill.textContent = 'Interesse marcado: ' + interesse + ' — preencha e eu te mando o link de acesso no WhatsApp.';
     pill.style.display = 'block';
   });
 });
@@ -662,7 +764,7 @@ document.getElementById('form-lead').addEventListener('submit', async (e) => {
     document.getElementById('form-lead').style.display = 'none';
     document.getElementById('form-sucesso').style.display = 'block';
   } catch (err) {
-    btn.disabled = false; btn.textContent = 'Receber meu diagnóstico grátis';
+    btn.disabled = false; btn.textContent = 'RECEBER MEU DIAGNÓSTICO GRÁTIS';
     erro.textContent = 'Não foi possível enviar agora. Tente de novo em instantes.';
     erro.style.display = 'block';
   }
