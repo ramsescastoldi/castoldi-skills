@@ -60,7 +60,7 @@ da Cloudflare e o site atualiza (cache de ~2 minutos).
 - **Mercado Pago — URLs de retorno** (configure em cada link de pagamento):
   - R$ 9,97 → `https://margem.lumenclubpainel.com.br/?pg=diagnostico&p=997`
   - R$ 49,66 → `https://margem.lumenclubpainel.com.br/?pg=diagnostico&p=4966`
-- Checkouts: 9,97 `mpago.la/2w1tYxX` · 49,66 `mpago.li/2NLByZA` · Call 297 `mpago.li/2ej3uUc`
+- Checkouts: 9,97 `mpago.la/2w1tYxX` · 49,66 `mpago.li/2NLByZA` · Call: urgência R$ 297 `mpago.la/19swLrY` · cheio R$ 497 `mpago.li/2ej3uUc`
   (constantes `CHECKOUT` no topo do script do `index.html`)
 - Respostas do formulário: painel Netlify → projeto **margem-castoldi-antigo** → aba Forms
   (NÃO delete esse projeto; configure lá a notificação por e-mail)
