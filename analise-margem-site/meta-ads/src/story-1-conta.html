@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset='utf-8'><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --paper:#f6f2ea; --ink:#16130f; --ink-soft:#4a443b; --muted:#8a8276;
+  --gold:#a97b1e; --gold-strong:#8f6512; --gold-bright:#e8b84b;
+  --red:#d1222a; --red-vivo:#ff5a56; --green-call:#1fae5e; --dark:#16130f; --dark2:#211d17;
+}
+body { font-family:'Inter',sans-serif; width:1080px; height:1920px; overflow:hidden; }
+.serif { font-family:'Bitstream Charter','Caladea',Georgia,serif; }
+.quadro { width:1080px; height:1920px; display:flex; flex-direction:column; justify-content:space-between; position:relative; }
+.dark { background: radial-gradient(1400px 700px at 50% -10%, rgba(232,184,75,0.20), transparent 60%), var(--dark); color:var(--paper); }
+.light { background: var(--paper); color:var(--ink); }
+.kicker { display:inline-block; font-size:30px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold-bright); border:3px solid rgba(232,184,75,.5); border-radius:999px; padding:16px 42px; }
+.light .kicker { color:var(--gold-strong); border-color:rgba(169,123,30,.5); }
+.h1 { font-family:'Bitstream Charter','Caladea',Georgia,serif; font-weight:bold; line-height:1.06; letter-spacing:-0.01em; }
+.red { color:var(--red-vivo); } .light .red { color:var(--red); }
+.gold { color:var(--gold-bright); } .light .gold { color:var(--gold-strong); }
+.cta { display:inline-block; background:var(--red); color:#fff; font-weight:900; border-radius:18px;
+  padding:34px 56px; font-size:44px; letter-spacing:.01em; box-shadow:0 18px 60px rgba(209,34,42,.45); }
+.cta.gold-btn { background:var(--gold-strong); box-shadow:0 18px 60px rgba(143,101,18,.45); }
+.rodape { display:flex; align-items:center; justify-content:space-between; }
+.marca { font-family:'Bitstream Charter',Georgia,serif; font-weight:bold; font-size:34px; letter-spacing:.08em; }
+.site { font-size:30px; font-weight:700; color:var(--muted); }
+.dark .site { color:#9a9080; }
+.preco-big { font-family:'Bitstream Charter',Georgia,serif; font-weight:bold; line-height:1; }
+.risco { text-decoration:line-through; }
+</style></head><body>
+<div class="quadro dark" style="padding:150px 90px 120px;">
+  <div style="text-align:center;"><span class="kicker">A conta que ninguém te mostrou</span></div>
+  <div style="text-align:center;">
+    <div class="h1" style="font-size:118px;">Sua empresa perde lucro <span class="red">todos os dias.</span></div>
+    <div class="h1" style="font-size:72px; margin-top:40px; color:#cfc6b4;">Você só nunca fez a conta.</div>
+    <div style="margin:70px auto 0; max-width:820px; border:3px dashed rgba(232,184,75,.5); border-radius:24px; padding:46px 40px;">
+      <div style="font-size:34px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--red-vivo);">Só neste mês já escaparam</div>
+      <div class="preco-big" style="font-size:120px; color:var(--red-vivo); margin-top:18px;">R$ •••••</div>
+      <div style="font-size:34px; color:#bdb4a4; margin-top:16px;">do caixa de quem precifica no escuro</div>
+    </div>
+    <div style="font-size:42px; margin-top:64px; color:#bdb4a4;">Faça a conta em <strong style="color:#fff;">10 segundos</strong> — grátis, sem cadastro.</div>
+    <div style="margin-top:56px;"><span class="cta" style="font-size:52px; padding:40px 70px;">FAZER A CONTA →</span></div>
+  </div>
+  <div style="text-align:center;">
+    <div class="marca">RAMSÉS CASTOLDI <span class="gold">· MARGEM</span></div>
+    <div class="site" style="margin-top:14px;">margem.lumenclubpainel.com.br</div>
+  </div>
+</div></body></html>
