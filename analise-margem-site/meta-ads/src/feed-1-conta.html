@@ -1,0 +1,42 @@
+<!doctype html><html><head><meta charset='utf-8'><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --paper:#f6f2ea; --ink:#16130f; --ink-soft:#4a443b; --muted:#8a8276;
+  --gold:#a97b1e; --gold-strong:#8f6512; --gold-bright:#e8b84b;
+  --red:#d1222a; --red-vivo:#ff5a56; --green-call:#1fae5e; --dark:#16130f; --dark2:#211d17;
+}
+body { font-family:'Inter',sans-serif; width:1080px; height:1080px; overflow:hidden; }
+.serif { font-family:'Bitstream Charter','Caladea',Georgia,serif; }
+.quadro { width:1080px; height:1080px; display:flex; flex-direction:column; justify-content:space-between; position:relative; }
+.dark { background: radial-gradient(1400px 700px at 50% -10%, rgba(232,184,75,0.20), transparent 60%), var(--dark); color:var(--paper); }
+.light { background: var(--paper); color:var(--ink); }
+.kicker { display:inline-block; font-size:30px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold-bright); border:3px solid rgba(232,184,75,.5); border-radius:999px; padding:16px 42px; }
+.light .kicker { color:var(--gold-strong); border-color:rgba(169,123,30,.5); }
+.h1 { font-family:'Bitstream Charter','Caladea',Georgia,serif; font-weight:bold; line-height:1.06; letter-spacing:-0.01em; }
+.red { color:var(--red-vivo); } .light .red { color:var(--red); }
+.gold { color:var(--gold-bright); } .light .gold { color:var(--gold-strong); }
+.cta { display:inline-block; background:var(--red); color:#fff; font-weight:900; border-radius:18px;
+  padding:34px 56px; font-size:44px; letter-spacing:.01em; box-shadow:0 18px 60px rgba(209,34,42,.45); }
+.cta.gold-btn { background:var(--gold-strong); box-shadow:0 18px 60px rgba(143,101,18,.45); }
+.rodape { display:flex; align-items:center; justify-content:space-between; }
+.marca { font-family:'Bitstream Charter',Georgia,serif; font-weight:bold; font-size:34px; letter-spacing:.08em; }
+.site { font-size:30px; font-weight:700; color:var(--muted); }
+.dark .site { color:#9a9080; }
+.preco-big { font-family:'Bitstream Charter',Georgia,serif; font-weight:bold; line-height:1; }
+.risco { text-decoration:line-through; }
+</style></head><body>
+<div class="quadro dark" style="padding:84px 88px;">
+  <div><span class="kicker">A conta que ninguém te mostrou</span></div>
+  <div>
+    <div class="h1" style="font-size:94px; max-width:950px;">Sua empresa perde lucro <span class="red">todos os dias.</span></div>
+    <div class="h1" style="font-size:58px; margin-top:28px; color:#cfc6b4;">Você só nunca fez a conta.</div>
+    <div style="font-size:37px; margin-top:36px; color:#bdb4a4; max-width:880px; line-height:1.4;">
+      Não é falta de venda. É <strong style="color:#fff;">preço errado</strong>. Descubra em 10 segundos
+      quanto escapa do seu caixa <strong style="color:#fff;">por mês</strong>.</div>
+    <div style="margin-top:44px;"><span class="cta">FAZER A CONTA GRÁTIS →</span></div>
+  </div>
+  <div class="rodape">
+  <div class="marca">RAMSÉS CASTOLDI <span class="gold">· MARGEM</span></div>
+  <div class="site">margem.lumenclubpainel.com.br</div></div>
+</div></body></html>

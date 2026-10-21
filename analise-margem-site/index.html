@@ -561,7 +561,7 @@
           <li><strong>Tudo</strong> do Margem Real, e mais:</li>
           <li><strong>Curva de upside</strong>: quanto de margem dá pra recuperar — e em que ordem</li>
           <li><strong>Plano de ação de pricing</strong> pra subir margem já no próximo mês</li>
-          <li class="agenda"><strong>Prioridade na agenda</strong> da Call de Margem 1:1 com condição exclusiva, revelada junto do diagnóstico</li>
+          <li class="agenda"><strong>Upsell exclusivo</strong>: marque a Call de Margem 1:1 (1 hora comigo) por <strong>+ R$ 297</strong> — fora daqui, valor único de R$ 497</li>
         </ul>
         <a class="btn btn-gold" data-checkout="4966" href="#diagnostico-gratis">QUERO O DIAGNÓSTICO COMPLETO</a>
       </div>
@@ -576,8 +576,8 @@
         <p>Quem recebe o diagnóstico ganha uma janela <strong>por tempo limitado</strong> pra entrar
         na agenda da call de 1 hora comigo — diagnóstico ao vivo + mentoria de pricing sobre o SEU
         negócio. Agenda individual, confirmada na sequência do pagamento.</p>
-        <div class="deal">Condição de urgência: <s>R$ 387</s> <strong>R$ 297</strong>
-        <span class="off">R$ 90 OFF · 23%</span></div>
+        <div class="deal">Condição de urgência: <s>R$ 497</s> <strong>R$ 297</strong>
+        <span class="off">R$ 200 OFF · 40%</span></div>
       </div>
       <a class="btn btn-atender" data-checkout="297" href="#diagnostico-gratis">ATENDER AGORA ➜</a>
     </div>
@@ -650,30 +650,12 @@
       </div>
       <div class="form-2col">
         <div class="form-campo">
-          <label for="f-email">E-mail</label>
-          <input type="email" id="f-email" autocomplete="email" required placeholder="voce@suaempresa.com.br">
-        </div>
-        <div class="form-campo">
           <label for="f-wpp">WhatsApp</label>
           <input type="tel" id="f-wpp" autocomplete="tel" required placeholder="(65) 99999-9999">
         </div>
-      </div>
-      <div class="form-2col">
         <div class="form-campo">
           <label for="f-seg">Seu ramo</label>
           <select id="f-seg"></select>
-        </div>
-        <div class="form-campo">
-          <label for="f-fat">Faturamento mensal</label>
-          <select id="f-fat">
-            <option value="">Prefiro não informar</option>
-            <option>Até R$ 50 mil</option>
-            <option>R$ 50 a 150 mil</option>
-            <option>R$ 150 a 500 mil</option>
-            <option>R$ 500 mil a 1 mi</option>
-            <option>R$ 1 a 5 mi</option>
-            <option>Acima de R$ 5 mi</option>
-          </select>
         </div>
       </div>
       <button class="btn btn-gold" type="submit" id="btn-enviar" style="width:100%">RECEBER MEU DIAGNÓSTICO GRÁTIS</button>
@@ -909,6 +891,11 @@
       benchmark do seu mercado</strong> chega no seu e-mail e WhatsApp em até <strong>24h úteis</strong>.</p>
     </div>
 
+    <div class="ok-box" id="ia-previa" style="display:none;text-align:left">
+      <h2 class="serif" style="font-size:19px">⚡ Prévia instantânea do seu diagnóstico</h2>
+      <p id="ia-previa-texto" style="white-space:pre-line"></p>
+    </div>
+
     <div class="call-ring">
       <div class="call-icon">📞</div>
       <div class="chamando">● Call chamando…</div>
@@ -916,8 +903,8 @@
       <p>Por ter feito o diagnóstico, você destravou — <strong>por tempo limitado</strong> — a
       condição exclusiva da Call de Margem 1:1: uma hora, ao vivo, comigo, revisando a precificação
       do SEU negócio com o relatório na mesa.</p>
-      <div class="deal">Condição de urgência: <s>R$ 387</s> <strong>R$ 297</strong> <span class="off">R$ 90 OFF · 23%</span></div>
-      <a class="btn btn-atender" href="https://mpago.li/2ej3uUc" target="_blank" rel="noopener">GARANTIR MINHA VAGA ➜</a>
+      <div class="deal">Condição de urgência: <s>R$ 497</s> <strong>R$ 297</strong> <span class="off">R$ 200 OFF · 40%</span></div>
+      <a class="btn btn-atender" href="https://mpago.la/19swLrY" target="_blank" rel="noopener">GARANTIR MINHA VAGA ➜</a>
       <p style="margin-top:12px;font-size:11.5px;color:#86a893">Agenda individual e limitada — horário confirmado
       no WhatsApp na sequência do pagamento. Depois que a janela fecha, o acesso volta ao valor cheio.</p>
     </div>
@@ -934,9 +921,11 @@
 const CHECKOUT = {
   '997':  'https://mpago.la/2w1tYxX',   // Margem Real — R$ 9,97
   '4966': 'https://mpago.li/2NLByZA',   // Diagnóstico de Margem — R$ 49,66
-  '297':  'https://mpago.li/2ej3uUc'    // Call 1:1 URGÊNCIA — R$ 297
+  '297':  'https://mpago.la/19swLrY'    // Call 1:1 URGÊNCIA — R$ 297
 };
 const WEBHOOK_LEAD = 'https://n8n.srv1662375.hstgr.cloud/webhook/crm-lead-add';
+// IA na nuvem (Cloudflare Worker /api/diagnostico). Vazio = sem prévia instantânea.
+const IA_ENDPOINT = 'https://margem.ramses-79e.workers.dev/api/diagnostico';
 const INDICE_PERDA = 0.2866; // margem média não capturada (metodologia Castoldi)
 
 // Segmento: [margem líquida típica mín, máx, margem dos melhores] (faixas educativas, %)
@@ -1049,15 +1038,12 @@ document.querySelectorAll('[data-checkout]').forEach(a => {
 document.getElementById('form-lead').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nome = document.getElementById('f-nome').value.trim();
-  const email = document.getElementById('f-email').value.trim();
   const wpp = document.getElementById('f-wpp').value.replace(/\D/g, '');
   const seg = document.getElementById('f-seg').value;
-  const fat = document.getElementById('f-fat').value;
   const erro = document.getElementById('form-erro');
   erro.style.display = 'none';
 
   if (!nome) { erro.textContent = 'Informe seu nome.'; erro.style.display = 'block'; return; }
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { erro.textContent = 'Informe um e-mail válido.'; erro.style.display = 'block'; return; }
   if (wpp.length < 10) { erro.textContent = 'Informe um WhatsApp válido com DDD.'; erro.style.display = 'block'; return; }
 
   const btn = document.getElementById('btn-enviar');
@@ -1065,8 +1051,8 @@ document.getElementById('form-lead').addEventListener('submit', async (e) => {
 
   // POST urlencoded simples (sem preflight). Resposta opaca (no-cors), mas o
   // webhook processa e o lead cai na lista do CRM.
-  const cargo = ['Margem', seg || 's/segmento', fat || 's/fat', interesse].filter(Boolean).join(' | ').slice(0, 118);
-  const body = new URLSearchParams({ nome, email, whatsapp: wpp, cargo, origem: 'direct' });
+  const cargo = ['Margem', seg || 's/segmento', interesse].filter(Boolean).join(' | ').slice(0, 118);
+  const body = new URLSearchParams({ nome, email: '', whatsapp: wpp, cargo, origem: 'direct' });
   try {
     await fetch(WEBHOOK_LEAD, { method: 'POST', mode: 'no-cors', body });
     document.getElementById('form-lead').style.display = 'none';
@@ -1158,6 +1144,24 @@ document.getElementById('form-diag').addEventListener('submit', async (e) => {
   document.getElementById('form-diag').style.display = 'none';
   document.getElementById('sucesso').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // 3) Prévia instantânea pela IA na nuvem (melhor esforço — silencioso se falhar)
+  if (IA_ENDPOINT) {
+    try {
+      const box = document.getElementById('ia-previa');
+      const txt = document.getElementById('ia-previa-texto');
+      box.style.display = 'block';
+      txt.textContent = 'Calculando sua margem real com IA… (até 1 minuto)';
+      const resp = await fetch(IA_ENDPOINT, { method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(f))) });
+      const j = await resp.json();
+      if (j && j.ok && j.previa) {
+        txt.textContent = 'Sua margem líquida calculada: ' + String(j.margem_liquida_pct).replace('.', ',') +
+          '% (bruta: ' + String(j.margem_bruta_pct).replace('.', ',') + '%)\n\n' + j.previa;
+      } else { box.style.display = 'none'; }
+    } catch (_) { document.getElementById('ia-previa').style.display = 'none'; }
+  }
 });
 
 }
