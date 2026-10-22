@@ -255,6 +255,13 @@
   .form-sucesso { display: none; padding: 28px; border-radius: 12px; max-width: 560px; background: #fff; border: 1.5px solid var(--green); }
   .form-sucesso h3 { margin: 0 0 8px; font-family: 'Fraunces', serif; font-size: 21px; color: var(--green); }
   .form-sucesso p { margin: 0; color: var(--ink-soft); font-size: 14.5px; }
+  .cad-fundo { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.55);
+    align-items: center; justify-content: center; padding: 16px; }
+  .cad-fundo.aberto { display: flex; }
+  .cad-caixa { background: #fff; border-radius: 14px; padding: 24px; width: 100%; max-width: 440px; max-height: 100%; overflow-y: auto; }
+  .cad-caixa h3 { margin: 0 0 6px; font-family: 'Fraunces', serif; font-size: 21px; }
+  .cad-caixa p { margin: 0 0 16px; color: var(--ink-soft); font-size: 14px; }
+  .cad-fechar { float: right; background: none; border: 0; font-size: 22px; cursor: pointer; color: var(--ink-soft); }
   .interesse-pill {
     display: none; margin-bottom: 15px; padding: 11px 16px; border-radius: 9px;
     background: rgba(169,123,30,0.12); border: 1.5px solid var(--gold);
@@ -648,6 +655,10 @@
         <label for="f-nome">Nome</label>
         <input type="text" id="f-nome" autocomplete="name" required placeholder="Seu nome">
       </div>
+      <div class="form-campo">
+        <label for="f-email">E-mail</label>
+        <input type="email" id="f-email" autocomplete="email" required placeholder="voce@suaempresa.com.br">
+      </div>
       <div class="form-2col">
         <div class="form-campo">
           <label for="f-wpp">WhatsApp</label>
@@ -915,6 +926,28 @@
 <footer>RAMSÉS CASTOLDI · MARGEM — As informações enviadas alimentam exclusivamente o seu diagnóstico.</footer>
 
 </div>
+<div class="cad-fundo" id="cad-fundo" role="dialog" aria-modal="true" aria-labelledby="cad-titulo">
+  <form class="cad-caixa" id="form-cad" novalidate>
+    <button type="button" class="cad-fechar" id="cad-fechar" aria-label="Fechar">×</button>
+    <h3 id="cad-titulo">Antes do pagamento</h3>
+    <p id="cad-texto">Pra onde eu mando o seu diagnóstico? Depois disso você vai direto pro pagamento.</p>
+    <div class="form-campo">
+      <label for="cad-nome">Nome</label>
+      <input type="text" id="cad-nome" autocomplete="name" required placeholder="Seu nome">
+    </div>
+    <div class="form-campo">
+      <label for="cad-email">E-mail</label>
+      <input type="email" id="cad-email" autocomplete="email" required placeholder="voce@suaempresa.com.br">
+    </div>
+    <div class="form-campo">
+      <label for="cad-wpp">WhatsApp</label>
+      <input type="tel" id="cad-wpp" autocomplete="tel" required placeholder="(65) 99999-9999">
+    </div>
+    <button class="btn btn-gold" type="submit" id="cad-btn" style="width:100%">IR PARA O PAGAMENTO</button>
+    <div class="form-erro" id="cad-erro"></div>
+  </form>
+</div>
+
 <script>
 // ================= CONFIG =================
 // Links de checkout (Mercado Pago). Vazio → botão marca interesse e cai no formulário.
@@ -1023,9 +1056,62 @@ document.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', ()
 // ================= CHECKOUT / INTERESSE =================
 const NOMES_PRODUTO = { '997':'Margem Real R$9,97', '4966':'Diagnóstico R$49,66', '297':'Call 1:1 URGÊNCIA R$297' };
 let interesse = '';
+
+// Cadastro do lead (nome, e-mail, WhatsApp) — vale pra todo botão de compra.
+// Fica guardado no navegador pra preencher o formulário pós-compra.
+const EMAIL_OK = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+function lerCadastro() { try { return JSON.parse(localStorage.getItem('margem_lead') || 'null'); } catch (_) { return null; } }
+function salvarCadastro(c) { try { localStorage.setItem('margem_lead', JSON.stringify(c)); } catch (_) {} }
+function enviarLead(nome, email, wpp, cargo) {
+  // keepalive: o envio termina mesmo se a página sair pro checkout logo em seguida.
+  return fetch(WEBHOOK_LEAD, { method: 'POST', mode: 'no-cors', keepalive: true,
+    body: new URLSearchParams({ nome, email, whatsapp: wpp, cargo: cargo.slice(0, 118), origem: 'direct' }) });
+}
+
+let checkoutPendente = '';
+const cadFundo = document.getElementById('cad-fundo');
+function abrirCadastro(k) {
+  checkoutPendente = k;
+  const c = lerCadastro() || {};
+  document.getElementById('cad-nome').value = c.nome || '';
+  document.getElementById('cad-email').value = c.email || '';
+  document.getElementById('cad-wpp').value = c.whatsapp || '';
+  document.getElementById('cad-texto').textContent = 'Pra onde eu mando o seu ' + NOMES_PRODUTO[k] +
+    '? Depois disso você vai direto pro pagamento.';
+  document.getElementById('cad-erro').style.display = 'none';
+  cadFundo.classList.add('aberto');
+  document.getElementById('cad-nome').focus();
+}
+function fecharCadastro() { cadFundo.classList.remove('aberto'); }
+document.getElementById('cad-fechar').addEventListener('click', fecharCadastro);
+cadFundo.addEventListener('click', (e) => { if (e.target === cadFundo) fecharCadastro(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharCadastro(); });
+
+document.getElementById('form-cad').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('cad-nome').value.trim();
+  const email = document.getElementById('cad-email').value.trim();
+  const wpp = document.getElementById('cad-wpp').value.replace(/\D/g, '');
+  const erro = document.getElementById('cad-erro');
+  erro.style.display = 'none';
+  if (!nome) { erro.textContent = 'Informe seu nome.'; erro.style.display = 'block'; return; }
+  if (!EMAIL_OK.test(email)) { erro.textContent = 'Informe um e-mail válido.'; erro.style.display = 'block'; return; }
+  if (wpp.length < 10) { erro.textContent = 'Informe um WhatsApp válido com DDD.'; erro.style.display = 'block'; return; }
+
+  const k = checkoutPendente;
+  salvarCadastro({ nome, email, whatsapp: wpp, produto: k });
+  enviarLead(nome, email, wpp, 'CHECKOUT | ' + NOMES_PRODUTO[k]).catch(() => {});
+  document.getElementById('cad-btn').textContent = 'Abrindo pagamento…';
+  location.href = CHECKOUT[k];
+});
+
 document.querySelectorAll('[data-checkout]').forEach(a => {
   const k = a.getAttribute('data-checkout');
-  if (CHECKOUT[k]) { a.href = CHECKOUT[k]; a.target = '_blank'; a.rel = 'noopener'; return; }
+  if (CHECKOUT[k]) {
+    a.href = CHECKOUT[k];
+    a.addEventListener('click', (e) => { e.preventDefault(); abrirCadastro(k); });
+    return;
+  }
   a.addEventListener('click', () => {
     interesse = NOMES_PRODUTO[k];
     const pill = document.getElementById('interesse-pill');
@@ -1038,12 +1124,14 @@ document.querySelectorAll('[data-checkout]').forEach(a => {
 document.getElementById('form-lead').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nome = document.getElementById('f-nome').value.trim();
+  const email = document.getElementById('f-email').value.trim();
   const wpp = document.getElementById('f-wpp').value.replace(/\D/g, '');
   const seg = document.getElementById('f-seg').value;
   const erro = document.getElementById('form-erro');
   erro.style.display = 'none';
 
   if (!nome) { erro.textContent = 'Informe seu nome.'; erro.style.display = 'block'; return; }
+  if (!EMAIL_OK.test(email)) { erro.textContent = 'Informe um e-mail válido.'; erro.style.display = 'block'; return; }
   if (wpp.length < 10) { erro.textContent = 'Informe um WhatsApp válido com DDD.'; erro.style.display = 'block'; return; }
 
   const btn = document.getElementById('btn-enviar');
@@ -1051,10 +1139,10 @@ document.getElementById('form-lead').addEventListener('submit', async (e) => {
 
   // POST urlencoded simples (sem preflight). Resposta opaca (no-cors), mas o
   // webhook processa e o lead cai na lista do CRM.
-  const cargo = ['Margem', seg || 's/segmento', interesse].filter(Boolean).join(' | ').slice(0, 118);
-  const body = new URLSearchParams({ nome, email: '', whatsapp: wpp, cargo, origem: 'direct' });
+  const cargo = ['Margem', seg || 's/segmento', interesse].filter(Boolean).join(' | ');
+  salvarCadastro({ nome, email, whatsapp: wpp });
   try {
-    await fetch(WEBHOOK_LEAD, { method: 'POST', mode: 'no-cors', body });
+    await enviarLead(nome, email, wpp, cargo);
     document.getElementById('form-lead').style.display = 'none';
     document.getElementById('form-sucesso').style.display = 'block';
   } catch (err) {
@@ -1087,6 +1175,15 @@ const qp = new URLSearchParams(location.search).get('p');
 if (qp === '997') document.querySelector('input[name=produto][value^="Margem Real"]').checked = true;
 if (qp === '4966') document.querySelector('input[name=produto][value^="Diagnóstico"]').checked = true;
 
+// Pré-preenche nome/e-mail/WhatsApp com o cadastro feito antes do pagamento.
+const cadSalvo = lerCadastro();
+if (cadSalvo) {
+  const fd = document.getElementById('form-diag');
+  if (!fd.nome.value) fd.nome.value = cadSalvo.nome || '';
+  if (!fd.email.value) fd.email.value = cadSalvo.email || '';
+  if (!fd.whatsapp.value) fd.whatsapp.value = cadSalvo.whatsapp || '';
+}
+
 document.getElementById('form-diag').addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target;
@@ -1108,23 +1205,17 @@ document.getElementById('form-diag').addEventListener('submit', async (e) => {
   const btn = document.getElementById('btn-diag');
   btn.disabled = true; btn.textContent = 'Enviando…';
 
-  // 1) Netlify Forms: tenta no próprio site; se o formulário não estiver
-  //    registrado aqui, envia pro projeto reserva onde ele ESTÁ registrado
+  // 1) Netlify Forms: envia direto pro projeto onde o formulário ESTÁ registrado
   //    (margem-castoldi-antigo — as respostas caem na aba Forms de lá).
+  //    Não postar em '/': o Worker responde 200 com o HTML pra qualquer caminho,
+  //    então o envio "dava certo" e a resposta se perdia.
   const dados = new URLSearchParams(new FormData(f));
   let enviado = false;
   try {
-    const r = await fetch('/', { method: 'POST',
+    await fetch('https://margem-castoldi-antigo.netlify.app/', { method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
-    enviado = r.ok;
+    enviado = true;
   } catch (_) {}
-  if (!enviado) {
-    try {
-      await fetch('https://margem-castoldi-antigo.netlify.app/', { method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
-      enviado = true;
-    } catch (_) {}
-  }
   if (!enviado) {
     btn.disabled = false; btn.textContent = 'ENVIAR MEUS DADOS → gerar diagnóstico';
     erro.textContent = 'Não foi possível enviar agora. Confira sua conexão e tente de novo.';

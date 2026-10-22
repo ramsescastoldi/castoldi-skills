@@ -28,6 +28,10 @@ export default {
       return Response.redirect(url.origin + "/?" + p.toString(), 301);
     }
     if (url.pathname === "/favicon.ico") return new Response(null, { status: 204 });
+    // O site é só leitura: POST fora da API não pode "dar certo" (engolia o formulário).
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return new Response("Metodo nao permitido", { status: 405, headers: cors });
+    }
 
     const html = await paginaHtml(env);
     if (!html) return new Response("Site em manutencao - volte em instantes.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" } });
