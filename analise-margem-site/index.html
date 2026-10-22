@@ -1108,23 +1108,17 @@ document.getElementById('form-diag').addEventListener('submit', async (e) => {
   const btn = document.getElementById('btn-diag');
   btn.disabled = true; btn.textContent = 'Enviando…';
 
-  // 1) Netlify Forms: tenta no próprio site; se o formulário não estiver
-  //    registrado aqui, envia pro projeto reserva onde ele ESTÁ registrado
+  // 1) Netlify Forms: envia direto pro projeto onde o formulário ESTÁ registrado
   //    (margem-castoldi-antigo — as respostas caem na aba Forms de lá).
+  //    Não postar em '/': o Worker responde 200 com o HTML pra qualquer caminho,
+  //    então o envio "dava certo" e a resposta se perdia.
   const dados = new URLSearchParams(new FormData(f));
   let enviado = false;
   try {
-    const r = await fetch('/', { method: 'POST',
+    await fetch('https://margem-castoldi-antigo.netlify.app/', { method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
-    enviado = r.ok;
+    enviado = true;
   } catch (_) {}
-  if (!enviado) {
-    try {
-      await fetch('https://margem-castoldi-antigo.netlify.app/', { method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: dados.toString() });
-      enviado = true;
-    } catch (_) {}
-  }
   if (!enviado) {
     btn.disabled = false; btn.textContent = 'ENVIAR MEUS DADOS → gerar diagnóstico';
     erro.textContent = 'Não foi possível enviar agora. Confira sua conexão e tente de novo.';
