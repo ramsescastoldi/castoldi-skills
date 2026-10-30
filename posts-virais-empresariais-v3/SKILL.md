@@ -1,6 +1,6 @@
 ---
 name: posts-virais-empresariais-v3
-description: Gera posts virais completos para o Instagram @eusouramses (Ramses Castoldi - mentoria empresarial 1:1 alto ticket). Use SEMPRE que o usuário disser "texto de hoje", "post de hoje", "post de [dia da semana]", "post viral", "post empresarial", "legenda do post", "arte do post", "gera post", "novo post", ou pedir conteúdo sobre temas como lucro, funcionário, CLT, liderança, imposto, demissão, empresário, mercado, Estado, mentoria, empreender. A skill entrega arte PNG renderizada no template oficial preto V3 (avatar real + cabeçalho "Ramses Castoldi" + selo verificado + rodapé "ESTRATÉGIA") aplicando a fórmula viral validada (94K-119K views) e legenda completa de 1100 caracteres no estilo filosófico-liberal com CTA para mentoria 1:1.
+description: Gera posts virais completos para o Instagram @eusouramses (Ramses Castoldi - mentoria empresarial 1:1 alto ticket). Use SEMPRE que o usuário disser "texto de hoje", "post de hoje", "post de [dia da semana]", "post viral", "post empresarial", "legenda do post", "arte do post", "gera post", "novo post", ou pedir conteúdo sobre temas como lucro, funcionário, CLT, liderança, imposto, demissão, empresário, mercado, Estado, mentoria, empreender. A skill entrega arte PNG renderizada no template oficial branco V3 (fundo branco, letras pretas, destaque vermelho) (avatar real + cabeçalho "Ramses Castoldi" + selo verificado + rodapé "ESTRATÉGIA") aplicando a fórmula viral validada (94K-119K views) e legenda completa de 1100 caracteres no estilo filosófico-liberal com CTA para mentoria 1:1.
 ---
 
 # Skill: posts-virais-empresariais-v3
@@ -19,7 +19,7 @@ Esta skill ativa AUTOMATICAMENTE quando o usuário (Ramses Castoldi) pedir:
 
 Toda vez que ativar a skill, entregar OS 3 ITENS:
 
-1. **Arquivo PNG renderizado** no template preto V3 (1080x1350, 2x retina)
+1. **Arquivo PNG renderizado** no template branco V3 (1080x1350, 2x retina)
 2. **Legenda completa** (~1100 caracteres, estrutura de 7 blocos)
 3. **Funil de stories** (4 stories: 1h, 4h, 8h, 20h após postar)
 
@@ -119,8 +119,8 @@ Especificações do template `template_master.html`:
 |------|-------|
 | Dimensão | 1080 x 1350 px (formato 4:5) |
 | Resolução | 2x retina (2160 x 2700 px) |
-| Fundo | Preto absoluto (#0a0a0a) |
-| Texto | Branco off-white (#f4f0e6) |
+| Fundo | Branco (#ffffff) — ordem do Ramsés, 30/10/2026 |
+| Texto | Preto (#0a0a0a) |
 | Ênfase vermelha | #e63946 (urgência/dor) |
 | Ênfase dourada | #d4a04a (autoridade/valor) |
 | Fonte | Inter Bold (Classic Instagram) |
