@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu QR Code — Locagora Cuiabá</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--preto:#0a0a0d;--carbono:#141419;--laranja:#ff5a00;--amarelo:#ffcc00;--branco:#f5f5f5;--cinza:#9a9aa5;--verde:#22c55e;--vermelho:#ef4444}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--preto);color:var(--branco);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:480px;margin:0 auto;padding:24px 18px 60px}
+  h1,h2,.display{font-family:'Anton',Impact,sans-serif;text-transform:uppercase;letter-spacing:.5px;line-height:1.08}
+  .laranja{color:var(--laranja)}.amarelo{color:var(--amarelo)}
+  .card{background:var(--carbono);border:2px solid var(--laranja);border-radius:18px;padding:24px 18px;text-align:center;margin-top:16px;box-shadow:0 0 40px rgba(255,90,0,.2)}
+  .card.verde{border-color:var(--verde);box-shadow:0 0 40px rgba(34,197,94,.25)}
+  #qr,#qr-vale{background:#fff;display:inline-block;padding:14px;border-radius:14px;margin:16px 0 8px}
+  #qr img,#qr-vale img{display:block;width:230px;height:230px}
+  .codigo{font-family:'Anton';font-size:26px;letter-spacing:3px;color:var(--amarelo);margin:8px 0 4px}
+  .mini{font-size:13px;color:var(--cinza);line-height:1.5}
+  .status-pill{display:inline-block;border-radius:999px;padding:7px 16px;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .aguardando{background:rgba(255,204,0,.12);border:1px solid var(--amarelo);color:var(--amarelo)}
+  .ok{background:rgba(34,197,94,.12);border:1px solid var(--verde);color:var(--verde)}
+  .usado{background:rgba(239,68,68,.12);border:1px solid var(--vermelho);color:#fca5a5}
+  .btn{display:block;width:100%;border:none;border-radius:14px;font-family:'Anton';font-size:19px;text-transform:uppercase;letter-spacing:1px;padding:16px 10px;margin-top:14px;cursor:pointer;text-decoration:none;text-align:center}
+  .btn-zap{background:#25d366;color:#000}
+  .btn-rota{background:transparent;border:2px solid var(--laranja);color:var(--laranja)}
+  .passin{text-align:left;font-size:14px;font-weight:600;line-height:1.6;background:#0e0e13;border:1px solid #2c2c35;border-radius:12px;padding:14px;margin-top:14px}
+  .passin b{color:var(--amarelo)}
+  .valor{font-family:'Anton';font-size:44px;color:var(--verde)}
+  .hide{display:none}
+  .cabecalho{text-align:center}
+  .cabecalho h1{font-size:30px}
+  .voltar{color:var(--cinza);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="voltar" href="/">← voltar pra página inicial</a>
+
+  <!-- CARREGANDO / ERRO -->
+  <div id="tela-erro" class="card hide">
+    <h2 style="font-size:22px">Código não encontrado 😕</h2>
+    <p class="mini" style="margin-top:10px">Faça seu cadastro de novo na página inicial.</p>
+    <a class="btn btn-rota" href="/">Fazer cadastro</a>
+  </div>
+
+  <!-- TELA 1: QR DO LEAD (aguardando validação) -->
+  <div id="tela-qr" class="hide">
+    <div class="cabecalho">
+      <h1>👋 E AÍ, <span class="laranja"><span id="nome-lead">PARÇA</span></span>!</h1>
+    </div>
+    <div class="card">
+      <span class="status-pill aguardando">⏳ Sem vale liberado</span>
+      <p style="font-weight:800;font-size:16px">Seu código de cadastro:</p>
+      <div class="codigo" id="codigo-lead"></div>
+      <p class="mini">A ação da inauguração já encerrou. Se o seu vale foi liberado na loja, ele aparece automaticamente nesta tela.</p>
+      <div class="passin">
+        🏍️ <b>Quer sua moto no boleto em 18x?</b><br>
+        Chama a gente no WhatsApp e a análise sai na hora — negativado também passa.
+      </div>
+    </div>
+    <a class="btn btn-zap" id="btn-share" target="_blank" rel="noopener">📲 Chamar os parças (compartilhar)</a>
+    <a class="btn btn-rota" target="_blank" rel="noopener"
+      href="https://www.google.com/maps/dir/?api=1&destination=Av.+Tenente+Coronel+Duarte,+1410+-+Centro+Sul,+Cuiab%C3%A1+-+MT">🧭 Traçar rota até a loja</a>
+  </div>
+
+  <!-- TELA 2: VALIDADO — VOUCHER -->
+  <div id="tela-voucher" class="hide">
+    <div class="cabecalho">
+      <h1>✅ VALIDADO!<br><span class="amarelo">VOCÊ FOI O <span id="pos-num">#</span>º</span></h1>
+    </div>
+    <div class="card verde">
+      <span class="status-pill ok" id="pill-vale">⛽ Vale-combustível liberado</span>
+      <div class="valor">R$ 50</div>
+      <p style="font-weight:800;font-size:15px">VALE-COMBUSTÍVEL • LOCAGORA CUIABÁ</p>
+      <div id="qr-vale"></div>
+      <div class="codigo" id="codigo-vale"></div>
+      <p class="mini" id="titular"></p>
+      <div class="passin">
+        ⛽ <b>Como usar:</b> apresente esse QR Code no posto parceiro.<br>
+        O frentista escaneia, valida e pronto: <b>R$50 de combustível</b> na tua moto.<br>
+        ⚠️ Uso único. Não vale dinheiro. Intransferível.
+      </div>
+    </div>
+    <a class="btn btn-zap" id="btn-share2" target="_blank" rel="noopener">📲 Contar pros parças</a>
+  </div>
+
+  <!-- TELA 3: VALIDADO FORA DOS 40 -->
+  <div id="tela-fora" class="hide">
+    <div class="cabecalho"><h1>🏍️ SUA MOTO <span class="laranja">NO BOLETO</span></h1></div>
+    <div class="card">
+      <p style="font-weight:700;font-size:15px;line-height:1.6">Você não teve vale liberado nesta ação.<br><br>
+      Mas o que interessa continua de pé: <b class="amarelo">moto nova e seminova no boleto em 18x</b>, até pra negativado, com análise na hora. 🏍️</p>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/qrcode.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const code = (params.get('c') || localStorage.getItem('smb_code') || '').toUpperCase();
+  const $ = id => document.getElementById(id);
+
+  function desenharQR(el, texto) {
+    const qr = qrcode(0, 'M');
+    qr.addData(texto);
+    qr.make();
+    el.innerHTML = qr.createImgTag(6, 8);
+    const img = el.querySelector('img');
+    img.style.width = '230px'; img.style.height = '230px';
+  }
+
+  function msgShare() {
+    return encodeURIComponent(
+      '🏍️🔥 MOTOBOY DE CUIABÁ: moto no BOLETO em 18X, até pra NEGATIVADO!\n\n' +
+      'Análise na hora, sem banco enrolando. LOCAGORA Cuiabá 👇\n' + location.origin
+    );
+  }
+
+  let validadoMostrado = false;
+  async function atualizar() {
+    if (!code) { $('tela-erro').classList.remove('hide'); return; }
+    try {
+      const r = await fetch('/api/status?c=' + encodeURIComponent(code));
+      const j = await r.json();
+      if (!j.ok) { $('tela-erro').classList.remove('hide'); $('tela-qr').classList.add('hide'); return; }
+      localStorage.setItem('smb_code', j.code);
+
+      if (j.validado && j.voucher) {
+        if (!validadoMostrado) {
+          validadoMostrado = true;
+          $('tela-qr').classList.add('hide');
+          $('tela-fora').classList.add('hide');
+          $('tela-voucher').classList.remove('hide');
+          if (j.validado.pos) {
+            $('pos-num').textContent = j.validado.pos;
+          } else {
+            document.querySelector('#tela-voucher h1').innerHTML = '✅ VALE LIBERADO!<br><span class="amarelo">R$50 DE COMBUSTÍVEL</span>';
+          }
+          $('codigo-vale').textContent = j.voucher.code;
+          $('titular').textContent = 'Titular: ' + j.nome + ' • código ' + j.code;
+          desenharQR($('qr-vale'), location.origin + '/vale.html?v=' + encodeURIComponent(j.voucher.code));
+          $('btn-share2').href = 'https://wa.me/?text=' + msgShare();
+        }
+        if (j.voucher.usadoEm) {
+          const pill = $('pill-vale');
+          pill.className = 'status-pill usado';
+          pill.textContent = '❌ Voucher já utilizado';
+        }
+      } else if (j.validado && !j.voucher) {
+        $('tela-qr').classList.add('hide');
+        $('tela-voucher').classList.add('hide');
+        $('tela-fora').classList.remove('hide');
+      } else {
+        $('tela-qr').classList.remove('hide');
+        $('nome-lead').textContent = (j.nome || 'PARÇA').split(' ')[0].toUpperCase();
+        $('codigo-lead').textContent = j.code;
+        $('btn-share').href = 'https://wa.me/?text=' + msgShare();
+      }
+    } catch (e) { /* tenta de novo no próximo ciclo */ }
+  }
+  atualizar();
+  setInterval(atualizar, 12000); // vira voucher sozinho quando a loja validar
+</script>
+</body>
+</html>
