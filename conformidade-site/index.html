@@ -1,0 +1,836 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumen Posto Club · Central de Análise de Conformidade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{
+  --ink:#0E1614; --panel:#14201D; --panel2:#1B2A26; --line:#2A3A35;
+  --paper:#F6F3EC; --paper2:#EFEADD; --card:#FFFFFF;
+  --gold:#C0912D; --gold-b:#E7B84B; --gold-soft:#F0DCA6;
+  --ok:#1E7A54; --ok-soft:#E4F1EA; --bad:#C1362F; --bad-soft:#FBE7E5;
+  --warn:#B87914; --warn-soft:#F8ECD4;
+  --tx-dark:#0E1614; --tx-mut:#6B7A74; --tx-onink:#D7E2DD; --tx-onink-mut:#8FA39B;
+  --r:14px; --rs:9px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--tx-dark);font-family:Inter,system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.disp{font-family:"Space Grotesk",Inter,sans-serif;letter-spacing:-.01em}
+.mono{font-family:"JetBrains Mono",monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+a{color:var(--gold-b)}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold-b);outline-offset:2px;border-radius:4px}
+
+/* ---------- HEADER ---------- */
+.top{background:var(--ink);color:var(--tx-onink);padding:26px 0 22px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:14px}
+.lamp{width:34px;height:34px;flex:0 0 auto;filter:drop-shadow(0 0 9px rgba(231,184,75,.55))}
+.brand .bn{font-family:"Space Grotesk";font-weight:700;font-size:19px;letter-spacing:.02em;color:#fff;line-height:1}
+.brand .bs{font-size:11px;color:var(--tx-onink-mut);letter-spacing:.14em;text-transform:uppercase;font-family:"JetBrains Mono",monospace;margin-top:4px}
+.top h1{font-size:clamp(23px,3.4vw,34px);margin:18px 0 6px;color:#fff;font-weight:600;max-width:20ch}
+.top .sub{color:var(--tx-onink-mut);max-width:56ch;font-size:15px}
+
+/* ---------- VIGÊNCIA STRIP ---------- */
+.vig{background:var(--panel);border-bottom:1px solid var(--line);padding:20px 0}
+.vig-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.status{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:7px 14px 7px 12px}
+.dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+.dot.on{background:var(--gold-b);box-shadow:0 0 0 0 rgba(231,184,75,.6);animation:pulse 2.4s infinite}
+.dot.off{background:var(--bad);box-shadow:0 0 0 0 rgba(193,54,47,.6);animation:pulse 1.3s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(231,184,75,.5)}70%{box-shadow:0 0 0 9px rgba(231,184,75,0)}100%{box-shadow:0 0 0 0 rgba(231,184,75,0)}}
+.status .st-tx{font-size:12.5px;color:var(--tx-onink);font-weight:500}
+.status .st-tx b{color:#fff}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:var(--rs);padding:11px 13px}
+.chip .ct{font-size:11px;color:var(--tx-onink-mut);text-transform:uppercase;letter-spacing:.08em;font-family:"JetBrains Mono",monospace}
+.chip .cn{font-size:14px;color:#fff;font-weight:600;margin-top:3px;font-family:"Space Grotesk"}
+.chip .cs{font-size:11.5px;color:var(--gold-b);margin-top:3px}
+.chip.warnflag{border-color:#5a4416}
+.chip.warnflag .cs{color:var(--gold-soft)}
+
+/* ---------- MAIN ---------- */
+main{padding:34px 0 10px}
+.sec-label{display:flex;align-items:center;gap:12px;margin:36px 0 16px}
+.sec-label .n{font-family:"JetBrains Mono";font-size:12px;color:var(--gold);font-weight:700}
+.sec-label h2{font-size:20px;margin:0;font-weight:600}
+.sec-label .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--paper2),transparent)}
+
+.card{background:var(--card);border:1px solid #E4DECF;border-radius:var(--r);box-shadow:0 1px 0 rgba(0,0,0,.02),0 10px 24px -18px rgba(14,22,20,.25)}
+.card-pad{padding:20px 22px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12.5px;color:var(--tx-mut);font-weight:600}
+.field .hint{font-size:11px;color:var(--tx-mut);font-weight:400}
+input,select{font-family:inherit;font-size:14.5px;padding:10px 12px;border:1px solid #D9D2C2;border-radius:var(--rs);background:#fff;color:var(--tx-dark);width:100%}
+input.num{font-family:"JetBrains Mono";font-weight:500}
+input:focus,select:focus{border-color:var(--gold)}
+
+/* product cards */
+.prod{margin-bottom:16px;overflow:hidden}
+.prod-h{display:flex;align-items:center;gap:14px;padding:16px 22px;background:var(--paper2);border-bottom:1px solid #E4DECF;cursor:pointer;user-select:none}
+.prod-h .pi{width:30px;height:30px;flex:0 0 auto;color:var(--ink)}
+.prod-h .pt{font-family:"Space Grotesk";font-weight:600;font-size:16.5px;flex:1}
+.prod-h .pt small{display:block;font-family:"JetBrains Mono";font-size:10.5px;color:var(--tx-mut);letter-spacing:.06em;font-weight:500;margin-top:2px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx-mut);font-weight:600}
+.sw{width:42px;height:24px;border-radius:99px;background:#CFC7B4;position:relative;transition:.2s;flex:0 0 auto}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.prod.active .sw{background:var(--gold)}
+.prod.active .sw::after{transform:translateX(18px)}
+.prod-body{padding:20px 22px;display:none}
+.prod.active .prod-body{display:block}
+
+/* verdict seal */
+.verdict{display:flex;align-items:center;gap:16px;margin-top:18px;padding:14px 16px;border-radius:var(--rs);border:1px dashed #D9D2C2;background:#FBFAF6}
+.seal{flex:0 0 auto;width:96px;height:96px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:3px solid;transform:rotate(-7deg);font-family:"Space Grotesk";font-weight:700}
+.seal .sl{font-size:9px;letter-spacing:.12em;opacity:.75}
+.seal .sv{font-size:14px;line-height:1.05;margin-top:2px}
+.seal.pend{border-color:#C9C1AE;color:#9A9280}
+.seal.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.seal.bad{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.verdict .vtx{font-size:13.5px}
+.verdict .vtx b{font-family:"Space Grotesk"}
+.reasons{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:var(--bad)}
+.reasons li{margin:2px 0}
+.calc{font-family:"JetBrains Mono";font-size:13px;background:var(--ink);color:var(--gold-b);padding:8px 12px;border-radius:7px;display:inline-block;margin-top:8px}
+.softnote{font-size:11.5px;color:var(--warn);background:var(--warn-soft);border-radius:7px;padding:7px 10px;margin-top:10px;display:flex;gap:7px;align-items:flex-start}
+
+/* summary / pdf */
+.summary{background:var(--ink);color:var(--tx-onink);border-radius:var(--r);padding:22px;margin-top:8px}
+.summary h3{color:#fff;margin:0 0 4px;font-size:18px}
+.summary p{color:var(--tx-onink-mut);font-size:13.5px;margin:0 0 16px}
+.sumrow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.pill{font-family:"JetBrains Mono";font-size:12px;padding:6px 11px;border-radius:99px;border:1px solid var(--line);color:var(--tx-onink)}
+.pill.ok{border-color:#2c6b4f;color:#7fdcae}
+.pill.bad{border-color:#7a3430;color:#f0a49f}
+.btn{background:var(--gold);color:#1a1305;border:none;padding:13px 22px;border-radius:var(--rs);font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:9px;transition:.15s}
+.btn:hover{background:var(--gold-b)}
+.btn:disabled{background:#4a5551;color:#8fa39b;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--gold-b);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--gold)}
+
+/* ---------- ROTINA ---------- */
+.rotina{background:var(--panel);color:var(--tx-onink);margin-top:44px;padding:38px 0}
+.rotina .cd{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+.cd .big{font-family:"Space Grotesk";font-size:34px;font-weight:700;color:#fff;line-height:1}
+.cd.vencido .big{color:var(--bad)}
+.cd .cdl{font-size:12.5px;color:var(--tx-onink-mut)}
+.cd .cdl b{color:var(--gold-b)}
+.checklist{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.checklist li{background:var(--panel2);border:1px solid var(--line);border-radius:var(--rs);padding:13px 15px;display:flex;gap:13px;align-items:flex-start}
+.checklist .cbx{width:20px;height:20px;flex:0 0 auto;border:2px solid #3c4f49;border-radius:5px;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:transparent;font-size:13px;font-weight:700}
+.checklist .cbx.ck{background:var(--gold);border-color:var(--gold);color:#1a1305}
+.checklist .ci{flex:1}
+.checklist .ci .cn{font-weight:600;color:#fff;font-size:14px}
+.checklist .ci .cd2{font-size:12.5px;color:var(--tx-onink-mut);margin-top:2px}
+.checklist .ci a{font-size:12.5px;font-family:"JetBrains Mono"}
+.rotina .actions{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.lastcheck{font-size:12.5px;color:var(--tx-onink-mut)}
+
+/* ---------- DIVULGAÇÃO (promo cards) ---------- */
+.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.promo-card{display:flex;flex-direction:column;gap:10px;padding:22px;text-decoration:none;color:#fff;border:1px solid transparent;border-radius:var(--r);box-shadow:0 10px 26px -16px rgba(14,22,20,.45);transition:transform .15s,box-shadow .15s}
+.promo-card:hover{transform:translateY(-3px);box-shadow:0 16px 34px -14px rgba(14,22,20,.55)}
+.promo-card .pk{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:700}
+.promo-card h3{margin:0;font-size:18px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.28)}
+.promo-card p{margin:0;font-size:13.5px;color:rgba(255,255,255,.92);text-shadow:0 1px 2px rgba(0,0,0,.22)}
+.promo-card .roi{font-family:"JetBrains Mono",monospace;font-size:11.5px;border-radius:7px;padding:6px 10px;align-self:flex-start;background:rgba(255,255,255,.14);color:#fff}
+.promo-card .cta{margin-top:6px;font-weight:700;font-size:14px;font-family:"Space Grotesk",Inter,sans-serif;color:#fff}
+/* Cada card com a identidade visual do seu site */
+.promo-card.c-lumen{background:linear-gradient(140deg,#1B2A26 0%,#0E1614 100%)}
+.promo-card.c-lumen .pk,.promo-card.c-lumen .cta{color:#E7B84B}
+.promo-card.c-lumen .roi{background:rgba(231,184,75,.16);color:#F0DCA6}
+.promo-card.c-hub{background:linear-gradient(140deg,#185FA5 0%,#0C447C 100%)}
+.promo-card.c-hub .pk,.promo-card.c-hub .cta{color:#F7B84E}
+.promo-card.c-ig{background:linear-gradient(135deg,#7B2FF7 0%,#C13584 48%,#F77737 100%)}
+.promo-card.c-ig .pk{color:#FFE3F1}
+.promo-card.c-wa{background:linear-gradient(140deg,#128C7E 0%,#075E54 100%)}
+.promo-card.c-wa .pk,.promo-card.c-wa .cta{color:#6EE7A0}
+
+footer{background:var(--ink);color:var(--tx-onink-mut);padding:26px 0;font-size:12px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--tx-onink-mut)}
+
+@media(max-width:720px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .top h1{font-size:24px}
+  .verdict{flex-direction:column;align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- TRIAL BANNER ---------- */
+#trialBar{position:sticky;top:0;z-index:40;display:none;align-items:center;justify-content:center;gap:10px;background:var(--warn-soft);color:#6b4e12;border-bottom:1px solid #E7D3A0;padding:8px 14px;font-size:12.5px;font-weight:600;text-align:center}
+#trialBar b{color:#8a5a0c}
+#trialBar a{color:#8a5a0c;text-decoration:underline}
+
+/* ---------- GATE (trial vencido) ---------- */
+#gate{--bg:#F6F3EC;--bg-card:#FFFFFF;--border:#E4DECF;--text:#0E1614;--text-muted:#6B7A74;--accent:#C0912D;--red:#C1362F;--green:#1E7A54;
+  position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#0E1614 0%,#1B2A26 100%);display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+#gate.show{display:flex}
+.gate-card{width:100%;max-width:440px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:34px 30px;color:var(--text)}
+.gate-lamp{width:40px;height:40px;margin-bottom:10px;filter:drop-shadow(0 0 9px rgba(231,184,75,.55))}
+.gate-logo{font-family:"Space Grotesk",Inter,sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.gate-sub{color:var(--text-muted);font-size:13.5px;margin:6px 0 22px;line-height:1.5}
+.gate-step{display:none}.gate-step.active{display:block}
+.gate-label{display:block;color:var(--text-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.gate-input{width:100%;padding:13px 14px;font:inherit;font-size:16px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px}
+.gate-input:focus{outline:none;border-color:var(--accent)}
+.gate-input.otp{letter-spacing:6px;text-align:center;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.gate-btn{width:100%;margin-top:14px;padding:13px 14px;background:var(--accent);color:#1a1305;border:none;border-radius:8px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.gate-btn:hover{opacity:.92}.gate-btn:disabled{opacity:.5;cursor:not-allowed}
+a.gate-btn{display:block;text-align:center;text-decoration:none;line-height:1.3}
+.gate-btn.join{background:var(--ink,#0E1614);color:#E7B84B;margin-top:10px}
+.gate-link{background:transparent;color:var(--text-muted);margin-top:8px;padding:8px;font-size:13px;border:none;cursor:pointer;width:100%}
+.gate-link:hover{color:var(--text);text-decoration:underline}
+.gate-msg{margin-top:14px;font-size:13px;padding:10px 12px;border-radius:6px}
+.gate-msg.error{background:rgba(193,54,47,.08);color:var(--red);border:1px solid rgba(193,54,47,.3)}
+.gate-msg.success{background:rgba(30,122,84,.08);color:var(--green);border:1px solid rgba(30,122,84,.3)}
+.gate-msg.info{background:rgba(192,145,45,.08);color:var(--accent);border:1px solid rgba(192,145,45,.3)}
+.gate-foot{margin-top:22px;padding-top:16px;border-top:1px solid var(--border);color:var(--text-muted);font-size:11.5px;text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- BARRA DE AVALIAÇÃO (trial ativo) -->
+<div id="trialBar"></div>
+
+<!-- GATE — aparece quando o trial de 30 dias vence e o usuário não é assinante -->
+<div id="gate">
+  <div class="gate-card">
+    <svg class="gate-lamp" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M24 5c-8 0-13 5.4-13 12.4 0 4.6 2.4 7.4 4.6 9.8 1.7 1.9 2.9 3.3 2.9 5.8h11c0-2.5 1.2-3.9 2.9-5.8C36.6 24.8 39 22 39 17.4 39 10.4 32 5 24 5z" fill="#E7B84B"></path>
+      <path d="M18.5 38h11M20 42h8" stroke="#C0912D" stroke-width="2.4" stroke-linecap="round"></path>
+    </svg>
+    <div class="gate-logo">Seu período de avaliação terminou</div>
+    <div class="gate-sub">A Central de Conformidade fica liberada por <b>30 dias</b>. Para continuar usando, entre com o WhatsApp que você usa no <b>Lumen Posto Club</b> — validamos que sua assinatura está ativa.</div>
+
+    <div class="gate-step active" id="gstep-phone">
+      <label class="gate-label" for="gate-phone">Seu WhatsApp de assinante</label>
+      <input class="gate-input" id="gate-phone" type="tel" placeholder="65 99999-8888" autocomplete="tel">
+      <button class="gate-btn" id="gbtn-send">Enviar código</button>
+      <a class="gate-btn join" href="https://pay.kiwify.com.br/kE87xuV?utm_source=conformidade&amp;utm_medium=gate&amp;utm_campaign=lumen-club" target="_blank" rel="noopener">Ainda não sou membro — entrar no Lumen Posto Club</a>
+      <div class="gate-msg" id="gmsg-phone" style="display:none"></div>
+    </div>
+
+    <div class="gate-step" id="gstep-otp">
+      <label class="gate-label" for="gate-otp">Código recebido por WhatsApp</label>
+      <input class="gate-input otp" id="gate-otp" type="text" inputmode="numeric" maxlength="6" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code">
+      <button class="gate-btn" id="gbtn-verify">Validar e acessar</button>
+      <button class="gate-link" id="gbtn-back">← Trocar número</button>
+      <div class="gate-msg" id="gmsg-otp" style="display:none"></div>
+    </div>
+
+    <div class="gate-step" id="gstep-checking">
+      <div class="gate-msg info">Verificando…</div>
+    </div>
+
+    <div class="gate-foot">
+      Acesso liberado por 30 dias enquanto a assinatura estiver ativa.<br>
+      Assinatura vencida? Reative em <a href="https://vendas.lumenclubpainel.com.br" target="_blank" rel="noopener" style="color:var(--accent)">vendas.lumenclubpainel.com.br</a>.
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg class="lamp" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M24 5c-8 0-13 5.4-13 12.4 0 4.6 2.4 7.4 4.6 9.8 1.7 1.9 2.9 3.3 2.9 5.8h11c0-2.5 1.2-3.9 2.9-5.8C36.6 24.8 39 22 39 17.4 39 10.4 32 5 24 5z" fill="#E7B84B"></path>
+        <path d="M18.5 38h11M20 42h8" stroke="#C0912D" stroke-width="2.4" stroke-linecap="round"></path>
+        <path d="M24 12c-3.2 0-5.4 2.3-5.4 5.2" stroke="#8a6a20" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <div>
+        <div class="bn">LUMEN POSTO CLUB</div>
+        <div class="bs">Inteligência de Mercado · Revenda</div>
+      </div>
+    </div>
+    <h1>Central de Análise de Conformidade</h1>
+    <p class="sub">Lance os resultados da análise no recebimento do combustível. A ferramenta aplica a especificação da ANP <b style="color:#fff">vigente hoje</b>, emite o veredito e gera o Registro de Análise da Qualidade em PDF.</p>
+  </div>
+</header>
+
+<!-- VIGÊNCIA -->
+<section class="vig" id="vigencia">
+  <div class="wrap">
+    <div class="vig-head">
+      <div>
+        <div class="eyebrow">Base normativa</div>
+        <div style="color:#fff;font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-top:4px">Vigência da legislação de referência</div>
+        <div id="vigFonte" style="font-size:11.5px;color:var(--tx-onink-mut);margin-top:3px"></div>
+      </div>
+      <div class="status" id="vigStatus">
+        <span class="dot on" id="vigDot"></span>
+        <span class="st-tx" id="vigStTx">carregando…</span>
+      </div>
+    </div>
+    <div class="chips" id="vigChips"></div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <!-- IDENTIFICAÇÃO -->
+    <div class="sec-label"><span class="n">01</span><h2>Identificação e recebimento</h2><span class="rule"></span></div>
+    <div class="card card-pad">
+      <div class="grid3">
+        <div class="field"><label>Posto / razão social</label><input id="f_posto" placeholder="ex.: Lumen Posto Club"></div>
+        <div class="field"><label>CNPJ</label><input id="f_cnpj" class="num" placeholder="ex.: 00.000.000/0000-00"></div>
+        <div class="field"><label>Responsável pela análise</label><input id="f_resp" placeholder="ex.: nome do frentista/gerente"></div>
+        <div class="field"><label>Data e hora</label><input id="f_data" class="num" type="datetime-local"></div>
+        <div class="field"><label>Distribuidor</label><input id="f_distrib" placeholder="ex.: Vibra, Ipiranga, Raízen…"></div>
+        <div class="field"><label>Nº da NF de recebimento</label><input id="f_nf" class="num" placeholder="ex.: 123456"></div>
+        <div class="field"><label>Transportador / placa</label><input id="f_transp" placeholder="ex.: Transportadora — ABC0D00"></div>
+        <div class="field"><label>Motorista</label><input id="f_mot" placeholder="ex.: nome do motorista"></div>
+        <div class="field"><label>Nº do(s) lacre(s)</label><input id="f_lacre" class="num" placeholder="ex.: 000123 / 000124"></div>
+        <div class="field"><label>Amostra-testemunha coletada?</label>
+          <select id="f_amostra"><option value="Sim">Sim — 1 L por compartimento</option><option value="Não">Não</option></select>
+          <span class="hint">A ANP pode exigir as 3 últimas. Guardar em envelope de segurança.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANÁLISES -->
+    <div class="sec-label"><span class="n">02</span><h2>Análises por produto</h2><span class="rule"></span></div>
+    <p style="color:var(--tx-mut);font-size:13.5px;margin:-6px 0 18px">Ative os produtos recebidos hoje. Informe a massa específica já convertida para 20&nbsp;°C (use a tabela de conversão do densímetro).</p>
+
+    <!-- GASOLINA -->
+    <div class="card prod" id="prodGas">
+      <div class="prod-h" data-prod="prodGas">
+        <svg class="pi" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="9" height="18" rx="1.5" stroke="currentColor" stroke-width="1.7"></rect><path d="M13 8h3.5a2 2 0 012 2v6a1.5 1.5 0 003 0V11l-2-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M6 6h5v4H6z" fill="currentColor" opacity=".25"></path></svg>
+        <div class="pt">Gasolina C<small>RES. ANP 898/2022 · 807/2020 · CNPE 09/2025</small></div>
+        <div class="toggle"><span>incluir</span><div class="sw"></div></div>
+      </div>
+      <div class="prod-body">
+        <div class="grid3">
+          <div class="field"><label>Tipo</label>
+            <select id="g_tipo"><option value="comum">Comum / Aditivada (E30)</option><option value="premium">Premium (25%)</option></select>
+          </div>
+          <div class="field"><label>Aspecto</label>
+            <select id="g_asp"><option value="ok">Límpido e isento de impurezas</option><option value="i2">Límpido e com impureza</option><option value="i3">Turvo e isento de impurezas</option><option value="i4">Turvo e com impurezas</option></select>
+          </div>
+          <div class="field"><label>Cor <span class="hint">(não pode ser azul)</span></label>
+            <input id="g_cor" placeholder="ex.: incolor a amarelada">
+          </div>
+          <div class="field"><label>Massa específica 20&nbsp;°C <span class="hint">kg/m³ (mín. 715)</span></label>
+            <input id="g_me" class="num" inputmode="decimal" placeholder="ex.: 745,0">
+          </div>
+          <div class="field"><label>Teste da proveta — aumento "A" (mL)</label>
+            <input id="g_A" class="num" inputmode="decimal" placeholder="ex.: 14,5">
+            <span class="hint">Aumento da camada aquosa (etanol + água).</span>
+          </div>
+          <div class="field"><label>…ou informe o teor direto (%)</label>
+            <input id="g_pct" class="num" inputmode="decimal" placeholder="opcional">
+            <span class="hint">Se preencher, ignora o cálculo por "A".</span>
+          </div>
+        </div>
+        <div class="verdict">
+          <div class="seal pend" id="g_seal"><span class="sl">STATUS</span><span class="sv">—</span></div>
+          <div>
+            <div class="vtx" id="g_vtx">Preencha o aspecto e o teste da proveta.</div>
+            <div class="calc" id="g_calc" style="display:none"></div>
+            <ul class="reasons" id="g_reasons"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETANOL -->
+    <div class="card prod" id="prodEta">
+      <div class="prod-h" data-prod="prodEta">
+        <svg class="pi" viewBox="0 0 24 24" fill="none"><path d="M9 3h6M10 3v4l-4.2 9.6A2 2 0 007.6 20h8.8a2 2 0 001.8-3.4L14 7V3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="M7.3 14h9.4" stroke="currentColor" stroke-width="1.7"></path><circle cx="10.5" cy="16.5" r="1" fill="currentColor"></circle></svg>
+        <div class="pt">Etanol Hidratado<small>RES. ANP 898/2022 · 907/2022</small></div>
+        <div class="toggle"><span>incluir</span><div class="sw"></div></div>
+      </div>
+      <div class="prod-body">
+        <div class="grid3">
+          <div class="field"><label>Tipo</label>
+            <select id="e_tipo"><option value="EHC">Comum (EHC)</option><option value="EHCP">Premium (EHCP)</option></select>
+          </div>
+          <div class="field"><label>Aspecto</label>
+            <select id="e_asp"><option value="ok">Límpido e isento de impurezas</option><option value="i2">Límpido e com impureza</option><option value="i3">Turvo e isento de impurezas</option><option value="i4">Turvo e com impurezas</option></select>
+          </div>
+          <div class="field"><label>Cor <span class="hint">(não pode ser azul nem laranja)</span></label>
+            <input id="e_cor" placeholder="ex.: incolor">
+          </div>
+          <div class="field"><label>Massa específica 20&nbsp;°C <span class="hint">kg/m³</span></label>
+            <input id="e_me" class="num" inputmode="decimal" placeholder="ex.: 807,0">
+          </div>
+          <div class="field"><label>Teor alcoólico <span class="hint">°INPM (opcional)</span></label>
+            <input id="e_teor" class="num" inputmode="decimal" placeholder="ex.: 93,8">
+          </div>
+        </div>
+        <div class="verdict">
+          <div class="seal pend" id="e_seal"><span class="sl">STATUS</span><span class="sv">—</span></div>
+          <div>
+            <div class="vtx" id="e_vtx">Informe o aspecto e a massa específica a 20&nbsp;°C.</div>
+            <ul class="reasons" id="e_reasons"></ul>
+            <div class="softnote" id="e_note" style="color:var(--ok);background:var(--ok-soft)">✓ Faixas conforme Res. ANP 907/2022 — EHC 805,2–811,2 kg/m³ · EHCP 799,7–802,8 kg/m³ (Cartilha ANP, maio/2026).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIESEL -->
+    <div class="card prod" id="prodDie">
+      <div class="prod-h" data-prod="prodDie">
+        <svg class="pi" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.7"></rect><path d="M17 9h2.5L21 11v5a1.5 1.5 0 01-3 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M6 10h8M6 13h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg>
+        <div class="pt">Óleo Diesel B<small>RES. ANP 898/2022 · 968/2024 · CNPE 09/2025 (B15)</small></div>
+        <div class="toggle"><span>incluir</span><div class="sw"></div></div>
+      </div>
+      <div class="prod-body">
+        <div class="grid3">
+          <div class="field"><label>Tipo</label>
+            <select id="d_tipo"><option value="s10">Diesel B S10</option><option value="s500">Diesel B S500</option></select>
+          </div>
+          <div class="field"><label>Aspecto</label>
+            <select id="d_asp"><option value="ok">Límpido e isento de impurezas</option><option value="i2">Límpido e com impureza</option><option value="i3">Turvo e isento de impurezas</option><option value="i4">Turvo e com impurezas</option></select>
+          </div>
+          <div class="field"><label>Cor</label>
+            <select id="d_cor">
+              <option value="claro">Incolor a amarelado (pode marrom/alaranjado)</option>
+              <option value="vermelho">Vermelho</option>
+              <option value="outra">Outra / violeta</option>
+            </select>
+          </div>
+          <div class="field"><label>Massa específica 20&nbsp;°C <span class="hint">kg/m³</span></label>
+            <input id="d_me" class="num" inputmode="decimal" placeholder="ex.: 840,0">
+          </div>
+        </div>
+        <div class="verdict">
+          <div class="seal pend" id="d_seal"><span class="sl">STATUS</span><span class="sv">—</span></div>
+          <div>
+            <div class="vtx" id="d_vtx">Informe o tipo, o aspecto, a cor e a massa específica.</div>
+            <ul class="reasons" id="d_reasons"></ul>
+            <div class="softnote" id="d_note">✓ B15 (Cartilha ANP maio/2026): S10 820,3–857,5 · S500 820,3–870,3 kg/m³. Lembrete: drenagem semanal do fundo do tanque é obrigatória (Res. ANP 968/2024) — guarde o registro.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUMMARY / PDF -->
+    <div class="sec-label"><span class="n">03</span><h2>Registro da Qualidade</h2><span class="rule"></span></div>
+    <div class="summary">
+      <h3>Gerar o Registro de Análise da Qualidade</h3>
+      <p>PDF com identificação, resultados por produto, veredito e a base normativa vigente. Guarde os registros dos últimos 6 meses no posto (Res. ANP 898/2022).</p>
+      <div class="sumrow" id="sumPills"><span class="pill">nenhum produto ativado</span></div>
+      <button class="btn" id="pdfBtn" disabled="">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v11m0 0l-4-4m4 4l4-4M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke="#1a1305" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        Gerar PDF do Registro
+      </button>
+    </div>
+
+    <!-- DIVULGAÇÃO — adicionar novos cards duplicando um <a class="promo-card"> -->
+    <div class="sec-label"><span class="n">04</span><h2>Conteúdo Lumen</h2><span class="rule"></span></div>
+    <div class="promo-grid">
+      <a class="promo-card c-lumen" href="https://vendas.lumenclubpainel.com.br" target="_blank" rel="noopener">
+        <span class="pk">Comunidade</span>
+        <h3>Lumen Posto Club</h3>
+        <p>Seu posto vende muito e <b>sobra pouco</b>? Dez centavos perdidos por litro parecem nada — até virar um carro 0&nbsp;km por ano escorrendo pelo ralo. Entre pra comunidade de donos de posto que decidem com dados e param de perder margem.</p>
+        <span class="roi">R$ 0,10/L × 80.000 L/mês = R$ 8.000/mês → R$ 96.000/ano</span>
+        <span class="cta">Entrar para o Lumen Posto Club →</span>
+      </a>
+      <a class="promo-card c-hub" href="https://postohub.com.br" target="_blank" rel="noopener">
+        <span class="pk">Ferramenta</span>
+        <h3>POSTO HUB</h3>
+        <p>Checklist e rotina operacional do posto na palma da mão: padronize a operação, cobre as tarefas da equipe e não deixe nada passar no dia a dia da pista e da loja.</p>
+        <span class="cta">Conhecer o POSTO HUB →</span>
+      </a>
+      <a class="promo-card c-ig" href="https://www.instagram.com/eusouramses" target="_blank" rel="noopener">
+        <span class="pk">Instagram</span>
+        <h3>@eusouramses</h3>
+        <p>Ramsés Castoldi — 25+ anos como empresário, dono da Rede Posto 10 (3 unidades). Conteúdo de gestão, margem e revenda, direto de quem opera posto de verdade.</p>
+        <span class="cta">Seguir no Instagram →</span>
+      </a>
+      <a class="promo-card c-wa" href="https://wa.me/5565992657008" target="_blank" rel="noopener">
+        <span class="pk">Contato</span>
+        <h3>WhatsApp direto</h3>
+        <p>Dúvida sobre o clube, a mentoria ou as ferramentas do Lumen? Chama no WhatsApp.</p>
+        <span class="cta">(65) 99265-7008 →</span>
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- ROTINA SEMANAL -->
+<section class="rotina" id="rotina">
+  <div class="wrap">
+    <div class="sec-label" style="margin-top:0"><span class="n" style="color:var(--gold-b)">05</span><h2 style="color:#fff">Rotina semanal de verificação da vigência</h2><span class="rule" style="background:linear-gradient(90deg,#2A3A35,transparent)"></span></div>
+    <p style="color:var(--tx-onink-mut);font-size:13.5px;max-width:64ch;margin:-4px 0 20px">A ANP revoga e substitui resoluções com frequência (a norma que sustentava o manual antigo, a Res. 09/2007, foi revogada). Toda segunda-feira, confira se as normas abaixo continuam vigentes e registre a verificação.</p>
+
+    <div class="cd" id="countdown">
+      <div><div class="big" id="cdDays">—</div></div>
+      <div class="cdl" id="cdLabel">Calculando próxima verificação…</div>
+    </div>
+
+    <ul class="checklist" id="checklist"></ul>
+
+    <div class="actions">
+      <button class="btn" id="markBtn">Marcar verificação de hoje</button>
+      <span class="lastcheck" id="lastCheck"></span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="yy"></span> Lumen Posto Club · Ferramenta de apoio. Não substitui o Boletim de Conformidade do distribuidor.</span>
+    <span>Base normativa conferida em <b id="footDate" style="color:var(--gold-b)"></b></span>
+  </div>
+</footer>
+
+<script>
+/* =========================================================================
+   CONFIG — parâmetros de conformidade e vigência.
+   >>> Atualize este bloco na revisão semanal e republique no Cloudflare
+   Pages (projeto lumen-conformidade, wrangler pages deploy). <<<
+   ========================================================================= */
+const CONFIG = {
+  vigencia: {
+    confirmadoEm: "2026-11-02",     // conferido no site da ANP (gov.br/anp)
+    fonte: "Cartilha do PRC 7ª ed. (ANP, maio/2026) + site ANP e DOU até nov/2026",
+    intervaloDias: 7,               // periodicidade da verificação
+    normas: [
+      {tema:"Controle de qualidade / Registro", norma:"Res. ANP 898/2022", nota:"modelo do Registro de Análise", url:"https://www.gov.br/anp/pt-br"},
+      {tema:"Gasolina", norma:"Res. ANP 807/2020 + 988/2025", nota:"E30 — RON mín. 94 (antes 93)", url:"https://www.gov.br/anp/pt-br/assuntos/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/gasolina"},
+      {tema:"Óleo diesel", norma:"Res. ANP 968/2024", nota:"especificação vigente", url:"https://www.gov.br/anp/pt-br/assuntos/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/oleo-diesel"},
+      {tema:"Etanol (EAC/EHC)", norma:"Res. ANP 907/2022", nota:"vigente — revisão (corante/denatônio) prevista p/ 2027", url:"https://www.gov.br/anp/pt-br/assuntos/producao-e-fornecimento-de-biocombustiveis/etanol"},
+      {tema:"Mistura E30 / B15", norma:"Res. CNPE 09/2025", nota:"desde 01/08/2025 — B16 adiado, segue B15", url:"https://www.gov.br/anp/pt-br/assuntos/producao-e-fornecimento-de-biocombustiveis/biodiesel"},
+      {tema:"Revenda varejista", norma:"Res. ANP 948/2023", nota:"autorização e obrigações", url:"https://www.gov.br/anp/pt-br/assuntos/distribuicao-e-revenda/revendedor"},
+      {tema:"Placa de transparência", norma:"Decreto 12.876/2026 + MP 1.340/2026", nota:"obrigatória desde mar/2026 — modelo ANP, mín. 65×50cm", url:"https://www.gov.br/anp/pt-br/canais_atendimento/imprensa/noticias-comunicados/anp-divulga-modelo-de-placa-para-postos-de-combustiveis"},
+    ]
+  },
+  // GASOLINA C — teor de etanol anidro (Cartilha ANP): comum 29–31%, premium 24–26%. ME 20°C mín. 715 kg/m³.
+  gasolina: { comum:{alvo:30,min:29,max:31}, premium:{alvo:25,min:24,max:26}, meMin:715 },
+  // ETANOL HIDRATADO — Res. ANP 907/2022 (confirmado na Cartilha ANP maio/2026).
+  etanol: {
+    EHC:  {rot:"Comum (EHC)",    meMin:805.2, meMax:811.2, teorMin:92.5, teorMax:94.6},
+    EHCP: {rot:"Premium (EHCP)", meMin:799.7, meMax:802.8, teorMin:95.5, teorMax:96.5}
+  },
+  // DIESEL B15 — massa específica a 20°C (Cartilha ANP maio/2026).
+  diesel: { s10:{meMin:820.3, meMax:857.5}, s500:{meMin:820.3, meMax:870.3} }
+};
+
+/* ---------- utils ---------- */
+const $=id=>document.getElementById(id);
+const num=v=>{if(v==null)return NaN;const n=parseFloat(String(v).replace(',','.').trim());return isNaN(n)?NaN:n;};
+const fmtD=d=>d.toLocaleDateString('pt-BR');
+const parseISO=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+$('yy').textContent=new Date().getFullYear();
+$('footDate').textContent=fmtD(parseISO(CONFIG.vigencia.confirmadoEm));
+// data/hora inicia em branco — preenchimento manual
+
+/* ---------- vigência: painel + status ---------- */
+function nextReview(){const base=parseISO(CONFIG.vigencia.confirmadoEm);base.setDate(base.getDate()+CONFIG.vigencia.intervaloDias);return base;}
+function renderVigencia(){
+  const chips=$('vigChips');chips.innerHTML='';
+  CONFIG.vigencia.normas.forEach(n=>{
+    const el=document.createElement('div');el.className='chip';
+    el.innerHTML=`<div class="ct">${n.tema}</div><div class="cn">${n.norma}</div><div class="cs">${n.nota}</div>`;
+    chips.appendChild(el);
+  });
+  const fEl=$('vigFonte'); if(fEl) fEl.textContent='Fonte: '+CONFIG.vigencia.fonte;
+  const nx=nextReview(), today=new Date();today.setHours(0,0,0,0);
+  const overdue=today>nx;
+  $('vigDot').className='dot '+(overdue?'off':'on');
+  $('vigStTx').innerHTML=overdue
+    ? `<b>Verificação vencida</b> — revise a legislação`
+    : `Base <b>vigente</b> · confirmada em ${fmtD(parseISO(CONFIG.vigencia.confirmadoEm))}`;
+}
+
+/* ---------- toggles dos produtos ---------- */
+document.querySelectorAll('.prod-h').forEach(h=>{
+  h.addEventListener('click',()=>{document.getElementById(h.dataset.prod).classList.toggle('active');updateAll();});
+});
+
+/* ---------- motores de conformidade ---------- */
+function setSeal(seal,state,label){
+  seal.className='seal '+state;
+  const map={ok:['CONFORME','APROVADO'],bad:['NÃO CONFORME','REPROVADO'],pend:['STATUS','—']};
+  seal.querySelector('.sl').textContent=map[state][0];
+  seal.querySelector('.sv').textContent=label||map[state][1];
+}
+function reasonsHTML(el,arr){el.innerHTML=arr.map(r=>`<li>${r}</li>`).join('');}
+
+const RECUSA='<b>Atenção:</b> fora de especificação — recuse o recebimento e comunique à Ouvidoria da ANP (0800 970 0267) em até 24h úteis.';
+
+function evalGasolina(){
+  const on=$('prodGas').classList.contains('active');
+  const asp=$('g_asp').value, tipo=$('g_tipo').value;
+  const A=num($('g_A').value), pctIn=num($('g_pct').value), me=num($('g_me').value);
+  const calc=$('g_calc'), seal=$('g_seal');
+  let pct=NaN;
+  if(!isNaN(pctIn)) pct=pctIn;
+  else if(!isNaN(A)){pct=A*2+1;calc.style.display='inline-block';calc.textContent=`V = (A × 2) + 1 = (${A.toString().replace('.',',')} × 2) + 1 = ${pct.toString().replace('.',',')} %`;}
+  if(isNaN(A)&&isNaN(pctIn)) calc.style.display='none';
+  const band=CONFIG.gasolina[tipo], meMin=CONFIG.gasolina.meMin;
+  const reasons=[];
+  if(asp!=='ok') reasons.push('Aspecto fora do padrão (deve ser límpido e isento de impurezas).');
+  if(!isNaN(pct)){ if(pct<band.min) reasons.push(`Teor de etanol ${pct.toString().replace('.',',')}% abaixo da faixa (${band.min}%–${band.max}%).`); else if(pct>band.max) reasons.push(`Teor de etanol ${pct.toString().replace('.',',')}% acima da faixa (${band.min}%–${band.max}%).`); }
+  if(!isNaN(me) && me<meMin) reasons.push(`Massa específica ${me.toString().replace('.',',')} abaixo do mínimo (${meMin} kg/m³).`);
+  const filled = !isNaN(pct);
+  let state='pend', verdict='pendente';
+  if(filled){ state=reasons.length?'bad':'ok'; verdict=reasons.length?'Não conforme':'Conforme'; }
+  setSeal(seal,state);
+  $('g_vtx').innerHTML = filled
+    ? (state==='ok'?`<b>Gasolina ${tipo==='premium'?'Premium':'C'} conforme.</b> Teor de anidro dentro da faixa (${band.min}%–${band.max}%).`:RECUSA)
+    : 'Preencha o aspecto e o teste da proveta (A ou %).';
+  reasonsHTML($('g_reasons'),filled?reasons:[]);
+  return {on,label:`Gasolina ${tipo==='premium'?'Premium':'C'}`,state,verdict,pct,band,asp,rows:gasRows(pct,band,asp,me,meMin)};
+}
+function gasRows(pct,band,asp,me,meMin){
+  const cor=$('g_cor').value.trim();
+  const corAzul=/azul/i.test(cor);
+  return [
+    ['Aspecto', $('g_asp').selectedOptions[0].text, 'Límpido e isento de impurezas', asp==='ok'?'Conforme':'Não conforme'],
+    ['Cor', cor||'—', 'Não pode ser azul', cor?(corAzul?'Não conforme':'Conforme'):'—'],
+    ['Massa esp. 20 °C (kg/m³)', isNaN(me)?'—':me.toString().replace('.',','), `mín. ${meMin}`, isNaN(me)?'—':(me>=meMin?'Conforme':'Não conforme')],
+    ['Teor de etanol anidro', isNaN(pct)?'—':pct.toString().replace('.',',')+'%', `${band.min}% a ${band.max}%`, isNaN(pct)?'—':(pct>=band.min&&pct<=band.max?'Conforme':'Não conforme')]
+  ];
+}
+
+function evalEtanol(){
+  const on=$('prodEta').classList.contains('active');
+  const tipo=$('e_tipo').value, asp=$('e_asp').value, me=num($('e_me').value), teor=num($('e_teor').value);
+  const c=CONFIG.etanol[tipo], reasons=[];
+  const cor=$('e_cor').value.trim(), corBad=/azul|laranja/i.test(cor);
+  if(asp!=='ok') reasons.push('Aspecto fora do padrão (deve ser límpido e isento de impurezas).');
+  if(corBad) reasons.push('Cor não permitida (não pode ser azul nem laranja).');
+  if(!isNaN(me)){ if(me<c.meMin) reasons.push(`Massa específica ${me.toString().replace('.',',')} abaixo da faixa (${c.meMin}–${c.meMax} kg/m³).`); else if(me>c.meMax) reasons.push(`Massa específica ${me.toString().replace('.',',')} acima da faixa (${c.meMin}–${c.meMax} kg/m³).`); }
+  if(!isNaN(teor)){ if(teor<c.teorMin) reasons.push(`Teor alcoólico ${teor.toString().replace('.',',')} abaixo da faixa (${c.teorMin}–${c.teorMax} °INPM).`); else if(teor>c.teorMax) reasons.push(`Teor alcoólico ${teor.toString().replace('.',',')} acima da faixa (${c.teorMin}–${c.teorMax} °INPM).`); }
+  const filled = !isNaN(me);
+  let state='pend';
+  if(filled){ state=reasons.length?'bad':'ok'; }
+  setSeal($('e_seal'),state);
+  $('e_vtx').innerHTML = filled ? (state==='ok'?`<b>Etanol ${c.rot} conforme.</b> Massa específica dentro da faixa.`:RECUSA) : 'Informe o aspecto e a massa específica a 20 °C.';
+  reasonsHTML($('e_reasons'),filled?reasons:[]);
+  return {on,label:`Etanol ${c.rot}`,state,verdict:state==='ok'?'Conforme':(state==='bad'?'Não conforme':'pendente'),rows:[
+    ['Aspecto', $('e_asp').selectedOptions[0].text,'Límpido e isento de impurezas', asp==='ok'?'Conforme':'Não conforme'],
+    ['Cor', cor||'—','Não pode ser azul nem laranja', cor?(corBad?'Não conforme':'Conforme'):'—'],
+    ['Massa esp. 20 °C (kg/m³)', isNaN(me)?'—':me.toString().replace('.',','), `${c.meMin} a ${c.meMax}`, isNaN(me)?'—':(me>=c.meMin&&me<=c.meMax?'Conforme':'Não conforme')],
+    ['Teor alcoólico (°INPM)', isNaN(teor)?'—':teor.toString().replace('.',','), `${c.teorMin} a ${c.teorMax}`, isNaN(teor)?'—':(teor>=c.teorMin&&teor<=c.teorMax?'Conforme':'Não conforme')]
+  ]};
+}
+
+function evalDiesel(){
+  const on=$('prodDie').classList.contains('active');
+  const tipo=$('d_tipo').value, asp=$('d_asp').value, cor=$('d_cor').value, me=num($('d_me').value);
+  const band=CONFIG.diesel[tipo], reasons=[];
+  if(asp!=='ok') reasons.push('Aspecto fora do padrão (deve ser límpido e isento de impurezas).');
+  if(tipo==='s500' && cor!=='vermelho') reasons.push('Diesel S500 deve conter corante vermelho.');
+  if(tipo==='s10' && cor==='vermelho') reasons.push('Diesel S10 não pode conter corante vermelho (corante proibido no S10).');
+  if(!isNaN(me)){ if(me<band.meMin) reasons.push(`Massa específica ${me.toString().replace('.',',')} abaixo da faixa (${band.meMin}–${band.meMax} kg/m³).`); else if(me>band.meMax) reasons.push(`Massa específica ${me.toString().replace('.',',')} acima da faixa (${band.meMin}–${band.meMax} kg/m³).`); }
+  const filled = !isNaN(me);
+  let state='pend';
+  if(filled){ state=reasons.length?'bad':'ok'; }
+  setSeal($('d_seal'),state);
+  $('d_vtx').innerHTML = filled ? (state==='ok'?`<b>Diesel B ${tipo.toUpperCase()} conforme.</b>`:RECUSA) : 'Informe o tipo, o aspecto, a cor e a massa específica.';
+  reasonsHTML($('d_reasons'),filled?reasons:[]);
+  const corTxt=$('d_cor').selectedOptions[0].text;
+  return {on,label:`Diesel B ${tipo.toUpperCase()}`,state,verdict:state==='ok'?'Conforme':(state==='bad'?'Não conforme':'pendente'),rows:[
+    ['Aspecto', $('d_asp').selectedOptions[0].text,'Límpido e isento de impurezas', asp==='ok'?'Conforme':'Não conforme'],
+    ['Cor', corTxt, tipo==='s500'?'Vermelho (corante obrigatório)':'Incolor a amarelado (sem corante)', (tipo==='s500'?(cor==='vermelho'?'Conforme':'Não conforme'):(cor==='vermelho'?'Não conforme':'Conforme'))],
+    ['Massa esp. 20 °C (kg/m³)', isNaN(me)?'—':me.toString().replace('.',','), `${band.meMin} a ${band.meMax}`, isNaN(me)?'—':(me>=band.meMin&&me<=band.meMax?'Conforme':'Não conforme')]
+  ]};
+}
+
+/* ---------- orquestração ---------- */
+let LAST=[];
+function updateAll(){
+  const results=[evalGasolina(),evalEtanol(),evalDiesel()];
+  const active=results.filter(r=>r.on);
+  LAST=active;
+  const pills=$('sumPills');
+  if(!active.length){ pills.innerHTML='<span class="pill">nenhum produto ativado</span>'; $('pdfBtn').disabled=true; return; }
+  pills.innerHTML=active.map(r=>{
+    const cls=r.state==='ok'?'ok':(r.state==='bad'?'bad':'');
+    const v=r.state==='pend'?'pendente':(r.state==='ok'?'conforme':'não conforme');
+    return `<span class="pill ${cls}">${r.label}: ${v}</span>`;
+  }).join('');
+  $('pdfBtn').disabled=false;
+}
+document.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',updateAll));
+
+/* ---------- PDF ---------- */
+$('pdfBtn').addEventListener('click',()=>{
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth();
+  const ink=[14,22,20], gold=[192,145,45], mut=[107,122,116];
+  // header band
+  doc.setFillColor(...ink);doc.rect(0,0,W,86,'F');
+  doc.setFillColor(231,184,75);doc.circle(52,43,9,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(15);
+  doc.text('LUMEN POSTO CLUB',74,40);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(180,195,188);
+  doc.text('Registro de Análise da Qualidade',74,55);
+  doc.setFontSize(8);doc.setTextColor(231,184,75);
+  doc.text('Base: Res. ANP 898/2022 · 807/2020 · 968/2024 · 907/2022 · CNPE 09/2025',74,68);
+
+  let y=108;
+  doc.setTextColor(...ink);doc.setFont('helvetica','bold');doc.setFontSize(11);
+  doc.text('Identificação e recebimento',40,y);y+=6;
+  doc.setDrawColor(...gold);doc.setLineWidth(1.2);doc.line(40,y,W-40,y);y+=14;
+
+  const g=(id)=>{const v=$(id).value;return v?v:'—';};
+  const dataV=(()=>{const v=$('f_data').value;if(!v)return '—';const d=new Date(v);return d.toLocaleString('pt-BR');})();
+  const info=[
+    ['Posto',g('f_posto'),'CNPJ',g('f_cnpj')],
+    ['Responsável',g('f_resp'),'Data/hora',dataV],
+    ['Distribuidor',g('f_distrib'),'NF recebimento',g('f_nf')],
+    ['Transportador/placa',g('f_transp'),'Motorista',g('f_mot')],
+    ['Lacre(s)',g('f_lacre'),'Amostra-testemunha',g('f_amostra')],
+  ];
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);
+  info.forEach(row=>{
+    doc.setTextColor(...mut);doc.text(row[0]+':',40,y);
+    doc.setTextColor(...ink);doc.text(String(row[1]),150,y);
+    doc.setTextColor(...mut);doc.text(row[2]+':',310,y);
+    doc.setTextColor(...ink);doc.text(String(row[3]),420,y);
+    y+=16;
+  });
+  y+=8;
+
+  LAST.forEach(r=>{
+    if(y>720){doc.addPage();y=48;}
+    const vc = r.state==='ok'?[30,122,84]:(r.state==='bad'?[193,54,47]:[120,120,120]);
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...ink);
+    doc.text(r.label,40,y);
+    doc.setFontSize(9.5);doc.setTextColor(...vc);
+    doc.text('• '+(r.state==='pend'?'PENDENTE':(r.state==='ok'?'CONFORME':'NÃO CONFORME')),W-40,y,{align:'right'});
+    y+=8;
+    doc.autoTable({
+      startY:y, head:[['Característica','Resultado','Limite (ANP)','Situação']], body:r.rows,
+      theme:'grid', styles:{font:'helvetica',fontSize:8.5,cellPadding:5,lineColor:[228,222,207]},
+      headStyles:{fillColor:[27,42,38],textColor:[255,255,255],fontStyle:'bold'},
+      columnStyles:{0:{cellWidth:130},3:{cellWidth:90}},
+      didParseCell:d=>{ if(d.section==='body'&&d.column.index===3){ const t=d.cell.raw; if(t==='Conforme')d.cell.styles.textColor=[30,122,84]; if(t==='Não conforme')d.cell.styles.textColor=[193,54,47]; d.cell.styles.fontStyle='bold'; } },
+      margin:{left:40,right:40}
+    });
+    y=doc.lastAutoTable.finalY+18;
+  });
+
+  if(y>700){doc.addPage();y=60;}
+  doc.setDrawColor(228,222,207);doc.line(40,y,W-40,y);y+=22;
+  doc.setTextColor(...mut);doc.setFontSize(9);
+  doc.text('Assinatura do responsável: ____________________________________________',40,y);y+=26;
+  doc.setFontSize(7.5);doc.setTextColor(150,150,150);
+  const foot='Documento de apoio gerado pela Central de Conformidade do Lumen Posto Club. Não substitui o Boletim de Conformidade do distribuidor. Guardar os Registros de Análise da Qualidade dos últimos 6 meses no posto (Res. ANP 898/2022). Em caso de não conformidade, recuse o recebimento e comunique a Ouvidoria da ANP (0800 970 0267) em ate 24h uteis. Parametros conforme a Cartilha do Posto Revendedor de Combustiveis (ANP, 7a ed., maio/2026). Base conferida em '+fmtD(parseISO(CONFIG.vigencia.confirmadoEm))+'.';
+  doc.text(doc.splitTextToSize(foot,W-80),40,y);
+
+  const posto=($('f_posto').value||'posto').replace(/[^\w]+/g,'-').toLowerCase();
+  doc.save(`registro-qualidade-${posto}-${new Date().toISOString().slice(0,10)}.pdf`);
+});
+
+/* ---------- rotina semanal ---------- */
+const LS='lumen_ultima_verificacao';
+function renderRotina(){
+  const cl=$('checklist');cl.innerHTML='';
+  CONFIG.vigencia.normas.forEach((n,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="cbx" data-i="${i}">✓</div><div class="ci"><div class="cn">${n.tema} — ${n.norma}</div><div class="cd2">Confirmar que continua vigente (${n.nota}).</div><a href="${n.url}" target="_blank" rel="noopener">abrir página da ANP ↗</a></div>`;
+    cl.appendChild(li);
+  });
+  cl.querySelectorAll('.cbx').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('ck')));
+
+  // countdown baseado na verificação editorial (CONFIG) ou na última marcada pelo usuário
+  let last=CONFIG.vigencia.confirmadoEm;
+  try{const u=localStorage.getItem(LS);if(u)last=u;}catch(e){}
+  const base=parseISO(last);const nx=new Date(base);nx.setDate(nx.getDate()+CONFIG.vigencia.intervaloDias);
+  const today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.round((nx-today)/86400000);
+  const cd=$('countdown');
+  if(diff<0){ cd.classList.add('vencido'); $('cdDays').textContent=Math.abs(diff)+'d'; $('cdLabel').innerHTML=`<b>Verificação vencida há ${Math.abs(diff)} dia(s).</b> Confira as normas e marque a verificação.`; }
+  else{ cd.classList.remove('vencido'); $('cdDays').textContent=diff+'d'; $('cdLabel').innerHTML=`Próxima verificação em <b>${fmtD(nx)}</b> · última em ${fmtD(base)}.`; }
+  try{const u=localStorage.getItem(LS); $('lastCheck').textContent=u?`Você marcou a última verificação em ${fmtD(parseISO(u))}.`:'';}catch(e){}
+}
+$('markBtn').addEventListener('click',()=>{
+  const t=new Date();const iso=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  try{localStorage.setItem(LS,iso);}catch(e){}
+  renderRotina();renderVigencia();
+});
+
+/* init */
+renderVigencia();renderRotina();updateAll();
+</script>
+
+<!-- ===================== GATE: trial 30d por IP + OTP de assinante ===================== -->
+<script>
+(function(){
+  const N8N='https://n8n.srv1662375.hstgr.cloud/webhook';
+  const SESSION_KEY='lumen_session_token';
+  const g=id=>document.getElementById(id);
+  const gate=g('gate'), bar=g('trialBar');
+
+  function gStep(name){for(const s of ['phone','otp','checking'])g('gstep-'+s).classList.toggle('active',s===name);}
+  function gMsg(id,txt,type){const e=g(id);e.textContent=txt;e.className='gate-msg '+(type||'info');e.style.display='block';}
+  function gHide(id){g(id).style.display='none';}
+  function gLoad(btn,on){btn.disabled=on;btn.textContent=on?'Aguarde…':btn.dataset.label;}
+  async function post(path,body){const r=await fetch(N8N+'/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json();}
+
+  function openGate(){gate.classList.add('show');document.body.style.overflow='hidden';}
+  function closeGate(){gate.classList.remove('show');document.body.style.overflow='';}
+  function showTrial(days){
+    bar.innerHTML=`🔓 Acesso de avaliação — <b>${days} dia${days===1?'':'s'}</b> restante${days===1?'':'s'}. Já é do clube? <a href="#" id="trialLogin">validar meu WhatsApp</a>.`;
+    bar.style.display='flex';
+    const l=g('trialLogin'); if(l) l.addEventListener('click',e=>{e.preventDefault();openGate();});
+  }
+
+  async function boot(){
+    // 1) já tem sessão de assinante válida? libera direto.
+    const tok=localStorage.getItem(SESSION_KEY);
+    if(tok){
+      try{ const r=await post('painel-check-session',{session_token:tok}); if(r&&r.ok){return;} localStorage.removeItem(SESSION_KEY);}catch(e){}
+    }
+    // 2) checa o trial por IP no Worker.
+    let daysLeft=30, trialActive=true;
+    try{ const r=await fetch('/api/gate',{cache:'no-store'}); const j=await r.json(); daysLeft=j.daysLeft; trialActive=j.trialActive; }
+    catch(e){ /* Worker off (preview local): não trava, deixa passar */ return; }
+    if(trialActive){ showTrial(daysLeft); }
+    else{ gStep('phone'); openGate(); }
+  }
+
+  // ---- OTP (reusa endpoints do painel; grupo pago = assinatura Kiwify ativa) ----
+  let phone=null;
+  const bSend=g('gbtn-send'); bSend.dataset.label=bSend.textContent;
+  bSend.addEventListener('click',async()=>{
+    const v=g('gate-phone').value.trim();
+    if(!v){gMsg('gmsg-phone','Digite seu WhatsApp.','error');return;}
+    gHide('gmsg-phone'); gLoad(bSend,true);
+    try{ const r=await post('painel-request-otp',{phone:v});
+      if(r&&r.ok){ phone=v; gStep('otp'); gHide('gmsg-otp'); gMsg('gmsg-otp',r.message||'Código enviado pelo WhatsApp.','success'); setTimeout(()=>g('gate-otp').focus(),100); }
+      else{ gMsg('gmsg-phone',r&&r.message?r.message:'Número não encontrado na assinatura ativa do Lumen Posto Club.','error'); }
+    }catch(e){ gMsg('gmsg-phone','Erro de rede. Tente novamente.','error'); }
+    gLoad(bSend,false);
+  });
+
+  const bVer=g('gbtn-verify'); bVer.dataset.label=bVer.textContent;
+  bVer.addEventListener('click',async()=>{
+    const otp=g('gate-otp').value.trim();
+    if(otp.length!==6){gMsg('gmsg-otp','O código tem 6 dígitos.','error');return;}
+    gHide('gmsg-otp'); gLoad(bVer,true);
+    try{ const r=await post('painel-verify-otp',{phone,otp});
+      if(r&&r.ok&&r.session_token){ localStorage.setItem(SESSION_KEY,r.session_token); gMsg('gmsg-otp','Acesso liberado!','success'); bar.style.display='none'; setTimeout(closeGate,500); }
+      else{ gMsg('gmsg-otp',r&&r.message?r.message:'Código inválido.','error'); }
+    }catch(e){ gMsg('gmsg-otp','Erro de rede. Tente novamente.','error'); }
+    gLoad(bVer,false);
+  });
+
+  g('gbtn-back').addEventListener('click',()=>{g('gate-otp').value='';gHide('gmsg-otp');gHide('gmsg-phone');gStep('phone');});
+  g('gate-phone').addEventListener('keydown',e=>{if(e.key==='Enter')bSend.click();});
+  g('gate-otp').addEventListener('keydown',e=>{if(e.key==='Enter')bVer.click();});
+
+  boot();
+})();
+</script>
+
+
+</body></html>
