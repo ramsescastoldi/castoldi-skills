@@ -166,77 +166,9 @@ footer a{color:var(--tx-onink-mut)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ---------- TRIAL BANNER ---------- */
-#trialBar{position:sticky;top:0;z-index:40;display:none;align-items:center;justify-content:center;gap:10px;background:var(--warn-soft);color:#6b4e12;border-bottom:1px solid #E7D3A0;padding:8px 14px;font-size:12.5px;font-weight:600;text-align:center}
-#trialBar b{color:#8a5a0c}
-#trialBar a{color:#8a5a0c;text-decoration:underline}
-
-/* ---------- GATE (trial vencido) ---------- */
-#gate{--bg:#F6F3EC;--bg-card:#FFFFFF;--border:#E4DECF;--text:#0E1614;--text-muted:#6B7A74;--accent:#C0912D;--red:#C1362F;--green:#1E7A54;
-  position:fixed;inset:0;z-index:1000;background:linear-gradient(135deg,#0E1614 0%,#1B2A26 100%);display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
-#gate.show{display:flex}
-.gate-card{width:100%;max-width:440px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:34px 30px;color:var(--text)}
-.gate-lamp{width:40px;height:40px;margin-bottom:10px;filter:drop-shadow(0 0 9px rgba(231,184,75,.55))}
-.gate-logo{font-family:"Space Grotesk",Inter,sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em}
-.gate-sub{color:var(--text-muted);font-size:13.5px;margin:6px 0 22px;line-height:1.5}
-.gate-step{display:none}.gate-step.active{display:block}
-.gate-label{display:block;color:var(--text-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-.gate-input{width:100%;padding:13px 14px;font:inherit;font-size:16px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px}
-.gate-input:focus{outline:none;border-color:var(--accent)}
-.gate-input.otp{letter-spacing:6px;text-align:center;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
-.gate-btn{width:100%;margin-top:14px;padding:13px 14px;background:var(--accent);color:#1a1305;border:none;border-radius:8px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
-.gate-btn:hover{opacity:.92}.gate-btn:disabled{opacity:.5;cursor:not-allowed}
-a.gate-btn{display:block;text-align:center;text-decoration:none;line-height:1.3}
-.gate-btn.join{background:var(--ink,#0E1614);color:#E7B84B;margin-top:10px}
-.gate-link{background:transparent;color:var(--text-muted);margin-top:8px;padding:8px;font-size:13px;border:none;cursor:pointer;width:100%}
-.gate-link:hover{color:var(--text);text-decoration:underline}
-.gate-msg{margin-top:14px;font-size:13px;padding:10px 12px;border-radius:6px}
-.gate-msg.error{background:rgba(193,54,47,.08);color:var(--red);border:1px solid rgba(193,54,47,.3)}
-.gate-msg.success{background:rgba(30,122,84,.08);color:var(--green);border:1px solid rgba(30,122,84,.3)}
-.gate-msg.info{background:rgba(192,145,45,.08);color:var(--accent);border:1px solid rgba(192,145,45,.3)}
-.gate-foot{margin-top:22px;padding-top:16px;border-top:1px solid var(--border);color:var(--text-muted);font-size:11.5px;text-align:center;line-height:1.5}
 </style>
 </head>
 <body>
-
-<!-- BARRA DE AVALIAÇÃO (trial ativo) -->
-<div id="trialBar"></div>
-
-<!-- GATE — aparece quando o trial de 30 dias vence e o usuário não é assinante -->
-<div id="gate">
-  <div class="gate-card">
-    <svg class="gate-lamp" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M24 5c-8 0-13 5.4-13 12.4 0 4.6 2.4 7.4 4.6 9.8 1.7 1.9 2.9 3.3 2.9 5.8h11c0-2.5 1.2-3.9 2.9-5.8C36.6 24.8 39 22 39 17.4 39 10.4 32 5 24 5z" fill="#E7B84B"></path>
-      <path d="M18.5 38h11M20 42h8" stroke="#C0912D" stroke-width="2.4" stroke-linecap="round"></path>
-    </svg>
-    <div class="gate-logo">Seu período de avaliação terminou</div>
-    <div class="gate-sub">A Central de Conformidade fica liberada por <b>30 dias</b>. Para continuar usando, entre com o WhatsApp que você usa no <b>Lumen Posto Club</b> — validamos que sua assinatura está ativa.</div>
-
-    <div class="gate-step active" id="gstep-phone">
-      <label class="gate-label" for="gate-phone">Seu WhatsApp de assinante</label>
-      <input class="gate-input" id="gate-phone" type="tel" placeholder="65 99999-8888" autocomplete="tel">
-      <button class="gate-btn" id="gbtn-send">Enviar código</button>
-      <a class="gate-btn join" href="https://pay.kiwify.com.br/kE87xuV?utm_source=conformidade&amp;utm_medium=gate&amp;utm_campaign=lumen-club" target="_blank" rel="noopener">Ainda não sou membro — entrar no Lumen Posto Club</a>
-      <div class="gate-msg" id="gmsg-phone" style="display:none"></div>
-    </div>
-
-    <div class="gate-step" id="gstep-otp">
-      <label class="gate-label" for="gate-otp">Código recebido por WhatsApp</label>
-      <input class="gate-input otp" id="gate-otp" type="text" inputmode="numeric" maxlength="6" pattern="\d{6}" placeholder="000000" autocomplete="one-time-code">
-      <button class="gate-btn" id="gbtn-verify">Validar e acessar</button>
-      <button class="gate-link" id="gbtn-back">← Trocar número</button>
-      <div class="gate-msg" id="gmsg-otp" style="display:none"></div>
-    </div>
-
-    <div class="gate-step" id="gstep-checking">
-      <div class="gate-msg info">Verificando…</div>
-    </div>
-
-    <div class="gate-foot">
-      Acesso liberado por 30 dias enquanto a assinatura estiver ativa.<br>
-      Assinatura vencida? Reative em <a href="https://vendas.lumenclubpainel.com.br" target="_blank" rel="noopener" style="color:var(--accent)">vendas.lumenclubpainel.com.br</a>.
-    </div>
-  </div>
-</div>
 
 <!-- HEADER -->
 <header class="top">
@@ -767,75 +699,6 @@ $('markBtn').addEventListener('click',()=>{
 renderVigencia();renderRotina();updateAll();
 </script>
 
-<!-- ===================== GATE: trial 30d por IP + OTP de assinante ===================== -->
-<script>
-(function(){
-  const N8N='https://n8n.srv1662375.hstgr.cloud/webhook';
-  const SESSION_KEY='lumen_session_token';
-  const g=id=>document.getElementById(id);
-  const gate=g('gate'), bar=g('trialBar');
-
-  function gStep(name){for(const s of ['phone','otp','checking'])g('gstep-'+s).classList.toggle('active',s===name);}
-  function gMsg(id,txt,type){const e=g(id);e.textContent=txt;e.className='gate-msg '+(type||'info');e.style.display='block';}
-  function gHide(id){g(id).style.display='none';}
-  function gLoad(btn,on){btn.disabled=on;btn.textContent=on?'Aguarde…':btn.dataset.label;}
-  async function post(path,body){const r=await fetch(N8N+'/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json();}
-
-  function openGate(){gate.classList.add('show');document.body.style.overflow='hidden';}
-  function closeGate(){gate.classList.remove('show');document.body.style.overflow='';}
-  function showTrial(days){
-    bar.innerHTML=`🔓 Acesso de avaliação — <b>${days} dia${days===1?'':'s'}</b> restante${days===1?'':'s'}. Já é do clube? <a href="#" id="trialLogin">validar meu WhatsApp</a>.`;
-    bar.style.display='flex';
-    const l=g('trialLogin'); if(l) l.addEventListener('click',e=>{e.preventDefault();openGate();});
-  }
-
-  async function boot(){
-    // 1) já tem sessão de assinante válida? libera direto.
-    const tok=localStorage.getItem(SESSION_KEY);
-    if(tok){
-      try{ const r=await post('painel-check-session',{session_token:tok}); if(r&&r.ok){return;} localStorage.removeItem(SESSION_KEY);}catch(e){}
-    }
-    // 2) checa o trial por IP no Worker.
-    let daysLeft=30, trialActive=true;
-    try{ const r=await fetch('/api/gate',{cache:'no-store'}); const j=await r.json(); daysLeft=j.daysLeft; trialActive=j.trialActive; }
-    catch(e){ /* Worker off (preview local): não trava, deixa passar */ return; }
-    if(trialActive){ showTrial(daysLeft); }
-    else{ gStep('phone'); openGate(); }
-  }
-
-  // ---- OTP (reusa endpoints do painel; grupo pago = assinatura Kiwify ativa) ----
-  let phone=null;
-  const bSend=g('gbtn-send'); bSend.dataset.label=bSend.textContent;
-  bSend.addEventListener('click',async()=>{
-    const v=g('gate-phone').value.trim();
-    if(!v){gMsg('gmsg-phone','Digite seu WhatsApp.','error');return;}
-    gHide('gmsg-phone'); gLoad(bSend,true);
-    try{ const r=await post('painel-request-otp',{phone:v});
-      if(r&&r.ok){ phone=v; gStep('otp'); gHide('gmsg-otp'); gMsg('gmsg-otp',r.message||'Código enviado pelo WhatsApp.','success'); setTimeout(()=>g('gate-otp').focus(),100); }
-      else{ gMsg('gmsg-phone',r&&r.message?r.message:'Número não encontrado na assinatura ativa do Lumen Posto Club.','error'); }
-    }catch(e){ gMsg('gmsg-phone','Erro de rede. Tente novamente.','error'); }
-    gLoad(bSend,false);
-  });
-
-  const bVer=g('gbtn-verify'); bVer.dataset.label=bVer.textContent;
-  bVer.addEventListener('click',async()=>{
-    const otp=g('gate-otp').value.trim();
-    if(otp.length!==6){gMsg('gmsg-otp','O código tem 6 dígitos.','error');return;}
-    gHide('gmsg-otp'); gLoad(bVer,true);
-    try{ const r=await post('painel-verify-otp',{phone,otp});
-      if(r&&r.ok&&r.session_token){ localStorage.setItem(SESSION_KEY,r.session_token); gMsg('gmsg-otp','Acesso liberado!','success'); bar.style.display='none'; setTimeout(closeGate,500); }
-      else{ gMsg('gmsg-otp',r&&r.message?r.message:'Código inválido.','error'); }
-    }catch(e){ gMsg('gmsg-otp','Erro de rede. Tente novamente.','error'); }
-    gLoad(bVer,false);
-  });
-
-  g('gbtn-back').addEventListener('click',()=>{g('gate-otp').value='';gHide('gmsg-otp');gHide('gmsg-phone');gStep('phone');});
-  g('gate-phone').addEventListener('keydown',e=>{if(e.key==='Enter')bSend.click();});
-  g('gate-otp').addEventListener('keydown',e=>{if(e.key==='Enter')bVer.click();});
-
-  boot();
-})();
-</script>
 
 
 </body></html>
