@@ -1,7 +1,7 @@
 # Central de Análise de Conformidade — Lumen Posto Club
 
 Site publicado em **https://conformidade.lumenclubpainel.com.br**
-(Cloudflare Pages, projeto `lumen-conformidade`, deploy por upload direto via wrangler).
+(Cloudflare Pages, projeto `lumen-conformidade`, deploy por upload direto via wrangler), acesso aberto.
 
 `index.html` é a página inteira (HTML + CSS + JS). Ele foi recuperado da versão publicada
 em produção (deploy de 02/11/2026), porque o código-fonte original só existia numa pasta local.
@@ -18,15 +18,11 @@ Toda a base normativa fica no bloco `CONFIG` do `<script>`:
 prorrogado uma vez. Se não houver prorrogação, volte `gasolina.comum` para
 `{alvo:30,min:29,max:31}` e troque os textos "E32" por "E30".
 
-## ⚠️ Antes de publicar
+## Publicar
 
-O site em produção também tem uma **Pages Function** (`/api/gate`, que faz o bloqueio de
-acesso por WhatsApp). O código dela **não está neste repositório**. Um `wrangler pages deploy`
-feito só com esta pasta **apaga essa função** e quebra o bloqueio.
-
-Para publicar, copie este `index.html` para a pasta local original do projeto (a que tem a
-pasta `functions/`) e rode o deploy de lá:
+Desde 17/11/2026 o site é aberto: o bloqueio por WhatsApp (Pages Function `/api/gate` +
+validação no n8n) foi removido a pedido. Esta pasta é o site inteiro; para publicar:
 
 ```bash
-npx wrangler pages deploy . --project-name lumen-conformidade --branch main
+npx wrangler pages deploy conformidade-site --project-name lumen-conformidade --branch main
 ```
