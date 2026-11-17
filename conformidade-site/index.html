@@ -306,13 +306,13 @@ a.gate-btn{display:block;text-align:center;text-decoration:none;line-height:1.3}
     <div class="card prod" id="prodGas">
       <div class="prod-h" data-prod="prodGas">
         <svg class="pi" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="9" height="18" rx="1.5" stroke="currentColor" stroke-width="1.7"></rect><path d="M13 8h3.5a2 2 0 012 2v6a1.5 1.5 0 003 0V11l-2-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><path d="M6 6h5v4H6z" fill="currentColor" opacity=".25"></path></svg>
-        <div class="pt">Gasolina C<small>RES. ANP 898/2022 · 807/2020 · CNPE 09/2025</small></div>
+        <div class="pt">Gasolina C<small>RES. ANP 898/2022 · 807/2020 · CNPE 09/2026 (E32)</small></div>
         <div class="toggle"><span>incluir</span><div class="sw"></div></div>
       </div>
       <div class="prod-body">
         <div class="grid3">
           <div class="field"><label>Tipo</label>
-            <select id="g_tipo"><option value="comum">Comum / Aditivada (E30)</option><option value="premium">Premium (25%)</option></select>
+            <select id="g_tipo"><option value="comum">Comum / Aditivada (E32)</option><option value="premium">Premium (25%)</option></select>
           </div>
           <div class="field"><label>Aspecto</label>
             <select id="g_asp"><option value="ok">Límpido e isento de impurezas</option><option value="i2">Límpido e com impureza</option><option value="i3">Turvo e isento de impurezas</option><option value="i4">Turvo e com impurezas</option></select>
@@ -495,21 +495,26 @@ a.gate-btn{display:block;text-align:center;text-decoration:none;line-height:1.3}
    ========================================================================= */
 const CONFIG = {
   vigencia: {
-    confirmadoEm: "2026-11-02",     // conferido no site da ANP (gov.br/anp)
-    fonte: "Cartilha do PRC 7ª ed. (ANP, maio/2026) + site ANP e DOU até nov/2026",
+    confirmadoEm: "2026-11-17",     // conferido no site da ANP (gov.br/anp)
+    fonte: "Cartilha do PRC 7ª ed. (ANP, maio/2026) + site ANP, CNPE e DOU até 17/11/2026",
     intervaloDias: 7,               // periodicidade da verificação
     normas: [
       {tema:"Controle de qualidade / Registro", norma:"Res. ANP 898/2022", nota:"modelo do Registro de Análise", url:"https://www.gov.br/anp/pt-br"},
-      {tema:"Gasolina", norma:"Res. ANP 807/2020 + 988/2025", nota:"E30 — RON mín. 94 (antes 93)", url:"https://www.gov.br/anp/pt-br/assuntos/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/gasolina"},
+      {tema:"Gasolina", norma:"Res. ANP 807/2020 + 988/2025", nota:"comum E32 / premium 25% — RON mín. 94", url:"https://www.gov.br/anp/pt-br/assuntos/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/gasolina"},
       {tema:"Óleo diesel", norma:"Res. ANP 968/2024", nota:"especificação vigente", url:"https://www.gov.br/anp/pt-br/assuntos/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/producao-de-derivados-de-petroleo-e-processamento-de-gas-natural/oleo-diesel"},
       {tema:"Etanol (EAC/EHC)", norma:"Res. ANP 907/2022", nota:"vigente — revisão (corante/denatônio) prevista p/ 2027", url:"https://www.gov.br/anp/pt-br/assuntos/producao-e-fornecimento-de-biocombustiveis/etanol"},
-      {tema:"Mistura E30 / B15", norma:"Res. CNPE 09/2025", nota:"desde 01/08/2025 — B16 adiado, segue B15", url:"https://www.gov.br/anp/pt-br/assuntos/producao-e-fornecimento-de-biocombustiveis/biodiesel"},
-      {tema:"Revenda varejista", norma:"Res. ANP 948/2023", nota:"autorização e obrigações", url:"https://www.gov.br/anp/pt-br/assuntos/distribuicao-e-revenda/revendedor"},
-      {tema:"Placa de transparência", norma:"Decreto 12.876/2026 + MP 1.340/2026", nota:"obrigatória desde mar/2026 — modelo ANP, mín. 65×50cm", url:"https://www.gov.br/anp/pt-br/canais_atendimento/imprensa/noticias-comunicados/anp-divulga-modelo-de-placa-para-postos-de-combustiveis"},
+      {tema:"Mistura E32 (gasolina)", norma:"Res. CNPE 09/2026", nota:"temporária desde 01/08/2026 por 180 dias (prorrogável 1×) — premium segue 25%", url:"https://www.gov.br/anp/pt-br/canais_atendimento/imprensa/noticias-comunicados/e32-gasolina-com-32-de-etanol-passa-a-valer-temporariamente-a-partir-de-amanha-1-8"},
+      {tema:"Mistura B15 (diesel)", norma:"Res. CNPE 09/2025", nota:"desde 01/08/2025 — B16 adiado (CNPE de 06/11/2026 não deliberou)", url:"https://www.gov.br/anp/pt-br/assuntos/producao-e-fornecimento-de-biocombustiveis/biodiesel"},
+      {tema:"Revenda varejista", norma:"Res. ANP 948/2023", nota:"vigente — em revisão: proposta de capital social mín. R$ 1 mi (consulta encerrada em 03/11/2026, ainda não vale)", url:"https://www.gov.br/anp/pt-br/assuntos/distribuicao-e-revenda/revendedor"},
+      {tema:"Placa de transparência", norma:"Decreto 12.876/2026", nota:"obrigatória desde mar/2026 — modelo ANP, mín. 65×50cm (a MP 1.340/2026 perdeu a vigência em 09/07/2026)", url:"https://www.gov.br/anp/pt-br/canais_atendimento/imprensa/noticias-comunicados/anp-divulga-modelo-de-placa-para-postos-de-combustiveis"},
+      {tema:"Preços na revenda", norma:"Res. ANP 1.005/2026", nota:"critérios de elevação abusiva de preços pelo revendedor (DOU 02/07/2026)", url:"https://www.gov.br/anp/pt-br"},
     ]
   },
-  // GASOLINA C — teor de etanol anidro (Cartilha ANP): comum 29–31%, premium 24–26%. ME 20°C mín. 715 kg/m³.
-  gasolina: { comum:{alvo:30,min:29,max:31}, premium:{alvo:25,min:24,max:26}, meMin:715 },
+  // GASOLINA C — teor de etanol anidro, tolerância ±1 p.p. (Res. ANP 807/2020).
+  // Comum/aditivada: E32 temporário (Res. CNPE 09/2026, desde 01/08/2026, 180 dias,
+  // prorrogável 1×) → 31–33%. Se o E32 não for prorrogado, volte para E30 (29–31%).
+  // Premium segue 25% (24–26%). ME 20°C mín. 715 kg/m³.
+  gasolina: { comum:{alvo:32,min:31,max:33}, premium:{alvo:25,min:24,max:26}, meMin:715 },
   // ETANOL HIDRATADO — Res. ANP 907/2022 (confirmado na Cartilha ANP maio/2026).
   etanol: {
     EHC:  {rot:"Comum (EHC)",    meMin:805.2, meMax:811.2, teorMin:92.5, teorMax:94.6},
@@ -673,7 +678,7 @@ $('pdfBtn').addEventListener('click',()=>{
   doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(180,195,188);
   doc.text('Registro de Análise da Qualidade',74,55);
   doc.setFontSize(8);doc.setTextColor(231,184,75);
-  doc.text('Base: Res. ANP 898/2022 · 807/2020 · 968/2024 · 907/2022 · CNPE 09/2025',74,68);
+  doc.text('Base: Res. ANP 898/2022 · 807/2020 · 968/2024 · 907/2022 · CNPE 09/2025 (B15) · 09/2026 (E32)',74,68);
 
   let y=108;
   doc.setTextColor(...ink);doc.setFont('helvetica','bold');doc.setFontSize(11);
